@@ -1,0 +1,21 @@
+{
+  "name": "pesopilot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PesoPilot AI-ready personal finance manager monorepo",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "install:all": "npm install --workspaces",
+    "dev:backend": "npm run dev --workspace backend",
+    "dev:frontend": "npm run start --workspace frontend",
+    "build": "npm run build --workspace backend && npm run typecheck --workspace frontend",
+    "lint": "npm run lint --workspaces"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
+

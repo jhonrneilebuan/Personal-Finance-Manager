@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+.expo/
+.expo-shared/
+.env
+.env.*
+!.env.example
+coverage/
+*.log
+backend/src/uploads/*
+!backend/src/uploads/.gitkeep
+frontend/.expo/
+frontend/.expo-shared/
+frontend/web-build/
+*.tsbuildinfo
+
