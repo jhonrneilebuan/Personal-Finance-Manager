@@ -1,6 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card, Text, useTheme } from 'react-native-paper';
+import { palette } from '@/theme/theme';
 import { formatCurrency } from '@/utils/currency';
 import { StateView } from './StateView';
 
@@ -8,6 +9,8 @@ type BarChartCardProps = {
   title: string;
   data: Array<{ label: string; value: number }>;
 };
+
+const chartColors = [palette.blue, palette.green, palette.orange, palette.indigo, palette.pink, palette.teal];
 
 export function BarChartCard({ title, data }: BarChartCardProps) {
   const theme = useTheme();
@@ -26,17 +29,20 @@ export function BarChartCard({ title, data }: BarChartCardProps) {
           <StateView title="No data yet" message="Add transactions to see this chart." />
         ) : (
           <View style={styles.rows}>
-            {data.map((item) => (
-              <View key={item.label} style={styles.row}>
-                <View style={styles.meta}>
-                  <Text numberOfLines={1} style={styles.label}>{item.label}</Text>
-                  <Text style={styles.value}>{formatCurrency(item.value)}</Text>
+            {data.map((item, index) => {
+              const color = chartColors[index % chartColors.length];
+              return (
+                <View key={item.label} style={styles.row}>
+                  <View style={styles.meta}>
+                    <Text numberOfLines={1} style={styles.label}>{item.label}</Text>
+                    <Text style={styles.value}>{formatCurrency(item.value)}</Text>
+                  </View>
+                  <View style={[styles.track, { backgroundColor: theme.colors.surfaceVariant }]}>
+                    <View style={[styles.bar, { width: `${Math.max((item.value / max) * 100, 5)}%`, backgroundColor: color }]} />
+                  </View>
                 </View>
-                <View style={[styles.track, { backgroundColor: theme.colors.surfaceVariant }]}>
-                  <View style={[styles.bar, { width: `${Math.max((item.value / max) * 100, 5)}%`, backgroundColor: theme.colors.primary }]} />
-                </View>
-              </View>
-            ))}
+              );
+            })}
           </View>
         )}
       </Card.Content>

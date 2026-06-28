@@ -102,16 +102,16 @@ export function ExpensesScreen() {
       />
       <Card mode="elevated" style={styles.formCard}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="plus-circle-outline" title="New Expense" subtitle="Track spending as soon as it happens." color={palette.red} />
+          <SectionHeader icon="robot-outline" title="New Expense" subtitle="Use AI to suggest the best category before saving." color={palette.red} />
           {expenseFields.map((name) => (
             <Fragment key={name}>
               <Controller control={control} name={name} render={({ field: { value, onChange } }) => (
                 <TextInput left={<TextInput.Icon icon={inputIcon[name]} />} mode="outlined" label={name[0].toUpperCase() + name.slice(1)} value={value} onChangeText={onChange} keyboardType={name === 'amount' ? 'numeric' : 'default'} />
               )} />
-              {name === 'category' ? (
+              {name === 'amount' ? (
                 <>
-                  <Button icon="auto-fix" mode="outlined" loading={isSuggesting} disabled={isSuggesting || isSubmitting} onPress={suggestCategory}>
-                    Suggest Category
+                  <Button icon="robot-outline" mode="contained-tonal" loading={isSuggesting} disabled={isSuggesting || isSubmitting} onPress={suggestCategory}>
+                    AI Suggest Category
                   </Button>
                   {aiReason ? <Text variant="bodySmall" style={styles.aiReason}>{aiReason}</Text> : null}
                 </>

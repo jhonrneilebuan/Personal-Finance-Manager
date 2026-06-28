@@ -30,9 +30,10 @@ export default function TabsLayout() {
     <>
       <Tabs
         screenOptions={{
-          headerStyle: { backgroundColor: theme.colors.background },
+          headerStyle: { backgroundColor: theme.colors.surface },
           headerShadowVisible: false,
           headerTitleAlign: 'left',
+          headerTintColor: theme.colors.onSurface,
           tabBarStyle: { display: 'none' },
         }}
       >

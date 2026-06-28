@@ -22,6 +22,7 @@ export function SectionHeader({ icon, title, subtitle, color }: SectionHeaderPro
         <Text variant="titleMedium" style={styles.title}>{title}</Text>
         {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
       </View>
+      <View style={[styles.marker, { backgroundColor: iconColor }]} />
     </View>
   );
 }
@@ -30,7 +31,7 @@ const styles = StyleSheet.create({
   copy: { flex: 1, gap: 2 },
   header: { alignItems: 'center', flexDirection: 'row', gap: 10 },
   iconWrap: { alignItems: 'center', borderRadius: 8, height: 40, justifyContent: 'center', width: 40 },
+  marker: { borderRadius: 8, height: 30, width: 4 },
   subtitle: { opacity: 0.62 },
-  title: { fontWeight: '800' },
+  title: { fontWeight: '900' },
 });
-

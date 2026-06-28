@@ -6,12 +6,15 @@ export const palette = {
   mint: '#30D158',
   green: '#34C759',
   orange: '#FF9F0A',
+  yellow: '#FFD60A',
   red: '#FF453A',
   pink: '#FF2D55',
+  teal: '#32D7C6',
   ink: '#101828',
   slate: '#667085',
   cloud: '#F2F4F7',
   mist: '#EAF1FF',
+  line: '#D9E2F1',
   dark: '#0B0F17',
 };
 
@@ -30,10 +33,10 @@ export const createAppTheme = (dark: boolean): MD3Theme => ({
     tertiary: palette.orange,
     tertiaryContainer: dark ? '#3E2604' : '#FFF1D6',
     error: palette.red,
-    background: dark ? palette.dark : palette.cloud,
+    background: dark ? palette.dark : '#F5F8FC',
     surface: dark ? '#151A24' : '#FFFFFF',
     surfaceVariant: dark ? '#1F2633' : '#EEF3FA',
-    outline: dark ? '#394255' : '#D0D5DD',
+    outline: dark ? '#394255' : palette.line,
     outlineVariant: dark ? '#252E3E' : '#E4E7EC',
     elevation: {
       level0: 'transparent',

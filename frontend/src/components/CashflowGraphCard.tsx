@@ -20,7 +20,7 @@ export function CashflowGraphCard({ income, expenses, savings }: CashflowGraphCa
   const data: GraphItem[] = [
     { label: 'Income', value: income, color: theme.colors.secondary },
     { label: 'Expenses', value: expenses, color: theme.colors.error },
-    { label: 'Savings', value: savings, color: theme.colors.tertiary },
+    { label: savings >= 0 ? 'Savings' : 'Deficit', value: savings, color: savings >= 0 ? theme.colors.tertiary : theme.colors.error },
   ];
   const max = Math.max(...data.map((item) => Math.abs(item.value)), 1);
 
@@ -43,7 +43,7 @@ export function CashflowGraphCard({ income, expenses, savings }: CashflowGraphCa
             return (
               <View key={item.label} style={styles.column}>
                 <Text variant="labelMedium" style={styles.value}>{formatCurrency(item.value)}</Text>
-                <View style={styles.barTrack}>
+                <View style={[styles.barTrack, { backgroundColor: theme.colors.surfaceVariant }]}>
                   <View style={[styles.bar, { height, backgroundColor: item.color }]} />
                 </View>
                 <Text variant="labelMedium" style={styles.label}>{item.label}</Text>
@@ -58,7 +58,7 @@ export function CashflowGraphCard({ income, expenses, savings }: CashflowGraphCa
 
 const styles = StyleSheet.create({
   bar: { borderRadius: 8, width: 34 },
-  barTrack: { alignItems: 'center', height: 150, justifyContent: 'flex-end' },
+  barTrack: { alignItems: 'center', borderRadius: 8, height: 150, justifyContent: 'flex-end', overflow: 'hidden', paddingBottom: 6, width: 46 },
   card: { borderRadius: 8 },
   column: { alignItems: 'center', flex: 1, gap: 8 },
   content: { gap: 18, paddingVertical: 20 },
@@ -70,4 +70,3 @@ const styles = StyleSheet.create({
   title: { fontWeight: '800' },
   value: { fontWeight: '700', textAlign: 'center' },
 });
-

@@ -170,7 +170,7 @@ export const aiCategorizationService = {
       const outputText = extractOutputText(response.data);
       if (!outputText) throw new Error('OpenAI response did not include text output');
       return parseAiSuggestion(outputText);
-    } catch (error) {
+    } catch {
       if (env.nodeEnv !== 'production') {
         console.warn('AI categorization unavailable, using local fallback.');
       }

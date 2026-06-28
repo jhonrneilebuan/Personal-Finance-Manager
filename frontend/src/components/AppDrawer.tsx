@@ -1,4 +1,4 @@
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { router, usePathname } from 'expo-router';
 import { Button, Divider, IconButton, List, Modal, Portal, Text, useTheme } from 'react-native-paper';
 import { useAuthStore } from '@/store/auth.store';
@@ -48,9 +48,11 @@ export function AppDrawer() {
           <IconButton icon="close" iconColor="#FFFFFF" onPress={closeDrawer} />
         </View>
 
-        <View style={styles.content}>
+        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
           <Text variant="labelLarge" style={styles.section}>Create</Text>
           <View style={styles.actions}>
+            <Button icon="cart-check" mode="contained-tonal" onPress={() => goTo('/(tabs)/dashboard')}>AI Planner</Button>
+            <Button icon="robot-outline" mode="contained" onPress={() => goTo('/(tabs)/expenses')}>AI Expense</Button>
             <Button icon="plus-circle-outline" mode="contained" onPress={() => goTo('/(tabs)/expenses')}>Expense</Button>
             <Button icon="cash-plus" mode="contained-tonal" onPress={() => goTo('/(tabs)/income')}>Income</Button>
             <Button icon="target-variant" mode="outlined" onPress={() => goTo('/(tabs)/budgets')}>Budget</Button>
@@ -73,7 +75,7 @@ export function AppDrawer() {
           })}
           <Divider />
           <List.Item title="Logout" style={styles.item} left={(props) => <List.Icon {...props} icon="logout" />} onPress={handleLogout} />
-        </View>
+        </ScrollView>
       </Modal>
     </Portal>
   );
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
   actions: { gap: 10 },
   avatar: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.22)', borderRadius: 8, height: 54, justifyContent: 'center', width: 54 },
   avatarText: { color: '#FFFFFF', fontWeight: '900' },
-  content: { gap: 8, padding: 16 },
+  content: { gap: 8, padding: 16, paddingBottom: 26 },
   drawer: { borderRadius: 0, elevation: 8, height: '100%', justifyContent: 'flex-start', margin: 0, maxWidth: 340, width: '84%' },
   email: { color: 'rgba(255,255,255,0.76)' },
   header: { alignItems: 'center', flexDirection: 'row', gap: 12, padding: 18, paddingTop: 28 },
@@ -92,4 +94,3 @@ const styles = StyleSheet.create({
   section: { opacity: 0.62, paddingHorizontal: 8, paddingTop: 6 },
   userCopy: { flex: 1 },
 });
-

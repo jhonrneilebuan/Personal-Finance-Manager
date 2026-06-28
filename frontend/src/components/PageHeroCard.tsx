@@ -15,6 +15,7 @@ export function PageHeroCard({ icon, title, subtitle, value, caption, color }: P
   return (
     <Card mode="elevated" style={[styles.card, { backgroundColor: color }]}>
       <Card.Content style={styles.content}>
+        <View style={styles.accent} />
         <View style={styles.top}>
           <View style={styles.iconWrap}>
             <MaterialCommunityIcons name={icon} color="#FFFFFF" size={28} />
@@ -32,6 +33,7 @@ export function PageHeroCard({ icon, title, subtitle, value, caption, color }: P
 }
 
 const styles = StyleSheet.create({
+  accent: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 8, height: 76, position: 'absolute', right: -22, top: -18, width: 76 },
   caption: { backgroundColor: 'rgba(255,255,255,0.16)', borderRadius: 8, color: '#FFFFFF', fontWeight: '800', overflow: 'hidden', paddingHorizontal: 12, paddingVertical: 7 },
   card: { borderRadius: 8, overflow: 'hidden' },
   content: { gap: 18, padding: 22 },
@@ -42,4 +44,3 @@ const styles = StyleSheet.create({
   top: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
   value: { color: '#FFFFFF', fontWeight: '900', letterSpacing: 0 },
 });
-

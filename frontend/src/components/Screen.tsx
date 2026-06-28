@@ -30,6 +30,6 @@ export function Screen({ children, scroll = true, refreshing = false, onRefresh 
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { flexGrow: 1, paddingBottom: 42 },
-  content: { alignSelf: 'center', gap: 18, maxWidth: 780, padding: 18, width: '100%' },
+  scroll: { flexGrow: 1, paddingBottom: 46 },
+  content: { alignSelf: 'center', gap: 18, maxWidth: 820, padding: 16, paddingTop: 12, width: '100%' },
 });

@@ -2,14 +2,17 @@ import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Button, Card, ProgressBar, Snackbar, Text, TextInput, useTheme } from 'react-native-paper';
+import { AiInsightCard } from '@/components/AiInsightCard';
 import { PageHeroCard } from '@/components/PageHeroCard';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { StateView } from '@/components/StateView';
 import { useAsyncData } from '@/hooks/useAsyncData';
+import { aiApi } from '@/services/ai.service';
 import { financeApi } from '@/services/finance.service';
 import { useFinanceStore } from '@/store/finance.store';
 import { palette } from '@/theme/theme';
+import type { AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
 
 const currentMonthIso = () => {
@@ -32,6 +35,8 @@ export function BudgetsScreen() {
   const revision = useFinanceStore((state) => state.revision);
   const markChanged = useFinanceStore((state) => state.markChanged);
   const [notice, setNotice] = useState('');
+  const [aiAdvice, setAiAdvice] = useState<AiFinanceInsight | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const { data, isLoading, error, refresh } = useAsyncData(useCallback(() => financeApi.budgets(), [revision]));
   const dashboard = useAsyncData(useCallback(() => financeApi.dashboard(), [revision]));
   const { control, handleSubmit, reset, setValue, formState: { isSubmitting } } = useForm({
@@ -39,6 +44,17 @@ export function BudgetsScreen() {
   });
   const selectedMonth = useWatch({ control, name: 'month' });
   const totalBudget = useMemo(() => data?.reduce((sum, item) => sum + Number(item.limitAmount), 0) ?? 0, [data]);
+
+  const generateBudgetAdvice = useCallback(async () => {
+    try {
+      setIsAiLoading(true);
+      setAiAdvice(await aiApi.budgetAdvice());
+    } catch {
+      setNotice('Unable to generate budget advice');
+    } finally {
+      setIsAiLoading(false);
+    }
+  }, []);
 
   const create = handleSubmit(async (values) => {
     const limitAmount = Number(values.limitAmount);
@@ -67,6 +83,16 @@ export function BudgetsScreen() {
         value={formatCurrency(totalBudget)}
         caption={formatMonth(selectedMonth)}
         color={palette.indigo}
+      />
+      <AiInsightCard
+        title="AI Budget Coach"
+        subtitle="Get advice on limits, overspending, and what to adjust next."
+        buttonLabel="Analyze Budgets"
+        icon="target-variant"
+        color={palette.indigo}
+        insight={aiAdvice}
+        loading={isAiLoading}
+        onGenerate={generateBudgetAdvice}
       />
       <Card mode="elevated" style={styles.formCard}>
         <Card.Content style={styles.formContent}>

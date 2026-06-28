@@ -1,7 +1,9 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Card, Text, useTheme } from 'react-native-paper';
+import { Card, Snackbar, Text, useTheme } from 'react-native-paper';
+import { AiInsightCard } from '@/components/AiInsightCard';
+import { AiSpendingPlannerCard } from '@/components/AiSpendingPlannerCard';
 import { BarChartCard } from '@/components/BarChartCard';
 import { CashflowGraphCard } from '@/components/CashflowGraphCard';
 import { Screen } from '@/components/Screen';
@@ -9,8 +11,10 @@ import { StateView } from '@/components/StateView';
 import { StatCard } from '@/components/StatCard';
 import { TransactionRow } from '@/components/TransactionRow';
 import { useAsyncData } from '@/hooks/useAsyncData';
+import { aiApi } from '@/services/ai.service';
 import { financeApi } from '@/services/finance.service';
 import { useFinanceStore } from '@/store/finance.store';
+import type { AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
 
 export function DashboardScreen() {
@@ -20,6 +24,20 @@ export function DashboardScreen() {
   const isWide = width >= 560;
   const load = useCallback(() => financeApi.dashboard(), [revision]);
   const { data, isLoading, error, refresh } = useAsyncData(load);
+  const [aiInsight, setAiInsight] = useState<AiFinanceInsight | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [notice, setNotice] = useState('');
+
+  const generateDashboardInsight = useCallback(async () => {
+    try {
+      setIsAiLoading(true);
+      setAiInsight(await aiApi.dashboardInsight());
+    } catch {
+      setNotice('Unable to generate AI insight');
+    } finally {
+      setIsAiLoading(false);
+    }
+  }, []);
 
   if (isLoading) return <StateView loading message="Loading dashboard" />;
   if (error || !data) return <StateView title="Dashboard unavailable" message={error ?? 'No dashboard data'} actionLabel="Retry" onAction={refresh} />;
@@ -47,6 +65,16 @@ export function DashboardScreen() {
           <Text style={styles.heroMeta}>Income {formatCurrency(data.totalIncome)} / Expenses {formatCurrency(data.totalExpenses)}</Text>
         </Card.Content>
       </Card>
+      <AiInsightCard
+        title="AI Dashboard Coach"
+        subtitle="Generate a quick read on balance, spending, and next actions."
+        buttonLabel="Generate Insight"
+        color={theme.colors.primary}
+        insight={aiInsight}
+        loading={isAiLoading}
+        onGenerate={generateDashboardInsight}
+      />
+      <AiSpendingPlannerCard defaultAvailableMoney={Math.max(0, data.savings || data.currentBalance)} />
       <View style={styles.grid}>
         <StatCard icon="cash-plus" style={isWide ? styles.statWide : styles.statHalf} label="Monthly Income" value={data.totalIncome} tone="income" />
         <StatCard icon="credit-card-minus-outline" style={isWide ? styles.statWide : styles.statHalf} label="Monthly Expenses" value={data.totalExpenses} tone="expense" />
@@ -77,6 +105,7 @@ export function DashboardScreen() {
           )}
         </Card.Content>
       </Card>
+      <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={2400}>{notice}</Snackbar>
     </Screen>
   );
 }

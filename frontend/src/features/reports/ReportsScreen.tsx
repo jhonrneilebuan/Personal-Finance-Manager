@@ -1,6 +1,7 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Card } from 'react-native-paper';
+import { Card, Snackbar } from 'react-native-paper';
+import { AiInsightCard } from '@/components/AiInsightCard';
 import { BarChartCard } from '@/components/BarChartCard';
 import { CashflowGraphCard } from '@/components/CashflowGraphCard';
 import { PageHeroCard } from '@/components/PageHeroCard';
@@ -8,15 +9,31 @@ import { Screen } from '@/components/Screen';
 import { StateView } from '@/components/StateView';
 import { StatCard } from '@/components/StatCard';
 import { useAsyncData } from '@/hooks/useAsyncData';
+import { aiApi } from '@/services/ai.service';
 import { financeApi } from '@/services/finance.service';
 import { useFinanceStore } from '@/store/finance.store';
 import { palette } from '@/theme/theme';
+import type { AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
 
 export function ReportsScreen() {
   const revision = useFinanceStore((state) => state.revision);
   const monthly = useAsyncData(useCallback(() => financeApi.monthlyReport(), [revision]));
   const category = useAsyncData(useCallback(() => financeApi.categoryReport(), [revision]));
+  const [summary, setSummary] = useState<AiFinanceInsight | null>(null);
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [notice, setNotice] = useState('');
+
+  const generateMonthlySummary = useCallback(async () => {
+    try {
+      setIsAiLoading(true);
+      setSummary(await aiApi.monthlySummary());
+    } catch {
+      setNotice('Unable to generate monthly summary');
+    } finally {
+      setIsAiLoading(false);
+    }
+  }, []);
 
   if (monthly.isLoading || category.isLoading) return <StateView loading message="Building reports" />;
 
@@ -29,6 +46,16 @@ export function ReportsScreen() {
         value={formatCurrency(monthly.data?.savings ?? 0)}
         caption="Monthly savings"
         color={palette.blue}
+      />
+      <AiInsightCard
+        title="AI Monthly Summary"
+        subtitle="Summarize this month and get practical next steps."
+        buttonLabel="Generate Summary"
+        icon="chart-timeline-variant"
+        color={palette.blue}
+        insight={summary}
+        loading={isAiLoading}
+        onGenerate={generateMonthlySummary}
       />
       {monthly.data ? (
         <>
@@ -45,6 +72,7 @@ export function ReportsScreen() {
       ) : (
         <Card mode="elevated" style={styles.emptyCard}><Card.Content><StateView title="No category data" message="Category charts appear after expenses are recorded." /></Card.Content></Card>
       )}
+      <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={2400}>{notice}</Snackbar>
     </Screen>
   );
 }

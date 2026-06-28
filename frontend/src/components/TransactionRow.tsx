@@ -16,7 +16,7 @@ export function TransactionRow({ title, subtitle, amount, type }: TransactionRow
 
   return (
     <List.Item
-      style={[styles.row, { backgroundColor: theme.colors.surface }]}
+      style={[styles.row, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outlineVariant }]}
       title={title}
       description={subtitle}
       titleNumberOfLines={1}
@@ -38,9 +38,9 @@ export function TransactionRow({ title, subtitle, amount, type }: TransactionRow
 }
 
 const styles = StyleSheet.create({
-  amount: { justifyContent: 'center' },
+  amount: { alignItems: 'flex-end', justifyContent: 'center', minWidth: 92 },
   description: { opacity: 0.58 },
   iconWrap: { alignItems: 'center', borderRadius: 8, height: 42, justifyContent: 'center', marginRight: 12, width: 42 },
-  row: { borderRadius: 8, marginVertical: 4, paddingHorizontal: 8, paddingVertical: 6 },
-  title: { fontWeight: '700' },
+  row: { borderRadius: 8, borderWidth: 1, marginVertical: 4, paddingHorizontal: 8, paddingVertical: 7 },
+  title: { fontWeight: '800' },
 });
