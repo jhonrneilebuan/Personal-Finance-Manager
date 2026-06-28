@@ -120,7 +120,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
               <Animated.View style={[styles.logoFrameLarge, { transform: [{ translateY: floatAnim }] }]}>
                 <Image source={pesoPilotLogo} resizeMode="contain" style={styles.logoImageLarge} />
               </Animated.View>
-              <Text style={styles.brandKicker}>PESOPILOT</Text>
+              <Text style={styles.brandKicker}>Peso Pilot</Text>
               <Text style={styles.brandText}>Track money, plan budgets, and let AI help decide what to buy first.</Text>
               <View style={styles.chips}>
                 {[
@@ -142,14 +142,12 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             <Card.Content style={styles.form}>
               {/* Compact logo row — only on mobile */}
               {!isWide && (
-                <View style={styles.mobileLogoRow}>
+                <View style={styles.mobileLogoBlock}>
                   <Animated.View style={[styles.logoFrameSmall, { transform: [{ translateY: floatAnim }] }]}>
                     <Image source={pesoPilotLogo} resizeMode="contain" style={styles.logoImageSmall} />
                   </Animated.View>
-                  <View style={styles.mobileBrandCopy}>
-                    <Text style={styles.mobileBrandName}>PesoPilot</Text>
-                    <Text style={styles.mobileBrandSub}>Personal Finance AI</Text>
-                  </View>
+                  <Text style={styles.mobileBrandName}>PesoPilot</Text>
+                  <Text style={styles.mobileBrandSub}>Personal Finance AI</Text>
                 </View>
               )}
 
@@ -357,15 +355,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.22,
     shadowRadius: 14,
     elevation: 6,
-    width: 130,
-    height: 130,
+    width: 158,
+    height: 158,
   },
   logoImageLarge: { height: '100%', width: '100%' },
   brandKicker: {
     color: '#FFFFFF',
     fontWeight: '900',
-    fontSize: 24,
-    letterSpacing: 2,
+    fontSize: 28,
+    letterSpacing: 0.4,
   },
   brandText: {
     color: 'rgba(255,255,255,0.55)',
@@ -388,31 +386,22 @@ const styles = StyleSheet.create({
   },
   chipText: { color: '#0A84FF', fontSize: 12, fontWeight: '700' },
 
-  // Mobile compact logo row (inside card)
-  mobileLogoRow: {
+  // Mobile logo block — centered column, no background
+  mobileLogoBlock: {
     alignItems: 'center',
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 4,
+    gap: 4,
+    marginBottom: 8,
   },
   logoFrameSmall: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
     justifyContent: 'center',
-    padding: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.18,
-    shadowRadius: 8,
-    elevation: 4,
-    width: 52,
-    height: 52,
+    width: 90,
+    height: 90,
+    marginBottom: 4,
   },
   logoImageSmall: { height: '100%', width: '100%' },
-  mobileBrandCopy: { gap: 2 },
-  mobileBrandName: { color: '#FFFFFF', fontSize: 18, fontWeight: '900', letterSpacing: 0.2 },
-  mobileBrandSub: { color: 'rgba(255,255,255,0.45)', fontSize: 12, fontWeight: '500' },
+  mobileBrandName: { color: '#FFFFFF', fontSize: 22, fontWeight: '900', letterSpacing: 0.2, textAlign: 'center' },
+  mobileBrandSub: { color: 'rgba(255,255,255,0.45)', fontSize: 12, fontWeight: '500', textAlign: 'center' },
 
   // Form card
   card: {

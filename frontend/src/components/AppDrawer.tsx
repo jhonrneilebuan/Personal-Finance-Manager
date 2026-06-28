@@ -2,7 +2,7 @@ import { ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { router, usePathname } from 'expo-router';
 import { Defs, LinearGradient, Rect, Stop, Svg } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Divider, Modal, Portal, Text, useTheme } from 'react-native-paper';
+import { Modal, Portal, Text, useTheme } from 'react-native-paper';
 import { useAuthStore } from '@/store/auth.store';
 import { useUiStore } from '@/store/ui.store';
 

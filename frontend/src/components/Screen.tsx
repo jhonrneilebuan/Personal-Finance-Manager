@@ -1,5 +1,5 @@
 import type { PropsWithChildren } from 'react';
-import { RefreshControl, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Platform, RefreshControl, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTheme } from 'react-native-paper';
 
 type ScreenProps = PropsWithChildren<{
@@ -43,9 +43,11 @@ export function Screen({
   );
 }
 
+const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 110 : 90;
+
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  scroll: { flexGrow: 1, paddingBottom: 46 },
+  scroll: { flexGrow: 1, paddingBottom: TAB_BAR_HEIGHT },
   content: { alignSelf: 'center', gap: 18, maxWidth: 820, padding: 16, paddingTop: 12, width: '100%' },
 });
 
