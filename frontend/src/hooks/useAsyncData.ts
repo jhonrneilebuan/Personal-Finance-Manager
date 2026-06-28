@@ -12,6 +12,7 @@ export function useAsyncData<T>(loader: () => Promise<T>) {
       setData(await loader());
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to load data');
+      return null;
     } finally {
       setIsLoading(false);
     }
@@ -23,4 +24,3 @@ export function useAsyncData<T>(loader: () => Promise<T>) {
 
   return { data, isLoading, error, refresh };
 }
-

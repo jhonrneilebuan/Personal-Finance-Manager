@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card, Text, useTheme } from 'react-native-paper';
 import { formatCurrency } from '@/utils/currency';
 import { StateView } from './StateView';
@@ -13,9 +14,14 @@ export function BarChartCard({ title, data }: BarChartCardProps) {
   const max = Math.max(...data.map((item) => item.value), 1);
 
   return (
-    <Card mode="contained" style={styles.card}>
-      <Card.Content>
-        <Text variant="titleMedium" style={styles.title}>{title}</Text>
+    <Card mode="elevated" style={styles.card}>
+      <Card.Content style={styles.content}>
+        <View style={styles.header}>
+          <View style={[styles.headerIcon, { backgroundColor: theme.colors.primaryContainer }]}>
+            <MaterialCommunityIcons name="chart-bar" color={theme.colors.primary} size={20} />
+          </View>
+          <Text variant="titleMedium" style={styles.title}>{title}</Text>
+        </View>
         {data.length === 0 ? (
           <StateView title="No data yet" message="Add transactions to see this chart." />
         ) : (
@@ -26,8 +32,8 @@ export function BarChartCard({ title, data }: BarChartCardProps) {
                   <Text numberOfLines={1} style={styles.label}>{item.label}</Text>
                   <Text style={styles.value}>{formatCurrency(item.value)}</Text>
                 </View>
-                <View style={styles.track}>
-                  <View style={[styles.bar, { width: `${Math.max((item.value / max) * 100, 4)}%`, backgroundColor: theme.colors.primary }]} />
+                <View style={[styles.track, { backgroundColor: theme.colors.surfaceVariant }]}>
+                  <View style={[styles.bar, { width: `${Math.max((item.value / max) * 100, 5)}%`, backgroundColor: theme.colors.primary }]} />
                 </View>
               </View>
             ))}
@@ -41,11 +47,14 @@ export function BarChartCard({ title, data }: BarChartCardProps) {
 const styles = StyleSheet.create({
   bar: { borderRadius: 8, height: 12 },
   card: { borderRadius: 8 },
-  label: { flex: 1, fontWeight: '600' },
+  content: { gap: 18, paddingVertical: 20 },
+  header: { alignItems: 'center', flexDirection: 'row', gap: 10 },
+  headerIcon: { alignItems: 'center', borderRadius: 8, height: 38, justifyContent: 'center', width: 38 },
+  label: { flex: 1, fontWeight: '700' },
   meta: { alignItems: 'center', flexDirection: 'row', gap: 10 },
   row: { gap: 8 },
   rows: { gap: 16 },
-  title: { marginBottom: 16 },
-  track: { backgroundColor: 'rgba(120,120,120,0.18)', borderRadius: 8, height: 12, overflow: 'hidden' },
-  value: { opacity: 0.7, textAlign: 'right' },
+  title: { fontWeight: '800' },
+  track: { borderRadius: 8, height: 12, overflow: 'hidden' },
+  value: { opacity: 0.64, textAlign: 'right' },
 });

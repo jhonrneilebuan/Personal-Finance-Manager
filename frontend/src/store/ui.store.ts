@@ -1,0 +1,14 @@
+import { create } from 'zustand';
+
+type UiState = {
+  isDrawerOpen: boolean;
+  openDrawer: () => void;
+  closeDrawer: () => void;
+};
+
+export const useUiStore = create<UiState>((set) => ({
+  isDrawerOpen: false,
+  openDrawer: () => set({ isDrawerOpen: true }),
+  closeDrawer: () => set({ isDrawerOpen: false }),
+}));
+

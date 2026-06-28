@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Constants from 'expo-constants';
+import { router } from 'expo-router';
 import { useAuthStore } from '@/store/auth.store';
 
 const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:4000/api';
@@ -17,5 +18,15 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export const unwrap = <T>(promise: Promise<{ data: { data: T } }>) => promise.then((response) => response.data.data);
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      await useAuthStore.getState().clearSession();
+      router.replace('/(auth)/login');
+    }
+    return Promise.reject(error);
+  },
+);
 
+export const unwrap = <T>(promise: Promise<{ data: { data: T } }>) => promise.then((response) => response.data.data);

@@ -20,5 +20,6 @@ export const env = {
   jwtRefreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN ?? '7d',
   corsOrigin: process.env.CORS_ORIGIN ?? '*',
   uploadDir: process.env.UPLOAD_DIR ?? 'src/uploads',
+  openAiApiKey: process.env.OPENAI_API_KEY,
+  openAiModel: process.env.OPENAI_MODEL ?? 'gpt-4.1-mini',
 };
-

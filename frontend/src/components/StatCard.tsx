@@ -1,4 +1,5 @@
 import { StyleSheet, View, type ViewStyle } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card, Text, useTheme } from 'react-native-paper';
 import { formatCurrency } from '@/utils/currency';
 
@@ -6,21 +7,33 @@ type StatCardProps = {
   label: string;
   value: number;
   tone?: 'primary' | 'income' | 'expense' | 'savings';
+  icon?: keyof typeof MaterialCommunityIcons.glyphMap;
   style?: ViewStyle;
 };
 
-export function StatCard({ label, value, tone = 'primary', style }: StatCardProps) {
+const toneIcon = {
+  primary: 'wallet-outline',
+  income: 'arrow-down-circle-outline',
+  expense: 'arrow-up-circle-outline',
+  savings: 'piggy-bank-outline',
+} satisfies Record<NonNullable<StatCardProps['tone']>, keyof typeof MaterialCommunityIcons.glyphMap>;
+
+export function StatCard({ label, value, tone = 'primary', icon, style }: StatCardProps) {
   const theme = useTheme();
-  const color = tone === 'expense' ? theme.colors.error : tone === 'income' ? theme.colors.secondary : theme.colors.primary;
+  const color = tone === 'expense' ? theme.colors.error : tone === 'income' ? theme.colors.secondary : tone === 'savings' ? theme.colors.tertiary : theme.colors.primary;
 
   return (
-    <Card mode="contained" style={[styles.card, style]}>
-      <Card.Content>
-        <View style={[styles.marker, { backgroundColor: color }]} />
-        <Text variant="labelMedium" style={styles.label}>
-          {label}
-        </Text>
-        <Text variant="titleLarge">{formatCurrency(value)}</Text>
+    <Card mode="elevated" style={[styles.card, style]}>
+      <Card.Content style={styles.content}>
+        <View style={[styles.iconWrap, { backgroundColor: `${color}18` }]}>
+          <MaterialCommunityIcons name={icon ?? toneIcon[tone]} color={color} size={22} />
+        </View>
+        <View style={styles.copy}>
+          <Text variant="labelLarge" style={styles.label}>
+            {label}
+          </Text>
+          <Text variant="titleLarge" style={styles.value}>{formatCurrency(value)}</Text>
+        </View>
       </Card.Content>
     </Card>
   );
@@ -28,6 +41,9 @@ export function StatCard({ label, value, tone = 'primary', style }: StatCardProp
 
 const styles = StyleSheet.create({
   card: { borderRadius: 8, flexGrow: 1, minWidth: 148 },
-  label: { marginBottom: 6, opacity: 0.75 },
-  marker: { borderRadius: 8, height: 4, marginBottom: 12, width: 44 },
+  content: { gap: 14, paddingVertical: 18 },
+  copy: { gap: 4 },
+  iconWrap: { alignItems: 'center', borderRadius: 8, height: 44, justifyContent: 'center', width: 44 },
+  label: { opacity: 0.68 },
+  value: { fontWeight: '800' },
 });

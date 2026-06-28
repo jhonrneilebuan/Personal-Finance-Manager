@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { Controller, type Resolver, useForm } from 'react-hook-form';
 import { StyleSheet, View } from 'react-native';
-import { Button, Card, Text, TextInput } from 'react-native-paper';
+import { Button, Card, Text, TextInput, useTheme } from 'react-native-paper';
 import { z } from 'zod';
 import { Screen } from '@/components/Screen';
 import { authApi } from '@/services/auth.service';
@@ -28,6 +29,7 @@ type AuthForm = {
 };
 
 export function AuthScreen({ mode }: AuthScreenProps) {
+  const theme = useTheme();
   const setSession = useAuthStore((state) => state.setSession);
   const schema = mode === 'login' ? loginSchema : registerSchema;
   const {
@@ -50,18 +52,27 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   return (
     <Screen>
       <View style={styles.hero}>
-        <Text variant="displaySmall">PesoPilot</Text>
-        <Text variant="bodyLarge" style={styles.subtitle}>Manage income, expenses, budgets, and reports in one clean workspace.</Text>
+        <View style={[styles.logo, { backgroundColor: theme.colors.primaryContainer }]}>
+          <MaterialCommunityIcons name="wallet-bifold-outline" size={34} color={theme.colors.primary} />
+        </View>
+        <View style={styles.heroCopy}>
+          <Text variant="displaySmall" style={styles.brand}>PesoPilot</Text>
+          <Text variant="bodyLarge" style={styles.subtitle}>Track cashflow, budgets, and savings with a clean mobile-first workspace.</Text>
+        </View>
       </View>
-      <Card mode="contained" style={styles.card}>
+
+      <Card mode="elevated" style={styles.card}>
         <Card.Content style={styles.form}>
-          <Text variant="titleLarge">{mode === 'login' ? 'Welcome back' : 'Create account'}</Text>
+          <View style={styles.formHeader}>
+            <Text variant="headlineSmall" style={styles.title}>{mode === 'login' ? 'Welcome back' : 'Create account'}</Text>
+            <Text style={styles.caption}>{mode === 'login' ? 'Sign in to continue your budget plan.' : 'Start with a secure finance profile.'}</Text>
+          </View>
           {mode === 'register' ? (
             <Controller
               control={control}
               name="fullName"
               render={({ field: { onChange, value } }) => (
-                <TextInput label="Full name" value={value} onChangeText={onChange} error={!!errors.fullName} />
+                <TextInput left={<TextInput.Icon icon="account-outline" />} mode="outlined" label="Full name" value={value} onChangeText={onChange} error={!!errors.fullName} />
               )}
             />
           ) : null}
@@ -69,23 +80,23 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             control={control}
             name="email"
             render={({ field: { onChange, value } }) => (
-              <TextInput autoCapitalize="none" keyboardType="email-address" label="Email" value={value} onChangeText={onChange} error={!!errors.email} />
+              <TextInput left={<TextInput.Icon icon="email-outline" />} autoCapitalize="none" keyboardType="email-address" mode="outlined" label="Email" value={value} onChangeText={onChange} error={!!errors.email} />
             )}
           />
           <Controller
             control={control}
             name="password"
             render={({ field: { onChange, value } }) => (
-              <TextInput secureTextEntry label="Password" value={value} onChangeText={onChange} error={!!errors.password} />
+              <TextInput left={<TextInput.Icon icon="lock-outline" />} secureTextEntry mode="outlined" label="Password" value={value} onChangeText={onChange} error={!!errors.password} />
             )}
           />
-          <Button mode="contained" loading={isSubmitting} disabled={isSubmitting} onPress={onSubmit}>
+          <Button icon={mode === 'login' ? 'login' : 'account-plus-outline'} mode="contained" contentStyle={styles.buttonContent} loading={isSubmitting} disabled={isSubmitting} onPress={onSubmit}>
             {mode === 'login' ? 'Login' : 'Register'}
           </Button>
           {mode === 'login' ? (
             <View style={styles.links}>
               <Link href="/(auth)/forgot-password">Forgot password?</Link>
-              <Link href="/(auth)/register">Create an account</Link>
+              <Link href="/(auth)/register">Create account</Link>
             </View>
           ) : (
             <Link href="/(auth)/login">Already have an account?</Link>
@@ -97,9 +108,16 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 }
 
 const styles = StyleSheet.create({
+  brand: { fontWeight: '900', letterSpacing: 0 },
+  buttonContent: { height: 50 },
+  caption: { opacity: 0.62 },
   card: { borderRadius: 8 },
-  form: { gap: 14 },
-  hero: { gap: 8, paddingVertical: 28 },
+  form: { gap: 14, padding: 20 },
+  formHeader: { gap: 4, marginBottom: 4 },
+  hero: { alignItems: 'center', gap: 16, paddingTop: 28, paddingBottom: 8 },
+  heroCopy: { alignItems: 'center', gap: 8 },
   links: { flexDirection: 'row', justifyContent: 'space-between' },
-  subtitle: { opacity: 0.7 },
+  logo: { alignItems: 'center', borderRadius: 8, height: 72, justifyContent: 'center', width: 72 },
+  subtitle: { maxWidth: 460, opacity: 0.68, textAlign: 'center' },
+  title: { fontWeight: '800' },
 });

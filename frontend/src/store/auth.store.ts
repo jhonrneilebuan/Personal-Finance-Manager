@@ -9,12 +9,15 @@ type AuthState = {
   refreshToken: string | null;
   isHydrated: boolean;
   setSession: (session: { user: User; accessToken: string; refreshToken: string }) => Promise<void>;
+  setUser: (user: User) => Promise<void>;
+  clearSession: () => Promise<void>;
   hydrate: () => Promise<void>;
   logout: () => Promise<void>;
 };
 
 const ACCESS_TOKEN_KEY = 'pesopilot.accessToken';
 const REFRESH_TOKEN_KEY = 'pesopilot.refreshToken';
+const USER_KEY = 'pesopilot.user';
 
 const webStorage = () => {
   if (Platform.OS !== 'web' || typeof window === 'undefined') return null;
@@ -53,17 +56,27 @@ export const useAuthStore = create<AuthState>((set) => ({
   async setSession(session) {
     await tokenStorage.setItem(ACCESS_TOKEN_KEY, session.accessToken);
     await tokenStorage.setItem(REFRESH_TOKEN_KEY, session.refreshToken);
+    await tokenStorage.setItem(USER_KEY, JSON.stringify(session.user));
     set(session);
   },
+  async setUser(user) {
+    await tokenStorage.setItem(USER_KEY, JSON.stringify(user));
+    set({ user });
+  },
+  async clearSession() {
+    await Promise.all([tokenStorage.deleteItem(ACCESS_TOKEN_KEY), tokenStorage.deleteItem(REFRESH_TOKEN_KEY), tokenStorage.deleteItem(USER_KEY)]);
+    set({ user: null, accessToken: null, refreshToken: null });
+  },
   async hydrate() {
-    const [accessToken, refreshToken] = await Promise.all([
+    const [accessToken, refreshToken, userJson] = await Promise.all([
       tokenStorage.getItem(ACCESS_TOKEN_KEY),
       tokenStorage.getItem(REFRESH_TOKEN_KEY),
+      tokenStorage.getItem(USER_KEY),
     ]);
-    set({ accessToken, refreshToken, isHydrated: true });
+    const user = userJson ? JSON.parse(userJson) as User : null;
+    set({ accessToken, refreshToken, user, isHydrated: true });
   },
   async logout() {
-    await Promise.all([tokenStorage.deleteItem(ACCESS_TOKEN_KEY), tokenStorage.deleteItem(REFRESH_TOKEN_KEY)]);
-    set({ user: null, accessToken: null, refreshToken: null });
+    await useAuthStore.getState().clearSession();
   },
 }));
