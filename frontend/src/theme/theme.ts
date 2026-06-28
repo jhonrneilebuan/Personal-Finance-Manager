@@ -20,7 +20,7 @@ export const palette = {
 
 export const createAppTheme = (dark: boolean): MD3Theme => ({
   ...(dark ? MD3DarkTheme : MD3LightTheme),
-  roundness: 8,
+  roundness: 16,
   colors: {
     ...(dark ? MD3DarkTheme.colors : MD3LightTheme.colors),
     primary: palette.blue,

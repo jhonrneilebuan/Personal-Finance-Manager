@@ -74,6 +74,15 @@ export function BudgetsScreen() {
     }
   });
 
+  const cardStyle = [
+    styles.card,
+    {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.outlineVariant,
+      borderWidth: theme.dark ? 1 : 0,
+    }
+  ];
+
   return (
     <Screen refreshing={isLoading || dashboard.isLoading} onRefresh={() => { refresh(); dashboard.refresh(); }}>
       <PageHeroCard
@@ -94,44 +103,84 @@ export function BudgetsScreen() {
         loading={isAiLoading}
         onGenerate={generateBudgetAdvice}
       />
-      <Card mode="elevated" style={styles.formCard}>
+      <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
           <SectionHeader icon="target-variant" title="New Budget" subtitle="Choose month, category, and spending limit." color={palette.indigo} />
-          <View style={styles.monthPicker}>
-            <Button icon="chevron-left" mode="text" onPress={() => setValue('month', shiftMonth(selectedMonth, -1))}>Prev</Button>
+          
+          <View style={[styles.monthPicker, { backgroundColor: theme.colors.surfaceVariant }]}>
+            <Button 
+              icon="chevron-left" 
+              mode="text" 
+              textColor={theme.colors.primary}
+              onPress={() => setValue('month', shiftMonth(selectedMonth, -1))}
+            >
+              Prev
+            </Button>
             <View style={styles.monthLabel}>
-              <Text variant="labelLarge" style={styles.subtitle}>Budget Month</Text>
-              <Text variant="titleMedium" style={styles.monthText}>{formatMonth(selectedMonth)}</Text>
+              <Text style={[styles.monthLabelText, { color: theme.colors.onSurfaceVariant }]}>Budget Month</Text>
+              <Text style={[styles.monthText, { color: theme.colors.onSurface }]}>{formatMonth(selectedMonth)}</Text>
             </View>
-            <Button contentStyle={styles.nextMonthButton} icon="chevron-right" mode="text" onPress={() => setValue('month', shiftMonth(selectedMonth, 1))}>Next</Button>
+            <Button 
+              contentStyle={styles.nextMonthButton} 
+              icon="chevron-right" 
+              mode="text" 
+              textColor={theme.colors.primary}
+              onPress={() => setValue('month', shiftMonth(selectedMonth, 1))}
+            >
+              Next
+            </Button>
           </View>
+
           {(['category', 'limitAmount'] as const).map((name) => (
             <Controller key={name} control={control} name={name} render={({ field: { value, onChange } }) => (
-              <TextInput left={<TextInput.Icon icon={inputIcon[name]} />} mode="outlined" label={name === 'limitAmount' ? 'Limit Amount' : name[0].toUpperCase() + name.slice(1)} value={value} onChangeText={onChange} keyboardType={name === 'limitAmount' ? 'numeric' : 'default'} />
+              <TextInput 
+                left={<TextInput.Icon icon={inputIcon[name]} color="rgba(120,120,120,0.5)" />} 
+                mode="outlined" 
+                label={name === 'limitAmount' ? 'Limit Amount' : name[0].toUpperCase() + name.slice(1)} 
+                value={value} 
+                onChangeText={onChange} 
+                keyboardType={name === 'limitAmount' ? 'numeric' : 'default'}
+                theme={{ roundness: 12 }}
+              />
             )} />
           ))}
-          <Button icon="target-variant" contentStyle={styles.button} mode="contained" loading={isSubmitting} disabled={isSubmitting} onPress={create}>Save Budget</Button>
+          <Button 
+            icon="target-variant" 
+            style={styles.saveButton}
+            contentStyle={styles.buttonContent} 
+            mode="contained" 
+            loading={isSubmitting} 
+            disabled={isSubmitting} 
+            onPress={create}
+          >
+            Save Budget
+          </Button>
         </Card.Content>
       </Card>
-      <Card mode="elevated" style={styles.listCard}>
+      
+      <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
           <SectionHeader icon="chart-donut" title="Budget Progress" subtitle="Current month usage by category" color={palette.indigo} />
-          {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load budgets" message={error} /> : data?.length ? data.map((item) => {
-            const spentAmount = dashboard.data?.budgetUsage.find((budget) => budget.category === item.category)?.spentAmount ?? 0;
-            const progress = Math.min(spentAmount / Number(item.limitAmount), 1);
-            return (
-              <View key={item.id} style={[styles.budgetItem, { backgroundColor: theme.colors.surface }]}>
-                <View style={styles.budgetMeta}>
-                  <View>
-                    <Text variant="titleSmall" style={styles.budgetTitle}>{item.category}</Text>
-                    <Text style={styles.subtitle}>Spent {formatCurrency(spentAmount)}</Text>
+          {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load budgets" message={error} /> : data?.length ? (
+            <View style={styles.budgetList}>
+              {data.map((item) => {
+                const spentAmount = dashboard.data?.budgetUsage.find((budget) => budget.category === item.category)?.spentAmount ?? 0;
+                const progress = Math.min(spentAmount / Number(item.limitAmount), 1);
+                return (
+                  <View key={item.id} style={[styles.budgetItem, { backgroundColor: theme.colors.surfaceVariant }]}>
+                    <View style={styles.budgetMeta}>
+                      <View style={styles.budgetTitleGroup}>
+                        <Text style={[styles.budgetTitle, { color: theme.colors.onSurface }]}>{item.category}</Text>
+                        <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>Spent {formatCurrency(spentAmount)}</Text>
+                      </View>
+                      <Text style={[styles.budgetLimitText, { color: theme.colors.onSurface }]}>{formatCurrency(Number(item.limitAmount))}</Text>
+                    </View>
+                    <ProgressBar progress={progress} color={progress >= 1 ? theme.colors.error : '#5E5CE6'} style={styles.progress} />
                   </View>
-                  <Text variant="titleSmall">{formatCurrency(Number(item.limitAmount))}</Text>
-                </View>
-                <ProgressBar progress={progress} color={progress >= 1 ? theme.colors.error : theme.colors.primary} style={styles.progress} />
-              </View>
-            );
-          }) : <StateView title="No budgets" message="Create budgets to track category limits." />}
+                );
+              })}
+            </View>
+          ) : <StateView title="No budgets" message="Create budgets to track category limits." />}
         </Card.Content>
       </Card>
       <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={2800}>{notice}</Snackbar>
@@ -140,19 +189,49 @@ export function BudgetsScreen() {
 }
 
 const styles = StyleSheet.create({
-  budgetItem: { borderRadius: 8, gap: 12, padding: 16 },
-  budgetMeta: { flexDirection: 'row', justifyContent: 'space-between', gap: 12 },
-  budgetTitle: { fontWeight: '800' },
-  button: { height: 48 },
-  formCard: { borderRadius: 8 },
-  formContent: { gap: 13, paddingVertical: 20 },
-  listCard: { borderRadius: 8 },
-  listContent: { gap: 14, paddingVertical: 20 },
-  monthLabel: { alignItems: 'center', flex: 1, gap: 2 },
-  monthPicker: { alignItems: 'center', backgroundColor: 'rgba(120,120,120,0.08)', borderRadius: 8, flexDirection: 'row', gap: 4, padding: 8 },
-  monthText: { fontWeight: '800', textAlign: 'center' },
+  budgetItem: { 
+    borderRadius: 12, 
+    gap: 10, 
+    padding: 14 
+  },
+  budgetMeta: { flexDirection: 'row', justifyContent: 'space-between', gap: 12, alignItems: 'center' },
+  budgetTitleGroup: { gap: 1 },
+  budgetTitle: { fontSize: 15, fontWeight: '800', letterSpacing: -0.1 },
+  budgetLimitText: { fontSize: 15, fontWeight: '800', letterSpacing: -0.2 },
+  buttonContent: { height: 48 },
+  saveButton: {
+    backgroundColor: '#5E5CE6',
+    borderRadius: 12,
+    shadowColor: '#5E5CE6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
+    marginTop: 6,
+  },
+  card: { 
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  formContent: { gap: 14, paddingVertical: 18 },
+  listContent: { gap: 12, paddingVertical: 18 },
+  budgetList: { gap: 8 },
+  monthLabel: { alignItems: 'center', flex: 1, gap: 1 },
+  monthLabelText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase', opacity: 0.6 },
+  monthPicker: { 
+    alignItems: 'center', 
+    borderRadius: 12, 
+    flexDirection: 'row', 
+    gap: 4, 
+    padding: 6 
+  },
+  monthText: { fontSize: 15, fontWeight: '800', textAlign: 'center', letterSpacing: -0.1 },
   nextMonthButton: { flexDirection: 'row-reverse' },
-  progress: { borderRadius: 8, height: 9 },
-  subtitle: { opacity: 0.64 },
-  title: { fontWeight: '800' },
+  progress: { borderRadius: 4, height: 8 },
+  subtitle: { fontSize: 12, opacity: 0.6, fontWeight: '500' },
 });
+

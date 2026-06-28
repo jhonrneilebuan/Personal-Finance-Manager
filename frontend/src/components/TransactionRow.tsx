@@ -16,21 +16,30 @@ export function TransactionRow({ title, subtitle, amount, type }: TransactionRow
 
   return (
     <List.Item
-      style={[styles.row, { backgroundColor: theme.colors.surface, borderColor: theme.colors.outlineVariant }]}
+      style={[
+        styles.row, 
+        { 
+          backgroundColor: theme.colors.surface, 
+          borderColor: theme.colors.outlineVariant,
+          borderWidth: theme.dark ? 1 : 0,
+        }
+      ]}
       title={title}
       description={subtitle}
       titleNumberOfLines={1}
       descriptionNumberOfLines={1}
-      titleStyle={styles.title}
-      descriptionStyle={styles.description}
+      titleStyle={[styles.title, { color: theme.colors.onSurface }]}
+      descriptionStyle={[styles.description, { color: theme.colors.onSurfaceVariant }]}
       left={() => (
-        <View style={[styles.iconWrap, { backgroundColor: `${color}18` }]}>
-          <MaterialCommunityIcons name={type === 'income' ? 'arrow-down' : 'arrow-up'} color={color} size={20} />
+        <View style={[styles.iconWrap, { backgroundColor: `${color}12` }]}>
+          <MaterialCommunityIcons name={type === 'income' ? 'arrow-down' : 'arrow-up'} color={color} size={18} />
         </View>
       )}
       right={() => (
         <View style={styles.amount}>
-          <Text variant="titleSmall" style={{ color }}>{type === 'income' ? '+' : '-'}{formatCurrency(amount)}</Text>
+          <Text style={[styles.amountText, { color }]}>
+            {type === 'income' ? '+' : '-'}{formatCurrency(amount)}
+          </Text>
         </View>
       )}
     />
@@ -39,8 +48,27 @@ export function TransactionRow({ title, subtitle, amount, type }: TransactionRow
 
 const styles = StyleSheet.create({
   amount: { alignItems: 'flex-end', justifyContent: 'center', minWidth: 92 },
-  description: { opacity: 0.58 },
-  iconWrap: { alignItems: 'center', borderRadius: 8, height: 42, justifyContent: 'center', marginRight: 12, width: 42 },
-  row: { borderRadius: 8, borderWidth: 1, marginVertical: 4, paddingHorizontal: 8, paddingVertical: 7 },
-  title: { fontWeight: '800' },
+  amountText: { fontSize: 15, fontWeight: '800', letterSpacing: -0.2 },
+  description: { fontSize: 13, opacity: 0.6, fontWeight: '500' },
+  iconWrap: { 
+    alignItems: 'center', 
+    borderRadius: 10, 
+    height: 38, 
+    justifyContent: 'center', 
+    marginRight: 8, 
+    width: 38 
+  },
+  row: { 
+    borderRadius: 12, 
+    marginVertical: 4, 
+    paddingHorizontal: 12, 
+    paddingVertical: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  title: { fontWeight: '700', fontSize: 15, letterSpacing: -0.1 },
 });
+

@@ -28,39 +28,62 @@ export function AiInsightCard({
   const accent = color ?? theme.colors.primary;
 
   return (
-    <Card mode="elevated" style={styles.card}>
+    <Card 
+      style={[
+        styles.card, 
+        { 
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.outlineVariant,
+          borderWidth: theme.dark ? 1 : 0,
+        }
+      ]}
+    >
       <Card.Content style={styles.content}>
         <View style={styles.header}>
-          <View style={[styles.iconBox, { backgroundColor: theme.colors.primaryContainer }]}>
-            <MaterialCommunityIcons name={icon} size={24} color={accent} />
+          <View style={[styles.iconBox, { backgroundColor: `${accent}12` }]}>
+            <MaterialCommunityIcons name={icon} size={20} color={accent} />
           </View>
           <View style={styles.copy}>
             <View style={styles.titleRow}>
-              <Text variant="titleMedium" style={styles.title}>{title}</Text>
-              <Text style={[styles.badge, { color: accent }]}>{insight?.source === 'ai' ? 'AI' : 'Coach'}</Text>
+              <Text style={[styles.title, { color: theme.colors.onSurface }]}>{title}</Text>
+              <Text style={[styles.badge, { color: accent, backgroundColor: `${accent}14` }]}>
+                {insight?.source === 'ai' ? 'AI' : 'Coach'}
+              </Text>
             </View>
-            <Text style={styles.subtitle}>{subtitle}</Text>
+            <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>{subtitle}</Text>
           </View>
         </View>
 
         {insight ? (
           <View style={styles.result}>
-            <Text variant="titleSmall" style={styles.insightTitle}>{insight.title}</Text>
-            <Text style={styles.summary}>{insight.summary}</Text>
+            <Text style={[styles.insightTitle, { color: theme.colors.onSurface }]}>{insight.title}</Text>
+            <Text style={[styles.summary, { color: theme.colors.onSurfaceVariant }]}>{insight.summary}</Text>
             <View style={styles.columns}>
               <View style={styles.column}>
-                <Text variant="labelLarge" style={styles.columnTitle}>Highlights</Text>
-                {insight.highlights.map((item) => <Text key={item} style={styles.item}>- {item}</Text>)}
+                <Text style={[styles.columnTitle, { color: theme.colors.onSurface }]}>Highlights</Text>
+                {insight.highlights.map((item) => (
+                  <Text key={item} style={[styles.item, { color: theme.colors.onSurfaceVariant }]}>• {item}</Text>
+                ))}
               </View>
               <View style={styles.column}>
-                <Text variant="labelLarge" style={styles.columnTitle}>Next Actions</Text>
-                {insight.actionItems.map((item) => <Text key={item} style={styles.item}>- {item}</Text>)}
+                <Text style={[styles.columnTitle, { color: theme.colors.onSurface }]}>Next Actions</Text>
+                {insight.actionItems.map((item) => (
+                  <Text key={item} style={[styles.item, { color: theme.colors.onSurfaceVariant }]}>• {item}</Text>
+                ))}
               </View>
             </View>
           </View>
         ) : null}
 
-        <Button icon="auto-fix" mode="contained-tonal" loading={loading} disabled={loading} onPress={onGenerate}>
+        <Button 
+          icon="auto-fix" 
+          mode="contained-tonal" 
+          style={styles.actionButton}
+          contentStyle={styles.buttonContent}
+          loading={loading} 
+          disabled={loading} 
+          onPress={onGenerate}
+        >
           {buttonLabel}
         </Button>
       </Card.Content>
@@ -69,20 +92,38 @@ export function AiInsightCard({
 }
 
 const styles = StyleSheet.create({
-  badge: { fontWeight: '900' },
-  card: { borderRadius: 8 },
-  column: { flex: 1, gap: 5, minWidth: 180 },
-  columnTitle: { fontWeight: '900' },
-  columns: { flexDirection: 'row', flexWrap: 'wrap', gap: 14 },
+  badge: { 
+    fontSize: 11, 
+    fontWeight: '900', 
+    letterSpacing: 0.5, 
+    paddingHorizontal: 8, 
+    paddingVertical: 3, 
+    borderRadius: 6,
+    overflow: 'hidden',
+  },
+  card: { 
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  column: { flex: 1, gap: 6, minWidth: 170 },
+  columnTitle: { fontWeight: '800', fontSize: 13, letterSpacing: -0.1 },
+  columns: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 },
   content: { gap: 14, paddingVertical: 18 },
-  copy: { flex: 1, gap: 3 },
+  copy: { flex: 1, gap: 2 },
   header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
-  iconBox: { alignItems: 'center', borderRadius: 8, height: 46, justifyContent: 'center', width: 46 },
-  insightTitle: { fontWeight: '900' },
-  item: { lineHeight: 20, opacity: 0.78 },
-  result: { gap: 10 },
-  subtitle: { opacity: 0.68 },
-  summary: { lineHeight: 21, opacity: 0.82 },
-  title: { flex: 1, fontWeight: '900' },
+  iconBox: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  insightTitle: { fontWeight: '800', fontSize: 15, letterSpacing: -0.2, marginTop: 4 },
+  item: { lineHeight: 18, opacity: 0.85, fontSize: 13, paddingLeft: 4 },
+  result: { gap: 10, paddingVertical: 4 },
+  subtitle: { opacity: 0.6, fontSize: 12, fontWeight: '500' },
+  summary: { lineHeight: 18, opacity: 0.8, fontSize: 13 },
+  title: { flex: 1, fontWeight: '800', fontSize: 15, letterSpacing: -0.2 },
   titleRow: { alignItems: 'center', flexDirection: 'row', gap: 10 },
+  actionButton: { borderRadius: 10, marginTop: 4 },
+  buttonContent: { height: 42 },
 });
+

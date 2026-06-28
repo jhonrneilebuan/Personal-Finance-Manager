@@ -76,28 +76,38 @@ export function AiSpendingPlannerCard({ defaultAvailableMoney }: AiSpendingPlann
   }, [availableMoney, parsedItems]);
 
   return (
-    <Card mode="elevated" style={styles.card}>
+    <Card 
+      style={[
+        styles.card, 
+        { 
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.outlineVariant,
+          borderWidth: theme.dark ? 1 : 0,
+        }
+      ]}
+    >
       <Card.Content style={styles.content}>
         <View style={styles.header}>
-          <View style={[styles.iconBox, { backgroundColor: theme.colors.primaryContainer }]}>
-            <MaterialCommunityIcons name="cart-check" size={24} color={theme.colors.primary} />
+          <View style={[styles.iconBox, { backgroundColor: `${theme.colors.primary}12` }]}>
+            <MaterialCommunityIcons name="cart-check" size={20} color={theme.colors.primary} />
           </View>
           <View style={styles.headerCopy}>
-            <Text variant="titleMedium" style={styles.title}>AI Spending Planner</Text>
-            <Text style={styles.subtitle}>Ranks what to buy first and how to split your money.</Text>
+            <Text style={[styles.title, { color: theme.colors.onSurface }]}>AI Spending Planner</Text>
+            <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>Ranks what to buy first and how to split your money.</Text>
           </View>
         </View>
 
         <TextInput
-          left={<TextInput.Icon icon="wallet-outline" />}
+          left={<TextInput.Icon icon="wallet-outline" color="rgba(120,120,120,0.5)" />}
           mode="outlined"
           label="Money available"
           keyboardType="numeric"
           value={availableMoney}
           onChangeText={setAvailableMoney}
+          theme={{ roundness: 12 }}
         />
         <TextInput
-          left={<TextInput.Icon icon="format-list-bulleted" />}
+          left={<TextInput.Icon icon="format-list-bulleted" color="rgba(120,120,120,0.5)" />}
           mode="outlined"
           label="Items to buy, one per line"
           placeholder={'Rice 1000\nShoes 1200\nPhone 8000'}
@@ -105,52 +115,63 @@ export function AiSpendingPlannerCard({ defaultAvailableMoney }: AiSpendingPlann
           numberOfLines={4}
           value={itemsText}
           onChangeText={setItemsText}
+          theme={{ roundness: 12 }}
         />
         {notice ? <Text style={styles.notice}>{notice}</Text> : null}
 
-        <Button icon="auto-fix" mode="contained" loading={isLoading} disabled={isLoading} onPress={generatePlan}>
+        <Button 
+          icon="auto-fix" 
+          mode="contained" 
+          style={styles.planButton}
+          contentStyle={styles.buttonContent}
+          loading={isLoading} 
+          disabled={isLoading} 
+          onPress={generatePlan}
+        >
           Plan What To Buy First
         </Button>
 
         {plan ? (
           <View style={styles.result}>
             <View>
-              <Text variant="titleSmall" style={styles.resultTitle}>{plan.title}</Text>
-              <Text style={styles.summary}>{plan.summary}</Text>
+              <Text style={[styles.resultTitle, { color: theme.colors.onSurface }]}>{plan.title}</Text>
+              <Text style={[styles.summary, { color: theme.colors.onSurfaceVariant }]}>{plan.summary}</Text>
             </View>
 
             <View style={styles.budgetRow}>
-              <View style={styles.budgetBox}>
+              <View style={[styles.budgetBox, { backgroundColor: theme.colors.surfaceVariant }]}>
                 <Text style={styles.budgetLabel}>Essentials</Text>
-                <Text style={styles.budgetValue}>{formatCurrency(plan.recommendedBudget.essentials)}</Text>
+                <Text style={[styles.budgetValue, { color: theme.colors.onSurface }]}>{formatCurrency(plan.recommendedBudget.essentials)}</Text>
               </View>
-              <View style={styles.budgetBox}>
+              <View style={[styles.budgetBox, { backgroundColor: theme.colors.surfaceVariant }]}>
                 <Text style={styles.budgetLabel}>Flexible</Text>
-                <Text style={styles.budgetValue}>{formatCurrency(plan.recommendedBudget.flexible)}</Text>
+                <Text style={[styles.budgetValue, { color: theme.colors.onSurface }]}>{formatCurrency(plan.recommendedBudget.flexible)}</Text>
               </View>
-              <View style={styles.budgetBox}>
+              <View style={[styles.budgetBox, { backgroundColor: theme.colors.surfaceVariant }]}>
                 <Text style={styles.budgetLabel}>Savings</Text>
-                <Text style={styles.budgetValue}>{formatCurrency(plan.recommendedBudget.savings)}</Text>
+                <Text style={[styles.budgetValue, { color: theme.colors.onSurface }]}>{formatCurrency(plan.recommendedBudget.savings)}</Text>
               </View>
             </View>
 
             <View style={styles.decisions}>
               {plan.decisions.map((item) => (
-                <View key={`${item.item}-${item.decision}`} style={styles.decisionItem}>
+                <View key={`${item.item}-${item.decision}`} style={[styles.decisionItem, { borderBottomWidth: 1, borderBottomColor: theme.colors.outlineVariant, paddingBottom: 10 }]}>
                   <View style={styles.decisionTop}>
-                    <Text variant="titleSmall" style={styles.itemName}>{item.item}</Text>
+                    <Text style={[styles.itemName, { color: theme.colors.onSurface }]}>{item.item}</Text>
                     <Text style={[styles.decisionBadge, item.decision === 'buy_now' ? styles.buyNow : undefined]}>
                       {decisionLabels[item.decision]}
                     </Text>
                   </View>
-                  <Text style={styles.summary}>{formatCurrency(item.estimatedCost)} - {item.reason}</Text>
+                  <Text style={[styles.summary, { color: theme.colors.onSurfaceVariant }]}>{formatCurrency(item.estimatedCost)} - {item.reason}</Text>
                 </View>
               ))}
             </View>
 
             <View style={styles.actions}>
-              <Text variant="labelLarge" style={styles.actionTitle}>Budget steps</Text>
-              {plan.actionItems.map((item) => <Text key={item} style={styles.summary}>- {item}</Text>)}
+              <Text style={[styles.actionTitle, { color: theme.colors.onSurface }]}>Budget steps</Text>
+              {plan.actionItems.map((item) => (
+                <Text key={item} style={[styles.summary, { color: theme.colors.onSurfaceVariant }]}>• {item}</Text>
+              ))}
             </View>
           </View>
         ) : null}
@@ -160,27 +181,46 @@ export function AiSpendingPlannerCard({ defaultAvailableMoney }: AiSpendingPlann
 }
 
 const styles = StyleSheet.create({
-  actionTitle: { fontWeight: '900' },
-  actions: { gap: 5 },
-  budgetBox: { backgroundColor: 'rgba(120,120,120,0.08)', borderRadius: 8, flex: 1, gap: 3, minWidth: 92, padding: 11 },
-  budgetLabel: { color: palette.slate, fontSize: 12, fontWeight: '800' },
-  budgetRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
-  budgetValue: { fontWeight: '900' },
-  buyNow: { backgroundColor: 'rgba(52,199,89,0.16)', color: palette.green },
-  card: { borderRadius: 8 },
+  actionTitle: { fontWeight: '800', fontSize: 13, letterSpacing: -0.1 },
+  actions: { gap: 4, marginTop: 4 },
+  budgetBox: { borderRadius: 12, flex: 1, gap: 2, minWidth: 90, padding: 10 },
+  budgetLabel: { color: palette.slate, fontSize: 11, fontWeight: '800', textTransform: 'uppercase' },
+  budgetRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  budgetValue: { fontWeight: '900', fontSize: 15, letterSpacing: -0.2 },
+  buyNow: { backgroundColor: 'rgba(52,199,89,0.12)', color: palette.green },
+  card: { 
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
   content: { gap: 14, paddingVertical: 18 },
-  decisionBadge: { backgroundColor: 'rgba(120,120,120,0.12)', borderRadius: 8, color: palette.slate, fontWeight: '900', overflow: 'hidden', paddingHorizontal: 9, paddingVertical: 5 },
-  decisionItem: { gap: 5 },
+  decisionBadge: { 
+    backgroundColor: 'rgba(120,120,120,0.12)', 
+    borderRadius: 8, 
+    color: palette.slate, 
+    fontWeight: '800', 
+    overflow: 'hidden', 
+    paddingHorizontal: 8, 
+    paddingVertical: 4,
+    fontSize: 11,
+  },
+  decisionItem: { gap: 4 },
   decisionTop: { alignItems: 'center', flexDirection: 'row', gap: 10, justifyContent: 'space-between' },
-  decisions: { gap: 13 },
+  decisions: { gap: 10 },
   header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
   headerCopy: { flex: 1 },
-  iconBox: { alignItems: 'center', borderRadius: 8, height: 46, justifyContent: 'center', width: 46 },
-  itemName: { flex: 1, fontWeight: '900' },
-  notice: { color: palette.red, fontWeight: '700' },
-  result: { gap: 14 },
-  resultTitle: { fontWeight: '900' },
-  subtitle: { opacity: 0.68 },
-  summary: { lineHeight: 20, opacity: 0.78 },
-  title: { fontWeight: '900' },
+  iconBox: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  itemName: { flex: 1, fontWeight: '800', fontSize: 14, letterSpacing: -0.1 },
+  notice: { color: palette.red, fontWeight: '700', fontSize: 13 },
+  result: { gap: 14, marginTop: 6 },
+  resultTitle: { fontWeight: '800', fontSize: 15, letterSpacing: -0.1 },
+  subtitle: { opacity: 0.6, fontSize: 12, fontWeight: '500' },
+  summary: { lineHeight: 18, opacity: 0.8, fontSize: 13 },
+  title: { fontWeight: '800', fontSize: 15, letterSpacing: -0.2 },
+  planButton: { borderRadius: 12 },
+  buttonContent: { height: 44 },
 });
+

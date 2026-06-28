@@ -25,15 +25,24 @@ export function CashflowGraphCard({ income, expenses, savings }: CashflowGraphCa
   const max = Math.max(...data.map((item) => Math.abs(item.value)), 1);
 
   return (
-    <Card mode="elevated" style={styles.card}>
+    <Card 
+      style={[
+        styles.card, 
+        { 
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.outlineVariant,
+          borderWidth: theme.dark ? 1 : 0,
+        }
+      ]}
+    >
       <Card.Content style={styles.content}>
         <View style={styles.header}>
           <View style={[styles.headerIcon, { backgroundColor: theme.colors.primaryContainer }]}>
-            <MaterialCommunityIcons name="chart-timeline-variant" size={21} color={theme.colors.primary} />
+            <MaterialCommunityIcons name="chart-timeline-variant" size={18} color={theme.colors.primary} />
           </View>
           <View>
-            <Text variant="titleMedium" style={styles.title}>Cashflow Graph</Text>
-            <Text style={styles.subtitle}>Monthly income, expenses, and savings</Text>
+            <Text style={[styles.title, { color: theme.colors.onSurface }]}>Cashflow Graph</Text>
+            <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>Monthly income, expenses, and savings</Text>
           </View>
         </View>
 
@@ -42,11 +51,11 @@ export function CashflowGraphCard({ income, expenses, savings }: CashflowGraphCa
             const height = Math.max((Math.abs(item.value) / max) * 142, 16);
             return (
               <View key={item.label} style={styles.column}>
-                <Text variant="labelMedium" style={styles.value}>{formatCurrency(item.value)}</Text>
+                <Text style={[styles.value, { color: theme.colors.onSurface }]}>{formatCurrency(item.value)}</Text>
                 <View style={[styles.barTrack, { backgroundColor: theme.colors.surfaceVariant }]}>
                   <View style={[styles.bar, { height, backgroundColor: item.color }]} />
                 </View>
-                <Text variant="labelMedium" style={styles.label}>{item.label}</Text>
+                <Text style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>{item.label}</Text>
               </View>
             );
           })}
@@ -57,16 +66,37 @@ export function CashflowGraphCard({ income, expenses, savings }: CashflowGraphCa
 }
 
 const styles = StyleSheet.create({
-  bar: { borderRadius: 8, width: 34 },
-  barTrack: { alignItems: 'center', borderRadius: 8, height: 150, justifyContent: 'flex-end', overflow: 'hidden', paddingBottom: 6, width: 46 },
-  card: { borderRadius: 8 },
+  bar: { 
+    borderTopLeftRadius: 6, 
+    borderTopRightRadius: 6,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    width: 32 
+  },
+  barTrack: { 
+    alignItems: 'center', 
+    borderRadius: 8, 
+    height: 150, 
+    justifyContent: 'flex-end', 
+    overflow: 'hidden', 
+    width: 44 
+  },
+  card: { 
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
   column: { alignItems: 'center', flex: 1, gap: 8 },
-  content: { gap: 18, paddingVertical: 20 },
-  graph: { alignItems: 'flex-end', flexDirection: 'row', gap: 12, minHeight: 210 },
-  header: { alignItems: 'center', flexDirection: 'row', gap: 10 },
-  headerIcon: { alignItems: 'center', borderRadius: 8, height: 40, justifyContent: 'center', width: 40 },
-  label: { opacity: 0.7 },
-  subtitle: { opacity: 0.62 },
-  title: { fontWeight: '800' },
-  value: { fontWeight: '700', textAlign: 'center' },
+  content: { gap: 16, paddingVertical: 18 },
+  graph: { alignItems: 'flex-end', flexDirection: 'row', gap: 12, minHeight: 200, marginTop: 4 },
+  header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
+  headerIcon: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  label: { fontSize: 13, fontWeight: '600', opacity: 0.6 },
+  subtitle: { fontSize: 12, opacity: 0.6, fontWeight: '500' },
+  title: { fontSize: 16, fontWeight: '800', letterSpacing: -0.2 },
+  value: { fontSize: 13, fontWeight: '700', textAlign: 'center', letterSpacing: -0.2 },
 });
+

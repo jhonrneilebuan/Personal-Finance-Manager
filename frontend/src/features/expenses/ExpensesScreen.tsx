@@ -1,7 +1,7 @@
 import { Fragment, useCallback, useMemo, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
-import { Card, Button, Snackbar, Text, TextInput } from 'react-native-paper';
+import { Card, Button, Snackbar, Text, TextInput, useTheme } from 'react-native-paper';
 import { PageHeroCard } from '@/components/PageHeroCard';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
@@ -25,6 +25,7 @@ type ExpenseFormValues = {
 };
 
 export function ExpensesScreen() {
+  const theme = useTheme();
   const { data, isLoading, error, refresh } = useAsyncData(useCallback(() => financeApi.expenses(), []));
   const markChanged = useFinanceStore((state) => state.markChanged);
   const [notice, setNotice] = useState('');
@@ -90,6 +91,15 @@ export function ExpensesScreen() {
     }
   });
 
+  const cardStyle = [
+    styles.card,
+    {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.outlineVariant,
+      borderWidth: theme.dark ? 1 : 0,
+    }
+  ];
+
   return (
     <Screen refreshing={isLoading} onRefresh={refresh}>
       <PageHeroCard
@@ -100,32 +110,60 @@ export function ExpensesScreen() {
         caption={`${data?.length ?? 0} records`}
         color={palette.red}
       />
-      <Card mode="elevated" style={styles.formCard}>
+      <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
           <SectionHeader icon="robot-outline" title="New Expense" subtitle="Use AI to suggest the best category before saving." color={palette.red} />
           {expenseFields.map((name) => (
             <Fragment key={name}>
               <Controller control={control} name={name} render={({ field: { value, onChange } }) => (
-                <TextInput left={<TextInput.Icon icon={inputIcon[name]} />} mode="outlined" label={name[0].toUpperCase() + name.slice(1)} value={value} onChangeText={onChange} keyboardType={name === 'amount' ? 'numeric' : 'default'} />
+                <TextInput 
+                  left={<TextInput.Icon icon={inputIcon[name]} color="rgba(120,120,120,0.5)" />} 
+                  mode="outlined" 
+                  label={name[0].toUpperCase() + name.slice(1)} 
+                  value={value} 
+                  onChangeText={onChange} 
+                  keyboardType={name === 'amount' ? 'numeric' : 'default'}
+                  theme={{ roundness: 12 }}
+                />
               )} />
               {name === 'amount' ? (
-                <>
-                  <Button icon="robot-outline" mode="contained-tonal" loading={isSuggesting} disabled={isSuggesting || isSubmitting} onPress={suggestCategory}>
+                <View style={styles.aiSuggestionRow}>
+                  <Button 
+                    icon="robot-outline" 
+                    mode="contained-tonal" 
+                    style={styles.aiButton}
+                    contentStyle={styles.aiButtonContent}
+                    loading={isSuggesting} 
+                    disabled={isSuggesting || isSubmitting} 
+                    onPress={suggestCategory}
+                  >
                     AI Suggest Category
                   </Button>
-                  {aiReason ? <Text variant="bodySmall" style={styles.aiReason}>{aiReason}</Text> : null}
-                </>
+                  {aiReason ? <Text style={[styles.aiReason, { color: theme.colors.onSurfaceVariant }]}>{aiReason}</Text> : null}
+                </View>
               ) : null}
             </Fragment>
           ))}
-          <Button icon="plus-circle-outline" contentStyle={styles.button} mode="contained" loading={isSubmitting} disabled={isSubmitting} onPress={create}>Save Expense</Button>
+          <Button 
+            icon="plus-circle-outline" 
+            style={styles.saveButton}
+            contentStyle={styles.buttonContent} 
+            mode="contained" 
+            loading={isSubmitting} 
+            disabled={isSubmitting} 
+            onPress={create}
+          >
+            Save Expense
+          </Button>
         </Card.Content>
       </Card>
-      <Card mode="elevated" style={styles.listCard}>
+      <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
           <SectionHeader icon="history" title="Expense History" subtitle="Latest spending records" color={palette.red} />
           {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load expenses" message={error} /> : data?.length ? (
-            data.map((item) => <TransactionRow key={item.id} title={item.title} subtitle={item.category} amount={Number(item.amount)} type="expense" />)
+            <View style={styles.list}>
+              {data.map((item) => <TransactionRow key={item.id} title={item.title} subtitle={item.category} amount={Number(item.amount)} type="expense" />)}
+            </View>
           ) : <StateView title="No expenses" message="Expenses you add will appear here." />}
         </Card.Content>
       </Card>
@@ -135,10 +173,31 @@ export function ExpensesScreen() {
 }
 
 const styles = StyleSheet.create({
-  aiReason: { color: palette.slate, lineHeight: 19 },
-  button: { height: 48 },
-  formCard: { borderRadius: 8 },
-  formContent: { gap: 13, paddingVertical: 20 },
-  listCard: { borderRadius: 8 },
-  listContent: { gap: 10, paddingVertical: 20 },
+  aiReason: { fontSize: 13, lineHeight: 18, opacity: 0.85, marginTop: 4 },
+  aiSuggestionRow: { gap: 6 },
+  aiButton: { borderRadius: 10 },
+  aiButtonContent: { height: 42 },
+  buttonContent: { height: 48 },
+  saveButton: {
+    backgroundColor: '#FF453A',
+    borderRadius: 12,
+    shadowColor: '#FF453A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
+    marginTop: 6,
+  },
+  card: { 
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  formContent: { gap: 14, paddingVertical: 18 },
+  listContent: { gap: 12, paddingVertical: 18 },
+  list: { gap: 4 },
 });
+

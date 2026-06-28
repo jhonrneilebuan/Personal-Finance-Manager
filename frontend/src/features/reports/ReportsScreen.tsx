@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Card, Snackbar } from 'react-native-paper';
+import { Card, Snackbar, useTheme } from 'react-native-paper';
 import { AiInsightCard } from '@/components/AiInsightCard';
 import { BarChartCard } from '@/components/BarChartCard';
 import { CashflowGraphCard } from '@/components/CashflowGraphCard';
@@ -17,6 +17,7 @@ import type { AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
 
 export function ReportsScreen() {
+  const theme = useTheme();
   const revision = useFinanceStore((state) => state.revision);
   const monthly = useAsyncData(useCallback(() => financeApi.monthlyReport(), [revision]));
   const category = useAsyncData(useCallback(() => financeApi.categoryReport(), [revision]));
@@ -36,6 +37,15 @@ export function ReportsScreen() {
   }, []);
 
   if (monthly.isLoading || category.isLoading) return <StateView loading message="Building reports" />;
+
+  const cardStyle = [
+    styles.card,
+    {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.outlineVariant,
+      borderWidth: theme.dark ? 1 : 0,
+    }
+  ];
 
   return (
     <Screen refreshing={monthly.isLoading || category.isLoading} onRefresh={() => { monthly.refresh(); category.refresh(); }}>
@@ -70,7 +80,11 @@ export function ReportsScreen() {
       {category.data?.length ? (
         <BarChartCard title="Expense Breakdown" data={category.data.map((item) => ({ label: item.category, value: item.amount }))} />
       ) : (
-        <Card mode="elevated" style={styles.emptyCard}><Card.Content><StateView title="No category data" message="Category charts appear after expenses are recorded." /></Card.Content></Card>
+        <Card style={cardStyle}>
+          <Card.Content>
+            <StateView title="No category data" message="Category charts appear after expenses are recorded." />
+          </Card.Content>
+        </Card>
       )}
       <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={2400}>{notice}</Snackbar>
     </Screen>
@@ -78,7 +92,15 @@ export function ReportsScreen() {
 }
 
 const styles = StyleSheet.create({
-  emptyCard: { borderRadius: 8 },
+  card: { 
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   stat: { flexBasis: '47%' },
 });
+

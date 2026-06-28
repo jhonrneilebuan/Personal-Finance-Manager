@@ -10,20 +10,29 @@ type BarChartCardProps = {
   data: Array<{ label: string; value: number }>;
 };
 
-const chartColors = [palette.blue, palette.green, palette.orange, palette.indigo, palette.pink, palette.teal];
+const chartColors = [palette.blue, palette.indigo, palette.green, palette.orange, palette.pink, palette.teal];
 
 export function BarChartCard({ title, data }: BarChartCardProps) {
   const theme = useTheme();
   const max = Math.max(...data.map((item) => item.value), 1);
 
   return (
-    <Card mode="elevated" style={styles.card}>
+    <Card 
+      style={[
+        styles.card, 
+        { 
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.outlineVariant,
+          borderWidth: theme.dark ? 1 : 0,
+        }
+      ]}
+    >
       <Card.Content style={styles.content}>
         <View style={styles.header}>
           <View style={[styles.headerIcon, { backgroundColor: theme.colors.primaryContainer }]}>
-            <MaterialCommunityIcons name="chart-bar" color={theme.colors.primary} size={20} />
+            <MaterialCommunityIcons name="chart-bar" color={theme.colors.primary} size={18} />
           </View>
-          <Text variant="titleMedium" style={styles.title}>{title}</Text>
+          <Text style={[styles.title, { color: theme.colors.onSurface }]}>{title}</Text>
         </View>
         {data.length === 0 ? (
           <StateView title="No data yet" message="Add transactions to see this chart." />
@@ -34,8 +43,8 @@ export function BarChartCard({ title, data }: BarChartCardProps) {
               return (
                 <View key={item.label} style={styles.row}>
                   <View style={styles.meta}>
-                    <Text numberOfLines={1} style={styles.label}>{item.label}</Text>
-                    <Text style={styles.value}>{formatCurrency(item.value)}</Text>
+                    <Text numberOfLines={1} style={[styles.label, { color: theme.colors.onSurface }]}>{item.label}</Text>
+                    <Text style={[styles.value, { color: theme.colors.onSurfaceVariant }]}>{formatCurrency(item.value)}</Text>
                   </View>
                   <View style={[styles.track, { backgroundColor: theme.colors.surfaceVariant }]}>
                     <View style={[styles.bar, { width: `${Math.max((item.value / max) * 100, 5)}%`, backgroundColor: color }]} />
@@ -51,16 +60,24 @@ export function BarChartCard({ title, data }: BarChartCardProps) {
 }
 
 const styles = StyleSheet.create({
-  bar: { borderRadius: 8, height: 12 },
-  card: { borderRadius: 8 },
-  content: { gap: 18, paddingVertical: 20 },
-  header: { alignItems: 'center', flexDirection: 'row', gap: 10 },
-  headerIcon: { alignItems: 'center', borderRadius: 8, height: 38, justifyContent: 'center', width: 38 },
-  label: { flex: 1, fontWeight: '700' },
+  bar: { borderRadius: 4, height: 6 },
+  card: { 
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  content: { gap: 16, paddingVertical: 18 },
+  header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
+  headerIcon: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  label: { flex: 1, fontWeight: '700', fontSize: 14, letterSpacing: -0.1 },
   meta: { alignItems: 'center', flexDirection: 'row', gap: 10 },
-  row: { gap: 8 },
-  rows: { gap: 16 },
-  title: { fontWeight: '800' },
-  track: { borderRadius: 8, height: 12, overflow: 'hidden' },
-  value: { opacity: 0.64, textAlign: 'right' },
+  row: { gap: 6 },
+  rows: { gap: 14 },
+  title: { fontSize: 16, fontWeight: '800', letterSpacing: -0.2 },
+  track: { borderRadius: 4, height: 6, overflow: 'hidden' },
+  value: { opacity: 0.8, textAlign: 'right', fontSize: 13, fontWeight: '700', letterSpacing: -0.2 },
 });
+

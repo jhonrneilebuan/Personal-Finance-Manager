@@ -1,7 +1,8 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Card, Button, Divider, List, Snackbar, Switch, TextInput } from 'react-native-paper';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Button, Card, Snackbar, Switch, Text, TextInput, useTheme } from 'react-native-paper';
 import { PageHeroCard } from '@/components/PageHeroCard';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
@@ -12,7 +13,33 @@ import { useAuthStore } from '@/store/auth.store';
 import { useSettingsStore } from '@/store/settings.store';
 import { palette } from '@/theme/theme';
 
+type SettingRowProps = {
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  iconBg: string;
+  label: string;
+  value?: string;
+  right: React.ReactNode;
+  onPress?: () => void;
+};
+
+function SettingRow({ icon, iconBg, label, value, right, onPress }: SettingRowProps) {
+  const theme = useTheme();
+  return (
+    <TouchableOpacity style={[styles.settingRow, { backgroundColor: theme.colors.surfaceVariant }]} onPress={onPress} activeOpacity={onPress ? 0.75 : 1} disabled={!onPress}>
+      <View style={[styles.settingIcon, { backgroundColor: iconBg }]}>
+        <MaterialCommunityIcons name={icon} size={17} color="#FFFFFF" />
+      </View>
+      <View style={styles.settingLabel}>
+        <Text style={[styles.settingTitle, { color: theme.colors.onSurface }]}>{label}</Text>
+        {value ? <Text style={[styles.settingValue, { color: theme.colors.onSurfaceVariant }]}>{value}</Text> : null}
+      </View>
+      {right}
+    </TouchableOpacity>
+  );
+}
+
 export function ProfileScreen() {
+  const theme = useTheme();
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
   const logout = useAuthStore((state) => state.logout);
@@ -70,6 +97,15 @@ export function ProfileScreen() {
     return <StateView loading message="Loading profile" />;
   }
 
+  const cardStyle = [
+    styles.card,
+    {
+      backgroundColor: theme.colors.surface,
+      borderColor: theme.colors.outlineVariant,
+      borderWidth: theme.dark ? 1 : 0,
+    },
+  ];
+
   return (
     <Screen refreshing={profile.isLoading} onRefresh={profile.refresh}>
       <PageHeroCard
@@ -79,40 +115,204 @@ export function ProfileScreen() {
         caption="My Wallet"
         color={palette.indigo}
       />
-      <Card mode="elevated" style={styles.card}>
+
+      {/* ── Update Profile ────────────────────────────── */}
+      <Card style={cardStyle}>
         <Card.Content style={styles.content}>
           <SectionHeader icon="account-edit-outline" title="Update Profile" subtitle="Keep your account details current." color={palette.indigo} />
-          <TextInput left={<TextInput.Icon icon="account-outline" />} mode="outlined" label="Full name" value={fullName} onChangeText={setFullName} />
-          <TextInput left={<TextInput.Icon icon="email-outline" />} mode="outlined" label="Email" value={activeUser?.email ?? ''} disabled />
-          <Button contentStyle={styles.button} mode="contained" icon="content-save" loading={isSavingProfile} disabled={isSavingProfile || fullName.trim().length < 2} onPress={handleSaveProfile}>Save Profile</Button>
+          <TextInput
+            left={<TextInput.Icon icon="account-outline" color="rgba(120,120,120,0.5)" />}
+            mode="outlined"
+            label="Full name"
+            value={fullName}
+            onChangeText={setFullName}
+            theme={{ roundness: 12 }}
+          />
+          <TextInput
+            left={<TextInput.Icon icon="email-outline" color="rgba(120,120,120,0.5)" />}
+            mode="outlined"
+            label="Email"
+            value={activeUser?.email ?? ''}
+            disabled
+            theme={{ roundness: 12 }}
+          />
+          <Button
+            icon="content-save"
+            style={styles.saveButton}
+            contentStyle={styles.buttonContent}
+            mode="contained"
+            loading={isSavingProfile}
+            disabled={isSavingProfile || fullName.trim().length < 2}
+            onPress={handleSaveProfile}
+          >
+            Save Profile
+          </Button>
         </Card.Content>
       </Card>
-      <Card mode="elevated" style={styles.card}>
+
+      {/* ── Change Password ───────────────────────────── */}
+      <Card style={cardStyle}>
         <Card.Content style={styles.content}>
           <SectionHeader icon="shield-lock-outline" title="Change Password" subtitle="Use at least 8 characters for the new password." color={palette.orange} />
-          <TextInput left={<TextInput.Icon icon="lock-outline" />} mode="outlined" label="Current password" value={currentPassword} onChangeText={setCurrentPassword} secureTextEntry />
-          <TextInput left={<TextInput.Icon icon="shield-lock-outline" />} mode="outlined" label="New password" value={newPassword} onChangeText={setNewPassword} secureTextEntry />
-          <Button contentStyle={styles.button} mode="outlined" icon="lock-reset" loading={isChangingPassword} disabled={isChangingPassword || currentPassword.length < 1 || newPassword.length < 8} onPress={handleChangePassword}>Update Password</Button>
+          <TextInput
+            left={<TextInput.Icon icon="lock-outline" color="rgba(120,120,120,0.5)" />}
+            mode="outlined"
+            label="Current password"
+            value={currentPassword}
+            onChangeText={setCurrentPassword}
+            secureTextEntry
+            theme={{ roundness: 12 }}
+          />
+          <TextInput
+            left={<TextInput.Icon icon="shield-lock-outline" color="rgba(120,120,120,0.5)" />}
+            mode="outlined"
+            label="New password"
+            value={newPassword}
+            onChangeText={setNewPassword}
+            secureTextEntry
+            theme={{ roundness: 12 }}
+          />
+          <Button
+            icon="lock-reset"
+            style={styles.passwordButton}
+            contentStyle={styles.buttonContent}
+            mode="contained"
+            loading={isChangingPassword}
+            disabled={isChangingPassword || currentPassword.length < 1 || newPassword.length < 8}
+            onPress={handleChangePassword}
+          >
+            Update Password
+          </Button>
         </Card.Content>
       </Card>
-      <Card mode="elevated" style={styles.card}>
+
+      {/* ── App Settings ──────────────────────────────── */}
+      <Card style={cardStyle}>
         <Card.Content style={styles.content}>
-          <SectionHeader icon="cog-outline" title="Settings" subtitle="Theme, currency, and notifications." color={palette.blue} />
-          <List.Item title="Dark Mode" left={(props) => <List.Icon {...props} icon="theme-light-dark" />} right={() => <Switch value={isDarkMode} onValueChange={setDarkMode} />} />
-          <Divider />
-          <List.Item title="Currency" description={currency} left={(props) => <List.Icon {...props} icon="currency-php" />} right={() => <Button onPress={() => setCurrency(currency === 'PHP' ? 'USD' : 'PHP')}>Change</Button>} />
-          <Divider />
-          <List.Item title="Notifications" left={(props) => <List.Icon {...props} icon="bell-outline" />} right={() => <Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} />} />
-          <Button contentStyle={styles.button} mode="contained-tonal" icon="logout" onPress={handleLogout}>Logout</Button>
+          <SectionHeader icon="cog-outline" title="App Settings" subtitle="Personalise theme, currency and alerts." color={palette.blue} />
+          <View style={styles.settingsGroup}>
+            <SettingRow
+              icon="theme-light-dark"
+              iconBg="#5E5CE6"
+              label="Dark Mode"
+              value={isDarkMode ? 'On' : 'Off'}
+              right={<Switch value={isDarkMode} onValueChange={setDarkMode} trackColor={{ true: '#5E5CE6' }} />}
+            />
+            <View style={[styles.separator, { backgroundColor: theme.colors.outlineVariant }]} />
+            <SettingRow
+              icon="currency-php"
+              iconBg="#FF9F0A"
+              label="Currency"
+              value={currency}
+              onPress={() => setCurrency(currency === 'PHP' ? 'USD' : 'PHP')}
+              right={
+                <View style={styles.chevronWrap}>
+                  <Text style={[styles.currencyBadge, { color: '#FF9F0A' }]}>{currency}</Text>
+                  <MaterialCommunityIcons name="chevron-right" size={16} color={theme.colors.onSurfaceVariant} style={{ opacity: 0.5 }} />
+                </View>
+              }
+            />
+            <View style={[styles.separator, { backgroundColor: theme.colors.outlineVariant }]} />
+            <SettingRow
+              icon="bell-outline"
+              iconBg="#34C759"
+              label="Notifications"
+              value={notificationsEnabled ? 'Enabled' : 'Disabled'}
+              right={<Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} trackColor={{ true: '#34C759' }} />}
+            />
+          </View>
         </Card.Content>
       </Card>
+
+      {/* ── Logout ────────────────────────────────────── */}
+      <TouchableOpacity style={[styles.logoutCard, { backgroundColor: 'rgba(255,69,58,0.07)', borderColor: 'rgba(255,69,58,0.18)', borderWidth: 1 }]} onPress={handleLogout} activeOpacity={0.8}>
+        <View style={styles.logoutIconWrap}>
+          <MaterialCommunityIcons name="logout" size={20} color="#FF453A" />
+        </View>
+        <Text style={styles.logoutText}>Logout</Text>
+        <MaterialCommunityIcons name="chevron-right" size={18} color="#FF453A" style={{ opacity: 0.6 }} />
+      </TouchableOpacity>
+
       <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={2400}>{notice}</Snackbar>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  button: { height: 46 },
-  card: { borderRadius: 8 },
-  content: { gap: 13, paddingVertical: 20 },
+  // Cards
+  card: {
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  content: { gap: 14, paddingVertical: 18 },
+
+  // Buttons
+  buttonContent: { height: 48 },
+  saveButton: {
+    backgroundColor: '#5E5CE6',
+    borderRadius: 12,
+    shadowColor: '#5E5CE6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    elevation: 3,
+    marginTop: 2,
+  },
+  passwordButton: {
+    backgroundColor: '#FF9F0A',
+    borderRadius: 12,
+    shadowColor: '#FF9F0A',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    elevation: 3,
+    marginTop: 2,
+  },
+
+  // Settings group
+  settingsGroup: { borderRadius: 14, overflow: 'hidden' },
+  settingRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+  },
+  settingIcon: {
+    alignItems: 'center',
+    borderRadius: 9,
+    height: 34,
+    justifyContent: 'center',
+    width: 34,
+  },
+  settingLabel: { flex: 1 },
+  settingTitle: { fontSize: 15, fontWeight: '600', letterSpacing: -0.1 },
+  settingValue: { fontSize: 12, marginTop: 1, opacity: 0.6 },
+  separator: { height: 1, marginLeft: 58, opacity: 0.4 },
+  chevronWrap: { alignItems: 'center', flexDirection: 'row', gap: 4 },
+  currencyBadge: { fontSize: 14, fontWeight: '800' },
+
+  // Logout
+  logoutCard: {
+    alignItems: 'center',
+    borderRadius: 16,
+    flexDirection: 'row',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    marginBottom: 4,
+  },
+  logoutIconWrap: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,69,58,0.13)',
+    borderRadius: 10,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  logoutText: { color: '#FF453A', flex: 1, fontSize: 16, fontWeight: '700', letterSpacing: -0.2 },
 });

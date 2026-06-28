@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card, Snackbar, Text, useTheme } from 'react-native-paper';
+import { Svg, Rect, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { AiInsightCard } from '@/components/AiInsightCard';
 import { AiSpendingPlannerCard } from '@/components/AiSpendingPlannerCard';
 import { BarChartCard } from '@/components/BarChartCard';
@@ -16,6 +17,7 @@ import { financeApi } from '@/services/finance.service';
 import { useFinanceStore } from '@/store/finance.store';
 import type { AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
+
 
 export function DashboardScreen() {
   const revision = useFinanceStore((state) => state.revision);
@@ -44,12 +46,23 @@ export function DashboardScreen() {
 
   return (
     <Screen refreshing={isLoading} onRefresh={refresh}>
-      <Card mode="elevated" style={[styles.hero, { backgroundColor: theme.colors.primary }]}>
+      <Card style={styles.hero}>
+        <View style={StyleSheet.absoluteFill}>
+          <Svg height="100%" width="100%">
+            <Defs>
+              <LinearGradient id="dashHeroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <Stop offset="0%" stopColor="#0A84FF" />
+                <Stop offset="100%" stopColor="#0052B3" />
+              </LinearGradient>
+            </Defs>
+            <Rect width="100%" height="100%" fill="url(#dashHeroGrad)" />
+          </Svg>
+        </View>
         <Card.Content style={styles.heroContent}>
           <View style={styles.heroTop}>
             <View style={styles.heroTopRight}>
               <View style={styles.heroIcon}>
-                <MaterialCommunityIcons name="wallet-bifold-outline" size={26} color="#FFFFFF" />
+                <MaterialCommunityIcons name="wallet-bifold-outline" size={24} color="#FFFFFF" />
               </View>
               <View>
                 <Text style={styles.heroTitle}>PesoPilot Wallet</Text>
@@ -59,12 +72,13 @@ export function DashboardScreen() {
             <Text style={styles.heroPill}>Live</Text>
           </View>
           <View>
-            <Text variant="labelLarge" style={styles.heroLabel}>Available Balance</Text>
-            <Text variant="displaySmall" style={styles.heroValue}>{formatCurrency(data.currentBalance)}</Text>
+            <Text style={styles.heroLabel}>Available Balance</Text>
+            <Text style={styles.heroValue}>{formatCurrency(data.currentBalance)}</Text>
           </View>
           <Text style={styles.heroMeta}>Income {formatCurrency(data.totalIncome)} / Expenses {formatCurrency(data.totalExpenses)}</Text>
         </Card.Content>
       </Card>
+      
       <AiInsightCard
         title="AI Dashboard Coach"
         subtitle="Generate a quick read on balance, spending, and next actions."
@@ -84,24 +98,40 @@ export function DashboardScreen() {
       <CashflowGraphCard income={data.totalIncome} expenses={data.totalExpenses} savings={data.savings} />
       <BarChartCard title="Expense by Category" data={data.expenseByCategory.map((item) => ({ label: item.category, value: item.amount }))} />
       <BarChartCard title="Budget Usage" data={data.budgetUsage.map((item) => ({ label: item.category, value: item.spentAmount }))} />
-      <Card mode="elevated" style={styles.card}>
+      
+      <Card 
+        style={[
+          styles.card, 
+          { 
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.outlineVariant,
+            borderWidth: theme.dark ? 1 : 0,
+          }
+        ]}
+      >
         <Card.Content style={styles.cardContent}>
           <View style={styles.sectionHeader}>
-            <Text variant="titleMedium" style={styles.sectionTitle}>Recent Transactions</Text>
-            <MaterialCommunityIcons name="history" color={theme.colors.primary} size={20} />
+            <View style={styles.sectionTitleRow}>
+              <View style={[styles.headerIcon, { backgroundColor: `${theme.colors.primary}12` }]}>
+                <MaterialCommunityIcons name="history" color={theme.colors.primary} size={18} />
+              </View>
+              <Text style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>Recent Transactions</Text>
+            </View>
           </View>
           {data.recentTransactions.length === 0 ? (
             <StateView title="No transactions yet" message="Create your first income or expense to begin tracking." />
           ) : (
-            data.recentTransactions.map((item, index) => (
-              <TransactionRow
-                key={`${String(item.id)}-${index}`}
-                title={String(item.title ?? item.source)}
-                subtitle={String(item.category ?? item.type)}
-                amount={Number(item.amount)}
-                type={item.type === 'income' ? 'income' : 'expense'}
-              />
-            ))
+            <View style={styles.list}>
+              {data.recentTransactions.map((item, index) => (
+                <TransactionRow
+                  key={`${String(item.id)}-${index}`}
+                  title={String(item.title ?? item.source)}
+                  subtitle={String(item.category ?? item.type)}
+                  amount={Number(item.amount)}
+                  type={item.type === 'income' ? 'income' : 'expense'}
+                />
+              ))}
+            </View>
           )}
         </Card.Content>
       </Card>
@@ -111,22 +141,40 @@ export function DashboardScreen() {
 }
 
 const styles = StyleSheet.create({
-  card: { borderRadius: 8 },
-  cardContent: { gap: 14, paddingVertical: 20 },
+  card: { 
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  cardContent: { gap: 12, paddingVertical: 16 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  hero: { borderRadius: 8, overflow: 'hidden' },
-  heroContent: { gap: 18, padding: 22 },
-  heroIcon: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 8, height: 48, justifyContent: 'center', width: 48 },
-  heroLabel: { color: 'rgba(255,255,255,0.78)' },
-  heroMeta: { color: 'rgba(255,255,255,0.80)', fontWeight: '700' },
-  heroPill: { backgroundColor: 'rgba(255,255,255,0.16)', borderRadius: 8, color: '#FFFFFF', fontWeight: '800', overflow: 'hidden', paddingHorizontal: 12, paddingVertical: 7 },
-  heroSubcopy: { color: 'rgba(255,255,255,0.72)' },
-  heroTitle: { color: '#FFFFFF', fontWeight: '900' },
+  hero: { 
+    borderRadius: 20, 
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  heroContent: { gap: 16, padding: 20, zIndex: 1 },
+  heroIcon: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 10, height: 44, justifyContent: 'center', width: 44 },
+  heroLabel: { color: 'rgba(255,255,255,0.80)', fontSize: 13, fontWeight: '600' },
+  heroMeta: { color: 'rgba(255,255,255,0.85)', fontWeight: '700', fontSize: 13 },
+  heroPill: { backgroundColor: 'rgba(255,255,255,0.16)', borderRadius: 10, color: '#FFFFFF', fontWeight: '800', overflow: 'hidden', paddingHorizontal: 12, paddingVertical: 6, fontSize: 12 },
+  heroSubcopy: { color: 'rgba(255,255,255,0.72)', fontSize: 12 },
+  heroTitle: { color: '#FFFFFF', fontWeight: '900', fontSize: 16, letterSpacing: -0.2 },
   heroTop: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
   heroTopRight: { alignItems: 'center', flexDirection: 'row', gap: 10 },
-  heroValue: { color: '#FFFFFF', fontWeight: '900', letterSpacing: 0 },
-  sectionHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
-  sectionTitle: { fontWeight: '800' },
+  heroValue: { color: '#FFFFFF', fontWeight: '900', letterSpacing: -0.6, fontSize: 28, marginTop: 4 },
+  sectionHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
+  sectionTitleRow: { alignItems: 'center', flexDirection: 'row', gap: 12 },
+  sectionTitle: { fontSize: 16, fontWeight: '800', letterSpacing: -0.2 },
+  headerIcon: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
   statHalf: { flexBasis: '47%' },
   statWide: { flexBasis: '23%' },
+  list: { gap: 4 },
 });

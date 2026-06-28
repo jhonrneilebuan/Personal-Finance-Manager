@@ -1,8 +1,8 @@
 import { Tabs } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import type { ColorValue } from 'react-native';
-import { StyleSheet, View } from 'react-native';
-import { IconButton, Text, useTheme } from 'react-native-paper';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text, useTheme } from 'react-native-paper';
 import { AppDrawer } from '@/components/AppDrawer';
 import { useUiStore } from '@/store/ui.store';
 
@@ -17,7 +17,14 @@ function HeaderTitle({ title }: { title: string }) {
 
   return (
     <View style={styles.headerTitle}>
-      <IconButton icon="menu" mode="contained-tonal" size={22} iconColor={theme.colors.primary} style={styles.menuButton} onPress={openDrawer} />
+      <TouchableOpacity
+        style={[styles.menuButton, { backgroundColor: theme.colors.primaryContainer }]}
+        onPress={openDrawer}
+        hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+        activeOpacity={0.75}
+      >
+        <MaterialCommunityIcons name="menu" size={20} color={theme.colors.primary} />
+      </TouchableOpacity>
       <Text variant="titleLarge" style={styles.title}>{title}</Text>
     </View>
   );
@@ -50,7 +57,13 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
-  headerTitle: { alignItems: 'center', flexDirection: 'row', gap: 8 },
-  menuButton: { borderRadius: 8, margin: 0 },
-  title: { fontWeight: '900', letterSpacing: 0 },
+  headerTitle: { alignItems: 'center', flexDirection: 'row', gap: 10 },
+  menuButton: {
+    alignItems: 'center',
+    borderRadius: 10,
+    height: 36,
+    justifyContent: 'center',
+    width: 36,
+  },
+  title: { fontWeight: '900', letterSpacing: -0.2 },
 });

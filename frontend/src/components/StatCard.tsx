@@ -23,19 +23,31 @@ export function StatCard({ label, value, tone = 'primary', icon, style }: StatCa
   const color = tone === 'expense' ? theme.colors.error : tone === 'income' ? theme.colors.secondary : tone === 'savings' ? theme.colors.tertiary : theme.colors.primary;
 
   return (
-    <Card mode="elevated" style={[styles.card, { borderColor: theme.colors.outlineVariant }, style]}>
+    <Card 
+      style={[
+        styles.card, 
+        { 
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.outlineVariant,
+          borderWidth: theme.dark ? 1 : 0,
+        }, 
+        style
+      ]}
+    >
       <Card.Content style={styles.content}>
         <View style={styles.topRow}>
-          <View style={[styles.iconWrap, { backgroundColor: `${color}18` }]}>
-            <MaterialCommunityIcons name={icon ?? toneIcon[tone]} color={color} size={22} />
+          <View style={[styles.iconWrap, { backgroundColor: `${color}14` }]}>
+            <MaterialCommunityIcons name={icon ?? toneIcon[tone]} color={color} size={20} />
           </View>
           <View style={[styles.dot, { backgroundColor: color }]} />
         </View>
         <View style={styles.copy}>
-          <Text variant="labelLarge" style={styles.label}>
+          <Text style={[styles.label, { color: theme.colors.onSurfaceVariant }]}>
             {label}
           </Text>
-          <Text variant="titleLarge" style={styles.value}>{formatCurrency(value)}</Text>
+          <Text style={[styles.value, { color: theme.colors.onSurface }]}>
+            {formatCurrency(value)}
+          </Text>
         </View>
       </Card.Content>
     </Card>
@@ -43,12 +55,22 @@ export function StatCard({ label, value, tone = 'primary', icon, style }: StatCa
 }
 
 const styles = StyleSheet.create({
-  card: { borderRadius: 8, borderWidth: 1, flexGrow: 1, minWidth: 148 },
-  content: { gap: 16, paddingVertical: 18 },
-  copy: { gap: 4 },
-  dot: { borderRadius: 8, height: 8, width: 8 },
-  iconWrap: { alignItems: 'center', borderRadius: 8, height: 44, justifyContent: 'center', width: 44 },
-  label: { opacity: 0.68 },
+  card: { 
+    borderRadius: 16, 
+    flexGrow: 1, 
+    minWidth: 140,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  content: { gap: 12, padding: 14, paddingVertical: 16 },
+  copy: { gap: 2 },
+  dot: { borderRadius: 4, height: 6, width: 6 },
+  iconWrap: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  label: { fontSize: 13, fontWeight: '600', opacity: 0.6 },
   topRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
-  value: { fontWeight: '900' },
+  value: { fontWeight: '900', fontSize: 19, letterSpacing: -0.3 },
 });
+
