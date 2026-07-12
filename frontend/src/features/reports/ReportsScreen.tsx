@@ -1,11 +1,13 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Card, Snackbar, useTheme } from 'react-native-paper';
+import { Button, Card, Snackbar, Text, useTheme } from 'react-native-paper';
 import { AiInsightCard } from '@/components/AiInsightCard';
 import { BarChartCard } from '@/components/BarChartCard';
 import { CashflowGraphCard } from '@/components/CashflowGraphCard';
+import { MonthSelector } from '@/components/MonthSelector';
 import { PageHeroCard } from '@/components/PageHeroCard';
 import { Screen } from '@/components/Screen';
+import { SectionHeader } from '@/components/SectionHeader';
 import { StateView } from '@/components/StateView';
 import { StatCard } from '@/components/StatCard';
 import { useAsyncData } from '@/hooks/useAsyncData';
@@ -16,27 +18,51 @@ import { palette } from '@/theme/theme';
 import type { AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
 
+const monthStart = (date = new Date()) => new Date(date.getFullYear(), date.getMonth(), 1);
+const shiftMonth = (date: Date, delta: number) => new Date(date.getFullYear(), date.getMonth() + delta, 1);
+const monthKey = (date: Date) => date.toISOString().slice(0, 7);
+const formatMonth = (date: Date) => new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+
 export function ReportsScreen() {
   const theme = useTheme();
   const revision = useFinanceStore((state) => state.revision);
-  const monthly = useAsyncData(useCallback(() => financeApi.monthlyReport(), [revision]));
-  const category = useAsyncData(useCallback(() => financeApi.categoryReport(), [revision]));
+  const [selectedMonth, setSelectedMonth] = useState(() => monthStart());
+  const selectedMonthKey = monthKey(selectedMonth);
+  const monthly = useAsyncData(useCallback(() => financeApi.monthlyReport(selectedMonthKey), [revision, selectedMonthKey]));
+  const category = useAsyncData(useCallback(() => financeApi.categoryReport(selectedMonthKey), [revision, selectedMonthKey]));
   const [summary, setSummary] = useState<AiFinanceInsight | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportPreview, setExportPreview] = useState('');
   const [notice, setNotice] = useState('');
 
   const generateMonthlySummary = useCallback(async () => {
     try {
       setIsAiLoading(true);
-      setSummary(await aiApi.monthlySummary());
+      setSummary(await aiApi.monthlySummary(selectedMonthKey));
     } catch {
       setNotice('Unable to generate monthly summary');
     } finally {
       setIsAiLoading(false);
     }
-  }, []);
+  }, [selectedMonthKey]);
 
-  if (monthly.isLoading || category.isLoading) return <StateView loading message="Building reports" />;
+  const exportReport = useCallback(async (format: 'csv' | 'pdf') => {
+    try {
+      setIsExporting(true);
+      const report = await financeApi.exportReport(format, selectedMonthKey);
+      if (format === 'csv' && typeof report === 'string') {
+        setExportPreview(report.slice(0, 600));
+      } else {
+        setExportPreview('');
+      }
+      setNotice(`${format.toUpperCase()} report generated`);
+    } catch {
+      setNotice('Unable to export report');
+    } finally {
+      setIsExporting(false);
+    }
+  }, [selectedMonthKey]);
 
   const cardStyle = [
     styles.card,
@@ -54,9 +80,22 @@ export function ReportsScreen() {
         title="Reports"
         subtitle="Understand income, expenses, savings, and category trends."
         value={formatCurrency(monthly.data?.savings ?? 0)}
-        caption="Monthly savings"
+        caption={formatMonth(selectedMonth)}
         color={palette.blue}
       />
+      <Card style={cardStyle}>
+        <Card.Content style={styles.monthContent}>
+          <MonthSelector
+            title="Report Month"
+            monthLabel={formatMonth(selectedMonth)}
+            caption="Review cashflow, charts, exports, and AI summary"
+            color={palette.blue}
+            onPrevious={() => setSelectedMonth((value) => shiftMonth(value, -1))}
+            onNext={() => setSelectedMonth((value) => shiftMonth(value, 1))}
+            onCurrent={() => setSelectedMonth(monthStart())}
+          />
+        </Card.Content>
+      </Card>
       <AiInsightCard
         title="AI Monthly Summary"
         subtitle="Summarize this month and get practical next steps."
@@ -67,7 +106,27 @@ export function ReportsScreen() {
         loading={isAiLoading}
         onGenerate={generateMonthlySummary}
       />
-      {monthly.data ? (
+      <Card style={cardStyle}>
+        <Card.Content style={styles.exportContent}>
+          <SectionHeader icon="file-export-outline" title="Export Report" subtitle="Generate CSV or PDF from the current month." color={palette.blue} />
+          <View style={styles.exportButtons}>
+            <Button icon="file-delimited-outline" mode="contained-tonal" loading={isExporting} disabled={isExporting} onPress={() => exportReport('csv')}>CSV</Button>
+            <Button icon="file-pdf-box" mode="contained-tonal" loading={isExporting} disabled={isExporting} onPress={() => exportReport('pdf')}>PDF</Button>
+          </View>
+          {exportPreview ? (
+            <View style={[styles.previewBox, { backgroundColor: theme.colors.surfaceVariant }]}>
+              <Text style={[styles.previewText, { color: theme.colors.onSurfaceVariant }]}>{exportPreview}</Text>
+            </View>
+          ) : null}
+        </Card.Content>
+      </Card>
+      {monthly.isLoading ? (
+        <Card style={cardStyle}>
+          <Card.Content>
+            <StateView loading message="Building reports" />
+          </Card.Content>
+        </Card>
+      ) : monthly.data ? (
         <>
           <CashflowGraphCard income={monthly.data.totalIncome} expenses={monthly.data.totalExpenses} savings={monthly.data.savings} />
           <View style={styles.grid}>
@@ -77,7 +136,13 @@ export function ReportsScreen() {
           </View>
         </>
       ) : <StateView title="No monthly report" message={monthly.error ?? 'Report data is empty'} />}
-      {category.data?.length ? (
+      {category.isLoading ? (
+        <Card style={cardStyle}>
+          <Card.Content>
+            <StateView loading message="Loading category chart" />
+          </Card.Content>
+        </Card>
+      ) : category.data?.length ? (
         <BarChartCard title="Expense Breakdown" data={category.data.map((item) => ({ label: item.category, value: item.amount }))} />
       ) : (
         <Card style={cardStyle}>
@@ -100,7 +165,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  exportButtons: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  exportContent: { gap: 12, paddingVertical: 18 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  monthContent: { paddingVertical: 18 },
+  previewBox: { borderRadius: 12, padding: 12 },
+  previewText: { fontFamily: 'monospace', fontSize: 11, lineHeight: 16 },
   stat: { flexBasis: '47%' },
 });
-

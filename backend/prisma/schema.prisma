@@ -17,6 +17,11 @@ model User {
   expenses  Expense[]
   incomes   Income[]
   budgets   Budget[]
+  goals     SavingGoal[]
+  bills     BillReminder[]
+  recurring RecurringTransaction[]
+  debts     Debt[]
+  allowance AllowancePlan[]
 }
 
 model Expense {
@@ -61,5 +66,89 @@ model Budget {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, category, month])
+  @@index([userId, month])
+}
+
+model SavingGoal {
+  id            String   @id @default(uuid())
+  userId        String
+  name          String
+  targetAmount  Decimal  @db.Decimal(12, 2)
+  currentAmount Decimal  @default(0) @db.Decimal(12, 2)
+  targetDate    DateTime?
+  note          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, targetDate])
+}
+
+model BillReminder {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  amount    Decimal  @db.Decimal(12, 2)
+  category  String
+  dueDate   DateTime
+  isPaid    Boolean  @default(false)
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, dueDate])
+  @@index([userId, isPaid])
+}
+
+model RecurringTransaction {
+  id          String   @id @default(uuid())
+  userId      String
+  type        String
+  title       String
+  amount      Decimal  @db.Decimal(12, 2)
+  category    String?
+  frequency   String
+  nextRunDate DateTime
+  isActive    Boolean  @default(true)
+  note        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, nextRunDate])
+  @@index([userId, isActive])
+}
+
+model Debt {
+  id             String   @id @default(uuid())
+  userId         String
+  lender         String
+  totalAmount    Decimal  @db.Decimal(12, 2)
+  paidAmount     Decimal  @default(0) @db.Decimal(12, 2)
+  interestRate   Decimal? @db.Decimal(5, 2)
+  dueDate        DateTime?
+  minimumPayment Decimal? @db.Decimal(12, 2)
+  note           String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, dueDate])
+}
+
+model AllowancePlan {
+  id            String   @id @default(uuid())
+  userId        String
+  name          String
+  month         DateTime
+  dailyAmount   Decimal  @db.Decimal(12, 2)
+  spendingLimit Decimal  @default(0) @db.Decimal(12, 2)
+  weekdays      Int[]
+  note          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId, month])
 }

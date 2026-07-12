@@ -3,6 +3,7 @@ import { aiInsightsService, type PurchasePlanItem } from '../services/aiInsights
 import { dashboardService } from '../services/dashboard.service';
 import { reportService } from '../services/report.service';
 import { asyncHandler } from '../utils/asyncHandler';
+import { HttpError } from '../utils/httpError';
 
 export const aiController = {
   categorizeExpense: asyncHandler(async (req, res) => {
@@ -27,6 +28,12 @@ export const aiController = {
     const dashboard = await dashboardService.getDashboard(req.user!.userId);
     const insight = await aiInsightsService.budgetAdvice(dashboard);
     res.json({ success: true, data: insight });
+  }),
+
+  budgetRecommendation: asyncHandler(async (req, res) => {
+    const dashboard = await dashboardService.getDashboard(req.user!.userId);
+    const recommendation = await aiInsightsService.budgetRecommendation(dashboard);
+    res.json({ success: true, data: recommendation });
   }),
 
   monthlySummary: asyncHandler(async (req, res) => {
@@ -66,5 +73,14 @@ export const aiController = {
     });
 
     res.json({ success: true, data: plan });
+  }),
+
+  scanReceipt: asyncHandler(async (req, res) => {
+    if (!req.file) {
+      throw new HttpError(400, 'Receipt image is required');
+    }
+
+    const receipt = await aiInsightsService.scanReceipt(req.file.path, req.file.mimetype);
+    res.json({ success: true, data: receipt });
   }),
 };

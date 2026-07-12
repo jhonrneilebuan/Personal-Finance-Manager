@@ -1,3 +1,4 @@
+import fs from 'node:fs/promises';
 import axios from 'axios';
 import { env } from '../config/env';
 
@@ -57,6 +58,30 @@ export type AiSpendingPlan = {
   source: 'ai' | 'fallback';
 };
 
+export type AiBudgetRecommendation = {
+  title: string;
+  summary: string;
+  recommendations: Array<{
+    category: string;
+    suggestedLimit: number;
+    reason: string;
+    priority: 'increase' | 'decrease' | 'keep' | 'create';
+  }>;
+  savingsTarget: number;
+  source: 'ai' | 'fallback';
+};
+
+export type AiReceiptScan = {
+  title: string;
+  merchant: string;
+  amount: number;
+  category: string;
+  transactionDate: string;
+  notes: string;
+  confidence: number;
+  source: 'ai' | 'fallback';
+};
+
 const insightSchema = {
   type: 'object',
   additionalProperties: false,
@@ -102,6 +127,46 @@ const spendingPlanSchema = {
     actionItems: { type: 'array', items: { type: 'string' } },
   },
   required: ['title', 'summary', 'recommendedBudget', 'decisions', 'actionItems'],
+};
+
+const budgetRecommendationSchema = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    title: { type: 'string' },
+    summary: { type: 'string' },
+    recommendations: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        properties: {
+          category: { type: 'string' },
+          suggestedLimit: { type: 'number' },
+          reason: { type: 'string' },
+          priority: { type: 'string', enum: ['increase', 'decrease', 'keep', 'create'] },
+        },
+        required: ['category', 'suggestedLimit', 'reason', 'priority'],
+      },
+    },
+    savingsTarget: { type: 'number' },
+  },
+  required: ['title', 'summary', 'recommendations', 'savingsTarget'],
+};
+
+const receiptScanSchema = {
+  type: 'object',
+  additionalProperties: false,
+  properties: {
+    title: { type: 'string' },
+    merchant: { type: 'string' },
+    amount: { type: 'number' },
+    category: { type: 'string' },
+    transactionDate: { type: 'string' },
+    notes: { type: 'string' },
+    confidence: { type: 'number' },
+  },
+  required: ['title', 'merchant', 'amount', 'category', 'transactionDate', 'notes', 'confidence'],
 };
 
 const extractOutputText = (payload: unknown): string | null => {
@@ -172,6 +237,51 @@ const sanitizeSpendingPlan = (value: unknown): AiSpendingPlan | null => {
     },
     decisions,
     actionItems: plan.actionItems.filter((item): item is string => typeof item === 'string').slice(0, 4),
+    source: 'ai',
+  };
+};
+
+const sanitizeBudgetRecommendation = (value: unknown): AiBudgetRecommendation | null => {
+  if (!value || typeof value !== 'object') return null;
+  const plan = value as Partial<AiBudgetRecommendation>;
+
+  if (typeof plan.title !== 'string' || typeof plan.summary !== 'string') return null;
+  if (!Array.isArray(plan.recommendations) || typeof plan.savingsTarget !== 'number') return null;
+
+  const recommendations = plan.recommendations
+    .filter((item): item is AiBudgetRecommendation['recommendations'][number] =>
+      item &&
+      typeof item === 'object' &&
+      typeof item.category === 'string' &&
+      typeof item.suggestedLimit === 'number' &&
+      typeof item.reason === 'string' &&
+      ['increase', 'decrease', 'keep', 'create'].includes(item.priority),
+    )
+    .slice(0, 8);
+
+  return {
+    title: plan.title.slice(0, 90),
+    summary: plan.summary.slice(0, 280),
+    recommendations,
+    savingsTarget: Math.max(0, Number(plan.savingsTarget)),
+    source: 'ai',
+  };
+};
+
+const sanitizeReceiptScan = (value: unknown): AiReceiptScan | null => {
+  if (!value || typeof value !== 'object') return null;
+  const receipt = value as Partial<AiReceiptScan>;
+
+  if (typeof receipt.title !== 'string' || typeof receipt.category !== 'string') return null;
+
+  return {
+    title: receipt.title.slice(0, 120) || 'Receipt expense',
+    merchant: typeof receipt.merchant === 'string' ? receipt.merchant.slice(0, 120) : '',
+    amount: Math.max(0, Number(receipt.amount ?? 0)),
+    category: receipt.category.slice(0, 80) || 'Other',
+    transactionDate: typeof receipt.transactionDate === 'string' ? receipt.transactionDate : '',
+    notes: typeof receipt.notes === 'string' ? receipt.notes.slice(0, 240) : '',
+    confidence: Math.max(0, Math.min(1, Number(receipt.confidence ?? 0.4))),
     source: 'ai',
   };
 };
@@ -265,6 +375,102 @@ const requestSpendingPlan = async (input: SpendingPlanInput): Promise<AiSpending
   const outputText = extractOutputText(response.data);
   if (!outputText) return null;
   return sanitizeSpendingPlan(JSON.parse(outputText));
+};
+
+const requestBudgetRecommendation = async (dashboard: DashboardSnapshot): Promise<AiBudgetRecommendation | null> => {
+  if (!env.openAiApiKey) return null;
+
+  const response = await axios.post(
+    'https://api.openai.com/v1/responses',
+    {
+      model: env.openAiModel,
+      input: [
+        {
+          role: 'system',
+          content: [
+            'You are PesoPilot, a strict but practical budget planner for a Philippine peso personal finance app.',
+            'Recommend monthly budget limits using the existing spending categories, current budgets, and savings.',
+            'Prioritize food, transportation, school, health, bills, and emergency savings before wants.',
+          ].join(' '),
+        },
+        {
+          role: 'user',
+          content: `Recommend budget limits and a savings target for the next month.\n\nData:\n${JSON.stringify(dashboard, null, 2)}`,
+        },
+      ],
+      max_output_tokens: 620,
+      text: {
+        format: {
+          type: 'json_schema',
+          name: 'budget_recommendation',
+          strict: true,
+          schema: budgetRecommendationSchema,
+        },
+      },
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${env.openAiApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: 12000,
+    },
+  );
+
+  const outputText = extractOutputText(response.data);
+  if (!outputText) return null;
+  return sanitizeBudgetRecommendation(JSON.parse(outputText));
+};
+
+const requestReceiptScan = async (filePath: string, mimeType: string): Promise<AiReceiptScan | null> => {
+  if (!env.openAiApiKey) return null;
+
+  const bytes = await fs.readFile(filePath);
+  const imageUrl = `data:${mimeType};base64,${bytes.toString('base64')}`;
+
+  const response = await axios.post(
+    'https://api.openai.com/v1/responses',
+    {
+      model: env.openAiModel,
+      input: [
+        {
+          role: 'system',
+          content: [
+            'You extract expense details from receipts for PesoPilot.',
+            'Return only data that is visible or strongly inferable from the receipt image.',
+            'Use Philippine peso context and choose a practical category such as Food, Transport, Bills, School, Health, Shopping, Groceries, or Other.',
+          ].join(' '),
+        },
+        {
+          role: 'user',
+          content: [
+            { type: 'input_text', text: 'Extract the merchant, total amount, date, title, category, and a short note from this receipt.' },
+            { type: 'input_image', image_url: imageUrl },
+          ],
+        },
+      ],
+      max_output_tokens: 360,
+      text: {
+        format: {
+          type: 'json_schema',
+          name: 'receipt_scan',
+          strict: true,
+          schema: receiptScanSchema,
+        },
+      },
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${env.openAiApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: 18000,
+    },
+  );
+
+  const outputText = extractOutputText(response.data);
+  if (!outputText) return null;
+  return sanitizeReceiptScan(JSON.parse(outputText));
 };
 
 const topCategory = (categories: Array<{ category: string; amount: number }>) =>
@@ -394,6 +600,53 @@ const fallbackSpendingPlan = (input: SpendingPlanInput): AiSpendingPlan => {
   };
 };
 
+const fallbackBudgetRecommendation = (dashboard: DashboardSnapshot): AiBudgetRecommendation => {
+  const existing = new Map(dashboard.budgetUsage.map((budget) => [budget.category, budget]));
+  const categories = dashboard.expenseByCategory.length
+    ? dashboard.expenseByCategory
+    : dashboard.budgetUsage.map((budget) => ({ category: budget.category, amount: budget.spentAmount }));
+
+  const recommendations = categories.slice(0, 6).map((item) => {
+    const current = existing.get(item.category);
+    const suggestedLimit = Math.max(500, Math.ceil((item.amount * 1.1) / 100) * 100);
+    const priority: AiBudgetRecommendation['recommendations'][number]['priority'] = current
+      ? current.spentAmount > current.limitAmount ? 'increase' : 'keep'
+      : 'create';
+
+    return {
+      category: item.category,
+      suggestedLimit,
+      priority,
+      reason: current
+        ? current.spentAmount > current.limitAmount
+          ? 'Recent spending is above the current limit, so adjust or cut spending here.'
+          : 'Current spending fits this category, so keep the limit close to the actual trend.'
+        : 'This is a top spending category without a clear monthly guardrail.',
+    };
+  });
+
+  const savingsTarget = Math.max(0, Math.round((dashboard.totalIncome || dashboard.currentBalance) * 0.15));
+
+  return {
+    title: 'Suggested next-month budget',
+    summary: 'PesoPilot used your largest categories and current limits to suggest practical monthly caps.',
+    recommendations,
+    savingsTarget,
+    source: 'fallback',
+  };
+};
+
+const fallbackReceiptScan = (): AiReceiptScan => ({
+  title: 'Receipt expense',
+  merchant: '',
+  amount: 0,
+  category: 'Other',
+  transactionDate: '',
+  notes: 'AI receipt scan is unavailable. Enter the amount manually before saving.',
+  confidence: 0.2,
+  source: 'fallback',
+});
+
 const withFallback = async <T>(createInsight: () => Promise<T | null>, fallback: T): Promise<T> => {
   try {
     return (await createInsight()) ?? fallback;
@@ -431,6 +684,20 @@ export const aiInsightsService = {
     return withFallback(
       () => requestSpendingPlan(input),
       fallbackSpendingPlan(input),
+    );
+  },
+
+  budgetRecommendation(dashboard: DashboardSnapshot) {
+    return withFallback(
+      () => requestBudgetRecommendation(dashboard),
+      fallbackBudgetRecommendation(dashboard),
+    );
+  },
+
+  scanReceipt(filePath: string, mimeType: string) {
+    return withFallback(
+      () => requestReceiptScan(filePath, mimeType),
+      fallbackReceiptScan(),
     );
   },
 };

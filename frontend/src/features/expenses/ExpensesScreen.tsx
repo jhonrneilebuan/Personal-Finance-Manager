@@ -1,5 +1,6 @@
 import { Fragment, useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { Controller, useForm } from 'react-hook-form';
 import { Card, Button, Snackbar, Text, TextInput, useTheme } from 'react-native-paper';
 import { PageHeroCard } from '@/components/PageHeroCard';
@@ -31,6 +32,9 @@ export function ExpensesScreen() {
   const [notice, setNotice] = useState('');
   const [aiReason, setAiReason] = useState('');
   const [isSuggesting, setIsSuggesting] = useState(false);
+  const [isScanningReceipt, setIsScanningReceipt] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
   const { control, handleSubmit, reset, setValue, watch, formState: { isSubmitting } } = useForm<ExpenseFormValues>({
     defaultValues: { title: '', amount: '', category: '', description: '' },
   });
@@ -38,6 +42,15 @@ export function ExpensesScreen() {
   const amountValue = watch('amount');
   const descriptionValue = watch('description');
   const totalExpenses = useMemo(() => data?.reduce((sum, item) => sum + Number(item.amount), 0) ?? 0, [data]);
+  const filteredExpenses = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    const category = categoryFilter.trim().toLowerCase();
+    return data?.filter((item) => {
+      const matchesQuery = !query || item.title.toLowerCase().includes(query) || item.category.toLowerCase().includes(query) || (item.description ?? '').toLowerCase().includes(query);
+      const matchesCategory = !category || item.category.toLowerCase().includes(category);
+      return matchesQuery && matchesCategory;
+    }) ?? [];
+  }, [categoryFilter, data, searchQuery]);
 
   const suggestCategory = useCallback(async () => {
     const title = titleValue.trim();
@@ -65,6 +78,44 @@ export function ExpensesScreen() {
       setIsSuggesting(false);
     }
   }, [amountValue, descriptionValue, setValue, titleValue]);
+
+  const scanReceipt = useCallback(async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        setNotice('Photo permission is required to scan receipts');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 0.85,
+      });
+
+      if (result.canceled || !result.assets[0]) return;
+
+      const asset = result.assets[0];
+      const formData = new FormData();
+      formData.append('receipt', {
+        uri: asset.uri,
+        name: asset.fileName ?? 'receipt.jpg',
+        type: asset.mimeType ?? 'image/jpeg',
+      } as unknown as Blob);
+
+      setIsScanningReceipt(true);
+      const receipt = await aiApi.scanReceipt(formData);
+      setValue('title', receipt.title || receipt.merchant || 'Receipt expense', { shouldDirty: true });
+      setValue('category', receipt.category || 'Other', { shouldDirty: true });
+      if (receipt.amount > 0) setValue('amount', String(receipt.amount), { shouldDirty: true });
+      setValue('description', receipt.notes || `Receipt scan confidence: ${Math.round(receipt.confidence * 100)}%`, { shouldDirty: true });
+      setAiReason(`${receipt.source === 'ai' ? 'AI' : 'PesoPilot'} scanned ${receipt.category} (${Math.round(receipt.confidence * 100)}%)`);
+      setNotice('Receipt scanned');
+    } catch {
+      setNotice('Unable to scan receipt');
+    } finally {
+      setIsScanningReceipt(false);
+    }
+  }, [setValue]);
 
   const create = handleSubmit(async (values) => {
     const amount = Number(values.amount);
@@ -113,6 +164,17 @@ export function ExpensesScreen() {
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
           <SectionHeader icon="robot-outline" title="New Expense" subtitle="Use AI to suggest the best category before saving." color={palette.red} />
+          <Button
+            icon="receipt-text-outline"
+            mode="contained-tonal"
+            style={styles.aiButton}
+            contentStyle={styles.aiButtonContent}
+            loading={isScanningReceipt}
+            disabled={isScanningReceipt || isSubmitting}
+            onPress={scanReceipt}
+          >
+            Scan Receipt with AI
+          </Button>
           {expenseFields.map((name) => (
             <Fragment key={name}>
               <Controller control={control} name={name} render={({ field: { value, onChange } }) => (
@@ -160,11 +222,31 @@ export function ExpensesScreen() {
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
           <SectionHeader icon="history" title="Expense History" subtitle="Latest spending records" color={palette.red} />
-          {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load expenses" message={error} /> : data?.length ? (
+          <View style={styles.filterRow}>
+            <TextInput
+              mode="outlined"
+              label="Search"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              left={<TextInput.Icon icon="magnify" />}
+              style={styles.filterInput}
+              theme={{ roundness: 12 }}
+            />
+            <TextInput
+              mode="outlined"
+              label="Category"
+              value={categoryFilter}
+              onChangeText={setCategoryFilter}
+              left={<TextInput.Icon icon="filter-outline" />}
+              style={styles.filterInput}
+              theme={{ roundness: 12 }}
+            />
+          </View>
+          {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load expenses" message={error} /> : filteredExpenses.length ? (
             <View style={styles.list}>
-              {data.map((item) => <TransactionRow key={item.id} title={item.title} subtitle={item.category} amount={Number(item.amount)} type="expense" />)}
+              {filteredExpenses.map((item) => <TransactionRow key={item.id} title={item.title} subtitle={item.category} amount={Number(item.amount)} type="expense" />)}
             </View>
-          ) : <StateView title="No expenses" message="Expenses you add will appear here." />}
+          ) : <StateView title="No expenses found" message={data?.length ? 'Adjust search or category filters.' : 'Expenses you add will appear here.'} />}
         </Card.Content>
       </Card>
       <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={2400}>{notice}</Snackbar>
@@ -196,8 +278,9 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  filterInput: { flex: 1, minWidth: 130 },
+  filterRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   formContent: { gap: 14, paddingVertical: 18 },
   listContent: { gap: 12, paddingVertical: 18 },
   list: { gap: 4 },
 });
-

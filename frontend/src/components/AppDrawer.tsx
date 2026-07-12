@@ -6,13 +6,27 @@ import { Modal, Portal, Text, useTheme } from 'react-native-paper';
 import { useAuthStore } from '@/store/auth.store';
 import { useUiStore } from '@/store/ui.store';
 
-type TabHref = '/(tabs)/dashboard' | '/(tabs)/expenses' | '/(tabs)/income' | '/(tabs)/budgets' | '/(tabs)/reports' | '/(tabs)/profile';
+type TabHref =
+  | '/(tabs)/dashboard'
+  | '/(tabs)/expenses'
+  | '/(tabs)/income'
+  | '/(tabs)/budgets'
+  | '/(tabs)/reports'
+  | '/(tabs)/profile'
+  | '/(tabs)/goals'
+  | '/(tabs)/bills'
+  | '/(tabs)/debts'
+  | '/(tabs)/allowance';
 
 const navItems: Array<{ title: string; icon: keyof typeof MaterialCommunityIcons.glyphMap; href: TabHref; match: string; accent: string }> = [
   { title: 'Dashboard',  icon: 'view-dashboard-outline',    href: '/(tabs)/dashboard', match: '/dashboard', accent: '#007AFF' },
   { title: 'Expenses',   icon: 'credit-card-minus-outline', href: '/(tabs)/expenses',  match: '/expenses',  accent: '#FF453A' },
   { title: 'Income',     icon: 'cash-plus',                 href: '/(tabs)/income',    match: '/income',    accent: '#34C759' },
   { title: 'Budgets',    icon: 'target-variant',            href: '/(tabs)/budgets',   match: '/budgets',   accent: '#5E5CE6' },
+  { title: 'Baon Plan',  icon: 'school-outline',            href: '/(tabs)/allowance', match: '/allowance', accent: '#30D158' },
+  { title: 'Goals',      icon: 'bullseye-arrow',            href: '/(tabs)/goals',     match: '/goals',     accent: '#0A84FF' },
+  { title: 'Bills',      icon: 'calendar-clock',            href: '/(tabs)/bills',     match: '/bills',     accent: '#FF9F0A' },
+  { title: 'Debts',      icon: 'credit-card-clock-outline', href: '/(tabs)/debts',     match: '/debts',     accent: '#FF453A' },
   { title: 'Reports',    icon: 'chart-areaspline',          href: '/(tabs)/reports',   match: '/reports',   accent: '#0A84FF' },
   { title: 'Profile',    icon: 'account-circle-outline',    href: '/(tabs)/profile',   match: '/profile',   accent: '#FF9F0A' },
 ];
@@ -21,7 +35,7 @@ const quickActions: Array<{ label: string; icon: keyof typeof MaterialCommunityI
   { label: 'AI Planner', icon: 'robot-outline',         href: '/(tabs)/dashboard', color: '#FFFFFF', bg: '#5E5CE6' },
   { label: 'Expense',    icon: 'plus-circle-outline',   href: '/(tabs)/expenses',  color: '#FFFFFF', bg: '#FF453A' },
   { label: 'Income',     icon: 'cash-plus',             href: '/(tabs)/income',    color: '#FFFFFF', bg: '#34C759' },
-  { label: 'Budget',     icon: 'target-variant',        href: '/(tabs)/budgets',   color: '#FFFFFF', bg: '#FF9F0A' },
+  { label: 'Baon',       icon: 'school-outline',        href: '/(tabs)/allowance', color: '#FFFFFF', bg: '#30D158' },
 ];
 
 export function AppDrawer() {

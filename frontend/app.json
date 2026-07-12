@@ -6,21 +6,31 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": ["**/*"],
-    "plugins": ["expo-router", "expo-secure-store"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#0B5D4B"
-      }
+      },
+      "package": "com.jhonrneilebuan.pesopilot"
     },
     "web": {
       "bundler": "metro"
     },
     "extra": {
-      "apiUrl": "http://192.168.1.15:4000/api"
+      "apiUrl": "http://192.168.1.11:4000/api",
+      "router": {},
+      "eas": {
+        "projectId": "e44232a6-7665-4155-9bf9-71270658f2a3"
+      }
     }
   }
 }

@@ -40,15 +40,21 @@ export const authService = {
   },
 
   async refresh(refreshToken: string) {
-    try {
-      const payload = verifyRefreshToken(refreshToken);
-      return {
-        accessToken: createAccessToken({ userId: payload.userId, email: payload.email }),
-        refreshToken: createRefreshToken({ userId: payload.userId, email: payload.email }),
-      };
-    } catch {
-      throw new HttpError(401, 'Invalid refresh token');
-    }
+    const payload = (() => {
+      try {
+        return verifyRefreshToken(refreshToken);
+      } catch {
+        throw new HttpError(401, 'Invalid refresh token');
+      }
+    })();
+
+    const user = await userRepository.findById(payload.userId);
+    if (!user) throw new HttpError(401, 'Session expired. Please log in again.');
+
+    const tokenPayload = { userId: user.id, email: user.email };
+    return {
+      accessToken: createAccessToken(tokenPayload),
+      refreshToken: createRefreshToken(tokenPayload),
+    };
   },
 };
-

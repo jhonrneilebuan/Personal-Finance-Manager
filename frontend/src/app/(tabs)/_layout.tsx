@@ -1,6 +1,5 @@
-import { Tabs, usePathname } from 'expo-router';
+import { router, Tabs, usePathname } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import type { ColorValue } from 'react-native';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { AppDrawer } from '@/components/AppDrawer';
@@ -47,7 +46,6 @@ function CustomTabBar() {
               key={tab.name}
               style={styles.tabItem}
               onPress={() => {
-                const { router } = require('expo-router');
                 router.push(`/(tabs)/${tab.name}`);
               }}
               activeOpacity={0.7}
@@ -96,6 +94,10 @@ const HEADER_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap>
   Budgets:   'target-variant',
   Reports:   'chart-areaspline',
   Profile:   'account-circle-outline',
+  Goals:     'bullseye-arrow',
+  Bills:     'calendar-clock',
+  Debts:     'credit-card-clock-outline',
+  Baon:      'school-outline',
 };
 
 function HeaderTitle({ title }: { title: string }) {
@@ -161,6 +163,10 @@ export default function TabsLayout() {
         <Tabs.Screen name="budgets"   options={{ title: 'Budgets',   headerTitle: () => <HeaderTitle title="Budgets" /> }} />
         <Tabs.Screen name="reports"   options={{ title: 'Reports',   headerTitle: () => <HeaderTitle title="Reports" /> }} />
         <Tabs.Screen name="profile"   options={{ title: 'Profile',   headerTitle: () => <HeaderTitle title="Profile" /> }} />
+        <Tabs.Screen name="goals"     options={{ title: 'Goals',     headerTitle: () => <HeaderTitle title="Goals" /> }} />
+        <Tabs.Screen name="bills"     options={{ title: 'Bills',     headerTitle: () => <HeaderTitle title="Bills" /> }} />
+        <Tabs.Screen name="debts"     options={{ title: 'Debts',     headerTitle: () => <HeaderTitle title="Debts" /> }} />
+        <Tabs.Screen name="allowance" options={{ title: 'Baon',      headerTitle: () => <HeaderTitle title="Baon" /> }} />
       </Tabs>
       <AppDrawer />
     </>

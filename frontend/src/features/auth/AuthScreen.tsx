@@ -43,6 +43,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   const isWide = width >= 720;
   const setSession = useAuthStore((state) => state.setSession);
   const [isPasswordVisible, setPasswordVisible] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const schema = mode === 'login' ? loginSchema : registerSchema;
 
   const {
@@ -78,12 +79,21 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   }, [mode]);
 
   const onSubmit = handleSubmit(async (values) => {
-    const session =
-      mode === 'login'
-        ? await authApi.login({ email: values.email, password: values.password })
-        : await authApi.register({ fullName: values.fullName, email: values.email, password: values.password });
-    await setSession(session);
-    router.replace('/(tabs)/dashboard');
+    setSubmitError('');
+    try {
+      const session =
+        mode === 'login'
+          ? await authApi.login({ email: values.email, password: values.password })
+          : await authApi.register({ fullName: values.fullName, email: values.email, password: values.password });
+      await setSession(session);
+      router.replace('/(tabs)/dashboard');
+    } catch {
+      setSubmitError(
+        mode === 'login'
+          ? 'Invalid email or password. If you switched to Neon, create your account again first.'
+          : 'Unable to create account. Try another email or check the backend server.',
+      );
+    }
   });
 
   return (
@@ -271,6 +281,11 @@ export function AuthScreen({ mode }: AuthScreenProps) {
               >
                 {mode === 'login' ? 'Login' : 'Create account'}
               </Button>
+              {submitError ? (
+                <HelperText type="error" visible style={styles.submitError}>
+                  {submitError}
+                </HelperText>
+              ) : null}
 
               {/* Navigation links */}
               {mode === 'login' ? (
@@ -458,6 +473,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   buttonContent: { height: 48 },
+  submitError: { color: '#FF453A', fontSize: 12, lineHeight: 17, marginTop: -2 },
 
   // Links
   links: {

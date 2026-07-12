@@ -19,6 +19,7 @@
     "axios": "latest",
     "expo": "latest",
     "expo-constants": "latest",
+    "expo-image-picker": "^56.0.18",
     "expo-linking": "latest",
     "expo-router": "latest",
     "expo-secure-store": "latest",

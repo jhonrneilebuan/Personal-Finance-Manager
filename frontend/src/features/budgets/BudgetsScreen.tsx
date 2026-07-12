@@ -3,6 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Button, Card, ProgressBar, Snackbar, Text, TextInput, useTheme } from 'react-native-paper';
 import { AiInsightCard } from '@/components/AiInsightCard';
+import { MonthSelector } from '@/components/MonthSelector';
 import { PageHeroCard } from '@/components/PageHeroCard';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
@@ -12,7 +13,7 @@ import { aiApi } from '@/services/ai.service';
 import { financeApi } from '@/services/finance.service';
 import { useFinanceStore } from '@/store/finance.store';
 import { palette } from '@/theme/theme';
-import type { AiFinanceInsight } from '@/types/ai';
+import type { AiBudgetRecommendation, AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
 
 const currentMonthIso = () => {
@@ -36,14 +37,26 @@ export function BudgetsScreen() {
   const markChanged = useFinanceStore((state) => state.markChanged);
   const [notice, setNotice] = useState('');
   const [aiAdvice, setAiAdvice] = useState<AiFinanceInsight | null>(null);
+  const [recommendation, setRecommendation] = useState<AiBudgetRecommendation | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [isRecommendationLoading, setIsRecommendationLoading] = useState(false);
   const { data, isLoading, error, refresh } = useAsyncData(useCallback(() => financeApi.budgets(), [revision]));
   const dashboard = useAsyncData(useCallback(() => financeApi.dashboard(), [revision]));
   const { control, handleSubmit, reset, setValue, formState: { isSubmitting } } = useForm({
     defaultValues: { category: 'Food', limitAmount: '', month: currentMonthIso() },
   });
   const selectedMonth = useWatch({ control, name: 'month' });
-  const totalBudget = useMemo(() => data?.reduce((sum, item) => sum + Number(item.limitAmount), 0) ?? 0, [data]);
+  const categorySpending = useAsyncData(useCallback(() => financeApi.categoryReport(selectedMonth?.slice(0, 7)), [revision, selectedMonth]));
+  const selectedMonthKey = selectedMonth?.slice(0, 7);
+  const selectedBudgets = useMemo(
+    () => data?.filter((item) => item.month.slice(0, 7) === selectedMonthKey) ?? [],
+    [data, selectedMonthKey],
+  );
+  const totalBudget = useMemo(() => selectedBudgets.reduce((sum, item) => sum + Number(item.limitAmount), 0), [selectedBudgets]);
+  const spentByCategory = useMemo(
+    () => new Map((categorySpending.data ?? []).map((item) => [item.category, Number(item.amount)])),
+    [categorySpending.data],
+  );
 
   const generateBudgetAdvice = useCallback(async () => {
     try {
@@ -53,6 +66,17 @@ export function BudgetsScreen() {
       setNotice('Unable to generate budget advice');
     } finally {
       setIsAiLoading(false);
+    }
+  }, []);
+
+  const generateRecommendation = useCallback(async () => {
+    try {
+      setIsRecommendationLoading(true);
+      setRecommendation(await aiApi.budgetRecommendation());
+    } catch {
+      setNotice('Unable to generate budget recommendation');
+    } finally {
+      setIsRecommendationLoading(false);
     }
   }, []);
 
@@ -66,7 +90,7 @@ export function BudgetsScreen() {
     try {
       await financeApi.createBudget({ category: values.category, limitAmount, month: values.month });
       reset({ category: 'Food', limitAmount: '', month: currentMonthIso() });
-      await Promise.all([refresh(), dashboard.refresh()]);
+      await Promise.all([refresh(), dashboard.refresh(), categorySpending.refresh()]);
       markChanged();
       setNotice('Budget saved');
     } catch {
@@ -84,7 +108,7 @@ export function BudgetsScreen() {
   ];
 
   return (
-    <Screen refreshing={isLoading || dashboard.isLoading} onRefresh={() => { refresh(); dashboard.refresh(); }}>
+    <Screen refreshing={isLoading || dashboard.isLoading || categorySpending.isLoading} onRefresh={() => { refresh(); dashboard.refresh(); categorySpending.refresh(); }}>
       <PageHeroCard
         icon="target-variant"
         title="Budgets"
@@ -104,32 +128,49 @@ export function BudgetsScreen() {
         onGenerate={generateBudgetAdvice}
       />
       <Card style={cardStyle}>
+        <Card.Content style={styles.recommendationContent}>
+          <SectionHeader icon="robot-excited-outline" title="AI Budget Recommendation" subtitle="Suggest limits and a savings target for the next month." color={palette.indigo} />
+          <Button
+            icon="sparkles"
+            mode="contained-tonal"
+            loading={isRecommendationLoading}
+            disabled={isRecommendationLoading}
+            onPress={generateRecommendation}
+          >
+            Suggest Next Limits
+          </Button>
+          {recommendation ? (
+            <View style={styles.recommendationList}>
+              <View style={[styles.savingsTarget, { backgroundColor: theme.colors.surfaceVariant }]}>
+                <Text style={[styles.savingsTargetLabel, { color: theme.colors.onSurfaceVariant }]}>Savings target</Text>
+                <Text style={[styles.savingsTargetValue, { color: palette.indigo }]}>{formatCurrency(recommendation.savingsTarget)}</Text>
+              </View>
+              <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>{recommendation.summary}</Text>
+              {recommendation.recommendations.map((item) => (
+                <View key={`${item.category}-${item.priority}`} style={[styles.recommendationItem, { backgroundColor: theme.colors.surfaceVariant }]}>
+                  <View style={styles.budgetMeta}>
+                    <Text style={[styles.budgetTitle, { color: theme.colors.onSurface }]}>{item.category}</Text>
+                    <Text style={[styles.budgetLimitText, { color: palette.indigo }]}>{formatCurrency(item.suggestedLimit)}</Text>
+                  </View>
+                  <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>{item.priority.toUpperCase()} - {item.reason}</Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </Card.Content>
+      </Card>
+      <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
           <SectionHeader icon="target-variant" title="New Budget" subtitle="Choose month, category, and spending limit." color={palette.indigo} />
-          
-          <View style={[styles.monthPicker, { backgroundColor: theme.colors.surfaceVariant }]}>
-            <Button 
-              icon="chevron-left" 
-              mode="text" 
-              textColor={theme.colors.primary}
-              onPress={() => setValue('month', shiftMonth(selectedMonth, -1))}
-            >
-              Prev
-            </Button>
-            <View style={styles.monthLabel}>
-              <Text style={[styles.monthLabelText, { color: theme.colors.onSurfaceVariant }]}>Budget Month</Text>
-              <Text style={[styles.monthText, { color: theme.colors.onSurface }]}>{formatMonth(selectedMonth)}</Text>
-            </View>
-            <Button 
-              contentStyle={styles.nextMonthButton} 
-              icon="chevron-right" 
-              mode="text" 
-              textColor={theme.colors.primary}
-              onPress={() => setValue('month', shiftMonth(selectedMonth, 1))}
-            >
-              Next
-            </Button>
-          </View>
+          <MonthSelector
+            title="Budget Month"
+            monthLabel={formatMonth(selectedMonth)}
+            caption={`${selectedBudgets.length} categories planned`}
+            color={palette.indigo}
+            onPrevious={() => setValue('month', shiftMonth(selectedMonth, -1))}
+            onNext={() => setValue('month', shiftMonth(selectedMonth, 1))}
+            onCurrent={() => setValue('month', currentMonthIso())}
+          />
 
           {(['category', 'limitAmount'] as const).map((name) => (
             <Controller key={name} control={control} name={name} render={({ field: { value, onChange } }) => (
@@ -161,10 +202,10 @@ export function BudgetsScreen() {
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
           <SectionHeader icon="chart-donut" title="Budget Progress" subtitle="Current month usage by category" color={palette.indigo} />
-          {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load budgets" message={error} /> : data?.length ? (
+          {isLoading || categorySpending.isLoading ? <StateView loading /> : error ? <StateView title="Unable to load budgets" message={error} /> : selectedBudgets.length ? (
             <View style={styles.budgetList}>
-              {data.map((item) => {
-                const spentAmount = dashboard.data?.budgetUsage.find((budget) => budget.category === item.category)?.spentAmount ?? 0;
+              {selectedBudgets.map((item) => {
+                const spentAmount = spentByCategory.get(item.category) ?? 0;
                 const progress = Math.min(spentAmount / Number(item.limitAmount), 1);
                 return (
                   <View key={item.id} style={[styles.budgetItem, { backgroundColor: theme.colors.surfaceVariant }]}>
@@ -180,7 +221,7 @@ export function BudgetsScreen() {
                 );
               })}
             </View>
-          ) : <StateView title="No budgets" message="Create budgets to track category limits." />}
+          ) : <StateView title="No budgets this month" message="Create budgets for the selected month to track category limits." />}
         </Card.Content>
       </Card>
       <Snackbar visible={!!notice} onDismiss={() => setNotice('')} duration={2800}>{notice}</Snackbar>
@@ -220,18 +261,12 @@ const styles = StyleSheet.create({
   formContent: { gap: 14, paddingVertical: 18 },
   listContent: { gap: 12, paddingVertical: 18 },
   budgetList: { gap: 8 },
-  monthLabel: { alignItems: 'center', flex: 1, gap: 1 },
-  monthLabelText: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase', opacity: 0.6 },
-  monthPicker: { 
-    alignItems: 'center', 
-    borderRadius: 12, 
-    flexDirection: 'row', 
-    gap: 4, 
-    padding: 6 
-  },
-  monthText: { fontSize: 15, fontWeight: '800', textAlign: 'center', letterSpacing: -0.1 },
-  nextMonthButton: { flexDirection: 'row-reverse' },
+  recommendationContent: { gap: 12, paddingVertical: 18 },
+  recommendationItem: { borderRadius: 12, gap: 6, padding: 12 },
+  recommendationList: { gap: 10 },
+  savingsTarget: { borderRadius: 14, gap: 3, padding: 14 },
+  savingsTargetLabel: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase' },
+  savingsTargetValue: { fontSize: 22, fontWeight: '900' },
   progress: { borderRadius: 4, height: 8 },
   subtitle: { fontSize: 12, opacity: 0.6, fontWeight: '500' },
 });
-

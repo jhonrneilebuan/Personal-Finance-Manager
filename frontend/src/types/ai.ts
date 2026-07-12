@@ -36,3 +36,27 @@ export type AiSpendingPlan = {
   actionItems: string[];
   source: 'ai' | 'fallback';
 };
+
+export type AiBudgetRecommendation = {
+  title: string;
+  summary: string;
+  recommendations: Array<{
+    category: string;
+    suggestedLimit: number;
+    reason: string;
+    priority: 'increase' | 'decrease' | 'keep' | 'create';
+  }>;
+  savingsTarget: number;
+  source: 'ai' | 'fallback';
+};
+
+export type AiReceiptScan = {
+  title: string;
+  merchant: string;
+  amount: number;
+  category: string;
+  transactionDate: string;
+  notes: string;
+  confidence: number;
+  source: 'ai' | 'fallback';
+};
