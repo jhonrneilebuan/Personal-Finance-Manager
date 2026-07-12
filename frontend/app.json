@@ -26,7 +26,7 @@
       "bundler": "metro"
     },
     "extra": {
-      "apiUrl": "http://192.168.1.11:4000/api",
+      "apiUrl": "https://personal-finance-manager-w188.onrender.com/api",
       "router": {},
       "eas": {
         "projectId": "e44232a6-7665-4155-9bf9-71270658f2a3"
