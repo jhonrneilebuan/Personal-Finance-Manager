@@ -2,7 +2,7 @@ import { Fragment, useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Controller, useForm } from 'react-hook-form';
-import { Card, Button, Snackbar, Text, TextInput, useTheme } from 'react-native-paper';
+import { Card, Button, Chip, Snackbar, Text, TextInput, useTheme } from 'react-native-paper';
 import { PageHeroCard } from '@/components/PageHeroCard';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
@@ -17,6 +17,7 @@ import { formatCurrency } from '@/utils/currency';
 
 const inputIcon = { title: 'store-outline', amount: 'cash-minus', category: 'shape-outline', description: 'note-text-outline' } as const;
 const expenseFields = ['title', 'amount', 'category', 'description'] as const;
+const quickCategories = ['Food', 'Transport', 'Bills', 'School', 'Shopping', 'Health'];
 
 type ExpenseFormValues = {
   title: string;
@@ -40,7 +41,9 @@ export function ExpensesScreen() {
   });
   const titleValue = watch('title');
   const amountValue = watch('amount');
+  const categoryValue = watch('category');
   const descriptionValue = watch('description');
+  const draftAmount = Number(amountValue);
   const totalExpenses = useMemo(() => data?.reduce((sum, item) => sum + Number(item.amount), 0) ?? 0, [data]);
   const filteredExpenses = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
@@ -156,14 +159,24 @@ export function ExpensesScreen() {
       <PageHeroCard
         icon="credit-card-minus-outline"
         title="Expenses"
-        subtitle="Control where your money goes and keep spending visible."
+        subtitle="Log spending fast, then let Tarsi suggest the right category."
         value={formatCurrency(totalExpenses)}
         caption={`${data?.length ?? 0} records`}
-        color={palette.red}
+        color={palette.forest}
+        mascot
       />
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="robot-outline" title="New Expense" subtitle="Use AI to suggest the best category before saving." color={palette.red} />
+          <SectionHeader icon="robot-outline" title="New Expense" subtitle="Use AI to suggest the best category before saving." color={palette.forest} />
+          <View style={[styles.entryPreview, { backgroundColor: theme.colors.surfaceVariant }]}>
+            <View style={styles.entryPreviewCopy}>
+              <Text style={[styles.entryPreviewLabel, { color: theme.colors.onSurfaceVariant }]}>Draft spending</Text>
+              <Text style={[styles.entryPreviewAmount, { color: palette.red }]}>{formatCurrency(Number.isFinite(draftAmount) ? draftAmount : 0)}</Text>
+            </View>
+            <View style={[styles.entryPreviewBadge, { backgroundColor: `${palette.forest}18` }]}>
+              <Text style={[styles.entryPreviewBadgeText, { color: palette.forest }]}>{categoryValue || 'Pick category'}</Text>
+            </View>
+          </View>
           <Button
             icon="receipt-text-outline"
             mode="contained-tonal"
@@ -206,6 +219,19 @@ export function ExpensesScreen() {
               ) : null}
             </Fragment>
           ))}
+          <View style={styles.quickCategories}>
+            {quickCategories.map((category) => (
+              <Chip
+                key={category}
+                icon="leaf"
+                selected={categoryValue === category}
+                onPress={() => setValue('category', category, { shouldDirty: true, shouldValidate: true })}
+                style={styles.quickChip}
+              >
+                {category}
+              </Chip>
+            ))}
+          </View>
           <Button 
             icon="plus-circle-outline" 
             style={styles.saveButton}
@@ -221,7 +247,7 @@ export function ExpensesScreen() {
       </Card>
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="history" title="Expense History" subtitle="Latest spending records" color={palette.red} />
+          <SectionHeader icon="history" title="Expense History" subtitle="Latest spending records" color={palette.forest} />
           <View style={styles.filterRow}>
             <TextInput
               mode="outlined"
@@ -244,7 +270,16 @@ export function ExpensesScreen() {
           </View>
           {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load expenses" message={error} /> : filteredExpenses.length ? (
             <View style={styles.list}>
-              {filteredExpenses.map((item) => <TransactionRow key={item.id} title={item.title} subtitle={item.category} amount={Number(item.amount)} type="expense" />)}
+              {filteredExpenses.map((item) => (
+                <TransactionRow
+                  key={item.id}
+                  title={item.title}
+                  subtitle={item.category}
+                  amount={Number(item.amount)}
+                  type="expense"
+                  badge={totalExpenses > 0 && Number(item.amount) / totalExpenses >= 0.25 ? 'HIGH' : undefined}
+                />
+              ))}
             </View>
           ) : <StateView title="No expenses found" message={data?.length ? 'Adjust search or category filters.' : 'Expenses you add will appear here.'} />}
         </Card.Content>
@@ -260,10 +295,16 @@ const styles = StyleSheet.create({
   aiButton: { borderRadius: 10 },
   aiButtonContent: { height: 42 },
   buttonContent: { height: 48 },
+  entryPreview: { alignItems: 'center', borderRadius: 20, flexDirection: 'row', gap: 12, justifyContent: 'space-between', padding: 14 },
+  entryPreviewAmount: { fontSize: 24, fontWeight: '900' },
+  entryPreviewBadge: { borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
+  entryPreviewBadgeText: { fontSize: 12, fontWeight: '900' },
+  entryPreviewCopy: { flex: 1, gap: 2 },
+  entryPreviewLabel: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase' },
   saveButton: {
-    backgroundColor: '#FF453A',
-    borderRadius: 12,
-    shadowColor: '#FF453A',
+    backgroundColor: palette.forest,
+    borderRadius: 16,
+    shadowColor: palette.forest,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
@@ -271,7 +312,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   card: { 
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -283,4 +324,6 @@ const styles = StyleSheet.create({
   formContent: { gap: 14, paddingVertical: 18 },
   listContent: { gap: 12, paddingVertical: 18 },
   list: { gap: 4 },
+  quickCategories: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  quickChip: { borderRadius: 999 },
 });

@@ -10,7 +10,7 @@ type BarChartCardProps = {
   data: Array<{ label: string; value: number }>;
 };
 
-const chartColors = [palette.blue, palette.indigo, palette.green, palette.orange, palette.pink, palette.teal];
+const chartColors = [palette.forest, palette.leaf, palette.green, palette.teal, palette.orange, palette.pink];
 
 export function BarChartCard({ title, data }: BarChartCardProps) {
   const theme = useTheme();
@@ -62,22 +62,21 @@ export function BarChartCard({ title, data }: BarChartCardProps) {
 const styles = StyleSheet.create({
   bar: { borderRadius: 4, height: 6 },
   card: { 
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
   },
-  content: { gap: 16, paddingVertical: 18 },
+  content: { gap: 16, paddingVertical: 20 },
   header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
-  headerIcon: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  headerIcon: { alignItems: 'center', borderRadius: 14, height: 42, justifyContent: 'center', width: 42 },
   label: { flex: 1, fontWeight: '700', fontSize: 14, letterSpacing: -0.1 },
   meta: { alignItems: 'center', flexDirection: 'row', gap: 10 },
   row: { gap: 6 },
   rows: { gap: 14 },
   title: { fontSize: 16, fontWeight: '800', letterSpacing: -0.2 },
-  track: { borderRadius: 4, height: 6, overflow: 'hidden' },
+  track: { borderRadius: 999, height: 8, overflow: 'hidden' },
   value: { opacity: 0.8, textAlign: 'right', fontSize: 13, fontWeight: '700', letterSpacing: -0.2 },
 });
-

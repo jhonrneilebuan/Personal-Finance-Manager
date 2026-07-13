@@ -36,10 +36,10 @@ const styles = StyleSheet.create({
   },
   iconWrap: { 
     alignItems: 'center', 
-    borderRadius: 10, 
-    height: 38, 
+    borderRadius: 14, 
+    height: 42, 
     justifyContent: 'center', 
-    width: 38 
+    width: 42 
   },
   subtitle: { 
     fontSize: 12, 
@@ -47,9 +47,8 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   title: { 
-    fontSize: 16, 
-    fontWeight: '800', 
+    fontSize: 17, 
+    fontWeight: '900', 
     letterSpacing: -0.2 
   },
 });
-

@@ -3,8 +3,10 @@ import { router, usePathname } from 'expo-router';
 import { Defs, LinearGradient, Rect, Stop, Svg } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Modal, Portal, Text, useTheme } from 'react-native-paper';
+import { TarsiMascot } from '@/components/TarsiMascot';
 import { useAuthStore } from '@/store/auth.store';
 import { useUiStore } from '@/store/ui.store';
+import { palette } from '@/theme/theme';
 
 type TabHref =
   | '/(tabs)/dashboard'
@@ -19,23 +21,23 @@ type TabHref =
   | '/(tabs)/allowance';
 
 const navItems: Array<{ title: string; icon: keyof typeof MaterialCommunityIcons.glyphMap; href: TabHref; match: string; accent: string }> = [
-  { title: 'Dashboard',  icon: 'view-dashboard-outline',    href: '/(tabs)/dashboard', match: '/dashboard', accent: '#007AFF' },
-  { title: 'Expenses',   icon: 'credit-card-minus-outline', href: '/(tabs)/expenses',  match: '/expenses',  accent: '#FF453A' },
-  { title: 'Income',     icon: 'cash-plus',                 href: '/(tabs)/income',    match: '/income',    accent: '#34C759' },
-  { title: 'Budgets',    icon: 'target-variant',            href: '/(tabs)/budgets',   match: '/budgets',   accent: '#5E5CE6' },
-  { title: 'Baon Plan',  icon: 'school-outline',            href: '/(tabs)/allowance', match: '/allowance', accent: '#30D158' },
-  { title: 'Goals',      icon: 'bullseye-arrow',            href: '/(tabs)/goals',     match: '/goals',     accent: '#0A84FF' },
-  { title: 'Bills',      icon: 'calendar-clock',            href: '/(tabs)/bills',     match: '/bills',     accent: '#FF9F0A' },
+  { title: 'Dashboard',  icon: 'view-dashboard-outline',    href: '/(tabs)/dashboard', match: '/dashboard', accent: palette.forest },
+  { title: 'Expenses',   icon: 'credit-card-minus-outline', href: '/(tabs)/expenses',  match: '/expenses',  accent: palette.red },
+  { title: 'Income',     icon: 'cash-plus',                 href: '/(tabs)/income',    match: '/income',    accent: palette.green },
+  { title: 'Budgets',    icon: 'target-variant',            href: '/(tabs)/budgets',   match: '/budgets',   accent: palette.forest },
+  { title: 'Baon Plan',  icon: 'school-outline',            href: '/(tabs)/allowance', match: '/allowance', accent: palette.leaf },
+  { title: 'Goals',      icon: 'bullseye-arrow',            href: '/(tabs)/goals',     match: '/goals',     accent: palette.forest },
+  { title: 'Bills',      icon: 'calendar-clock',            href: '/(tabs)/bills',     match: '/bills',     accent: palette.orange },
   { title: 'Debts',      icon: 'credit-card-clock-outline', href: '/(tabs)/debts',     match: '/debts',     accent: '#FF453A' },
-  { title: 'Reports',    icon: 'chart-areaspline',          href: '/(tabs)/reports',   match: '/reports',   accent: '#0A84FF' },
-  { title: 'Profile',    icon: 'account-circle-outline',    href: '/(tabs)/profile',   match: '/profile',   accent: '#FF9F0A' },
+  { title: 'Reports',    icon: 'chart-areaspline',          href: '/(tabs)/reports',   match: '/reports',   accent: palette.forest },
+  { title: 'Profile',    icon: 'account-circle-outline',    href: '/(tabs)/profile',   match: '/profile',   accent: palette.orange },
 ];
 
 const quickActions: Array<{ label: string; icon: keyof typeof MaterialCommunityIcons.glyphMap; href: TabHref; color: string; bg: string }> = [
-  { label: 'AI Planner', icon: 'robot-outline',         href: '/(tabs)/dashboard', color: '#FFFFFF', bg: '#5E5CE6' },
-  { label: 'Expense',    icon: 'plus-circle-outline',   href: '/(tabs)/expenses',  color: '#FFFFFF', bg: '#FF453A' },
-  { label: 'Income',     icon: 'cash-plus',             href: '/(tabs)/income',    color: '#FFFFFF', bg: '#34C759' },
-  { label: 'Baon',       icon: 'school-outline',        href: '/(tabs)/allowance', color: '#FFFFFF', bg: '#30D158' },
+  { label: 'AI Planner', icon: 'robot-outline',         href: '/(tabs)/dashboard', color: '#FFFFFF', bg: palette.forest },
+  { label: 'Expense',    icon: 'plus-circle-outline',   href: '/(tabs)/expenses',  color: '#FFFFFF', bg: palette.red },
+  { label: 'Income',     icon: 'cash-plus',             href: '/(tabs)/income',    color: '#FFFFFF', bg: palette.green },
+  { label: 'Baon',       icon: 'school-outline',        href: '/(tabs)/allowance', color: '#FFFFFF', bg: palette.leaf },
 ];
 
 export function AppDrawer() {
@@ -71,8 +73,8 @@ export function AppDrawer() {
           <Svg style={StyleSheet.absoluteFill}>
             <Defs>
               <LinearGradient id="dg" x1="0" y1="0" x2="1" y2="1">
-                <Stop offset="0%" stopColor="#007AFF" />
-                <Stop offset="100%" stopColor="#5E5CE6" />
+                <Stop offset="0%" stopColor="#1B4332" />
+                <Stop offset="100%" stopColor="#081C15" />
               </LinearGradient>
             </Defs>
             <Rect width="100%" height="100%" fill="url(#dg)" />
@@ -83,10 +85,14 @@ export function AppDrawer() {
             <MaterialCommunityIcons name="close" size={20} color="rgba(255,255,255,0.85)" />
           </TouchableOpacity>
 
-          {/* Avatar */}
-          <View style={styles.avatarRing}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{initials}</Text>
+          <View style={styles.profileRow}>
+            <View style={styles.avatarRing}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{initials}</Text>
+              </View>
+            </View>
+            <View style={styles.drawerMascot}>
+              <TarsiMascot size={46} />
             </View>
           </View>
 
@@ -95,8 +101,8 @@ export function AppDrawer() {
 
           {/* App badge */}
           <View style={styles.appBadge}>
-            <MaterialCommunityIcons name="rocket-launch-outline" size={11} color="rgba(255,255,255,0.7)" />
-            <Text style={styles.appBadgeText}>PesoPilot</Text>
+            <MaterialCommunityIcons name="leaf" size={11} color="rgba(255,255,255,0.7)" />
+            <Text style={styles.appBadgeText}>Tarsi Wallet</Text>
           </View>
         </View>
 
@@ -216,6 +222,8 @@ const styles = StyleSheet.create({
     width: 60,
   },
   avatarText: { color: '#FFFFFF', fontSize: 24, fontWeight: '900' },
+  drawerMascot: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.88)', borderRadius: 18, height: 54, justifyContent: 'center', width: 54 },
+  profileRow: { alignItems: 'center', flexDirection: 'row', gap: 10 },
   userName: { color: '#FFFFFF', fontSize: 18, fontWeight: '900', letterSpacing: -0.3, marginTop: 2 },
   userEmail: { color: 'rgba(255,255,255,0.7)', fontSize: 13 },
   appBadge: {

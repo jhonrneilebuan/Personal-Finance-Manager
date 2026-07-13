@@ -1,6 +1,11 @@
 import { MD3DarkTheme, MD3LightTheme, type MD3Theme } from 'react-native-paper';
 
 export const palette = {
+  forest: '#1B4332',
+  deepForest: '#14532D',
+  leaf: '#2F9E5B',
+  cream: '#F7F5F0',
+  sage: '#E8F3EC',
   blue: '#0A84FF',
   indigo: '#5E5CE6',
   mint: '#30D158',
@@ -12,30 +17,30 @@ export const palette = {
   teal: '#32D7C6',
   ink: '#101828',
   slate: '#667085',
-  cloud: '#F2F4F7',
-  mist: '#EAF1FF',
-  line: '#D9E2F1',
+  cloud: '#F2F4F0',
+  mist: '#E8F3EC',
+  line: '#DDE7DF',
   dark: '#0B0F17',
 };
 
 export const createAppTheme = (dark: boolean): MD3Theme => ({
   ...(dark ? MD3DarkTheme : MD3LightTheme),
-  roundness: 16,
+  roundness: 22,
   colors: {
     ...(dark ? MD3DarkTheme.colors : MD3LightTheme.colors),
-    primary: palette.blue,
+    primary: palette.forest,
     onPrimary: '#FFFFFF',
-    primaryContainer: dark ? '#12345A' : '#D8EAFF',
-    onPrimaryContainer: dark ? '#D8EAFF' : '#06315F',
-    secondary: palette.green,
+    primaryContainer: dark ? '#153B2B' : '#DFF3E7',
+    onPrimaryContainer: dark ? '#DFF3E7' : '#103326',
+    secondary: palette.leaf,
     onSecondary: '#FFFFFF',
     secondaryContainer: dark ? '#13351E' : '#DDF8E6',
     tertiary: palette.orange,
     tertiaryContainer: dark ? '#3E2604' : '#FFF1D6',
     error: palette.red,
-    background: dark ? palette.dark : '#F5F8FC',
+    background: dark ? palette.dark : palette.cream,
     surface: dark ? '#151A24' : '#FFFFFF',
-    surfaceVariant: dark ? '#1F2633' : '#EEF3FA',
+    surfaceVariant: dark ? '#1F2633' : '#EEF4EA',
     outline: dark ? '#394255' : palette.line,
     outlineVariant: dark ? '#252E3E' : '#E4E7EC',
     elevation: {

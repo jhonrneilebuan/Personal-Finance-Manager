@@ -6,6 +6,7 @@ import { aiApi } from '@/services/ai.service';
 import { palette } from '@/theme/theme';
 import type { AiSpendingPlan, PurchasePlanItem } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
+import { TarsiMascot } from './TarsiMascot';
 
 type AiSpendingPlannerCardProps = {
   defaultAvailableMoney: number;
@@ -88,6 +89,7 @@ export function AiSpendingPlannerCard({ defaultAvailableMoney }: AiSpendingPlann
     >
       <Card.Content style={styles.content}>
         <View style={styles.header}>
+          <TarsiMascot size={58} mood={plan ? 'happy' : 'thinking'} />
           <View style={[styles.iconBox, { backgroundColor: `${theme.colors.primary}12` }]}>
             <MaterialCommunityIcons name="cart-check" size={20} color={theme.colors.primary} />
           </View>
@@ -189,14 +191,14 @@ const styles = StyleSheet.create({
   budgetValue: { fontWeight: '900', fontSize: 15, letterSpacing: -0.2 },
   buyNow: { backgroundColor: 'rgba(52,199,89,0.12)', color: palette.green },
   card: { 
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
   },
-  content: { gap: 14, paddingVertical: 18 },
+  content: { gap: 14, paddingVertical: 20 },
   decisionBadge: { 
     backgroundColor: 'rgba(120,120,120,0.12)', 
     borderRadius: 8, 
@@ -212,7 +214,7 @@ const styles = StyleSheet.create({
   decisions: { gap: 10 },
   header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
   headerCopy: { flex: 1 },
-  iconBox: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  iconBox: { alignItems: 'center', borderRadius: 14, height: 40, justifyContent: 'center', width: 40 },
   itemName: { flex: 1, fontWeight: '800', fontSize: 14, letterSpacing: -0.1 },
   notice: { color: palette.red, fontWeight: '700', fontSize: 13 },
   result: { gap: 14, marginTop: 6 },
@@ -223,4 +225,3 @@ const styles = StyleSheet.create({
   planButton: { borderRadius: 12 },
   buttonContent: { height: 44 },
 });
-

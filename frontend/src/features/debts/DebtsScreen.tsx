@@ -105,19 +105,20 @@ export function DebtsScreen() {
       <PageHeroCard
         icon="credit-card-clock-outline"
         title="Debt Tracker"
-        subtitle="Monitor balances, minimum payments, and payoff progress."
+        subtitle="Tarsi helps you lower balances one payment at a time."
         value={formatCurrency(totals.remaining)}
         caption={`${formatCurrency(totals.paid)} paid`}
-        color={palette.red}
+        color={palette.forest}
+        mascot
       />
 
       <Card style={cardStyle}>
         <Card.Content style={styles.snapshotContent}>
-          <SectionHeader icon="finance" title="Debt Snapshot" subtitle="See total pressure and payoff progress fast." color={palette.red} />
+          <SectionHeader icon="finance" title="Debt Snapshot" subtitle="See total pressure and payoff progress fast." color={palette.forest} />
           <View style={styles.statGrid}>
             <FeatureStatCard icon="credit-card-clock-outline" label="Remaining" value={formatCurrency(totals.remaining)} helper="balance left" color={palette.red} />
             <FeatureStatCard icon="cash-check" label="Paid" value={formatCurrency(totals.paid)} helper={`${Math.round(totals.progress * 100)}% complete`} color={palette.green} />
-            <FeatureStatCard icon="scale-balance" label="Total" value={formatCurrency(totals.total)} helper="all debts" color={palette.indigo} />
+            <FeatureStatCard icon="scale-balance" label="Total" value={formatCurrency(totals.total)} helper="all debts" color={palette.forest} />
             <FeatureStatCard
               icon="calendar-alert"
               label="Next Due"
@@ -131,7 +132,7 @@ export function DebtsScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="plus-circle-outline" title="New Debt" subtitle="Add loans, borrowed money, or installment balances." color={palette.red} />
+          <SectionHeader icon="plus-circle-outline" title="New Debt" subtitle="Add loans, borrowed money, or installment balances." color={palette.forest} />
           {(['lender', 'totalAmount', 'paidAmount', 'minimumPayment', 'interestRate', 'dueDate', 'note'] as const).map((name) => (
             <Controller key={name} control={control} name={name} render={({ field: { value, onChange } }) => (
               <TextInput
@@ -154,7 +155,7 @@ export function DebtsScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="chart-donut" title="Payoff Progress" subtitle="Record minimum payments from each debt card." color={palette.red} />
+          <SectionHeader icon="chart-donut" title="Payoff Progress" subtitle="Record minimum payments from each debt card." color={palette.forest} />
           {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load debts" message={error} /> : data?.length ? (
             <View style={styles.list}>
               {data.map((debt) => {
@@ -173,7 +174,7 @@ export function DebtsScreen() {
                       </View>
                       <Text style={[styles.itemAmount, { color: theme.colors.onSurface }]}>{Math.round(progress * 100)}%</Text>
                     </View>
-                    <ProgressBar progress={progress} color={palette.red} style={styles.progress} />
+                    <ProgressBar progress={progress} color={palette.leaf} style={styles.progress} />
                     <Button mode="contained-tonal" icon="cash-check" onPress={() => payMinimum(debt.id, debt.minimumPayment)}>
                       Pay minimum {debt.minimumPayment ? formatCurrency(Number(debt.minimumPayment)) : ''}
                     </Button>
@@ -192,9 +193,9 @@ export function DebtsScreen() {
 
 const styles = StyleSheet.create({
   buttonContent: { height: 48 },
-  card: { borderRadius: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 8 },
+  card: { borderRadius: 22, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 8 },
   formContent: { gap: 14, paddingVertical: 18 },
-  item: { borderRadius: 14, gap: 12, padding: 14 },
+  item: { borderRadius: 18, gap: 12, padding: 14 },
   itemAmount: { fontSize: 16, fontWeight: '900' },
   itemHeader: { alignItems: 'center', flexDirection: 'row', gap: 12, justifyContent: 'space-between' },
   itemSubtitle: { fontSize: 12, fontWeight: '500', opacity: 0.72 },
@@ -203,7 +204,7 @@ const styles = StyleSheet.create({
   list: { gap: 10 },
   listContent: { gap: 12, paddingVertical: 18 },
   progress: { borderRadius: 4, height: 8 },
-  saveButton: { backgroundColor: '#FF453A', borderRadius: 12, marginTop: 6 },
+  saveButton: { backgroundColor: palette.forest, borderRadius: 16, marginTop: 6 },
   snapshotContent: { gap: 12, paddingVertical: 18 },
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
 });

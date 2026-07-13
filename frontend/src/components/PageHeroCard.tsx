@@ -3,6 +3,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card, Text } from 'react-native-paper';
 import { Svg, Rect, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { palette } from '@/theme/theme';
+import { TarsiMascot } from './TarsiMascot';
 
 type PageHeroCardProps = {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
@@ -11,18 +12,20 @@ type PageHeroCardProps = {
   value?: string;
   caption?: string;
   color: string;
+  mascot?: boolean;
 };
 
 const getGradientColors = (baseColor: string): [string, string] => {
   const normalized = baseColor.toLowerCase();
-  if (normalized === palette.blue.toLowerCase()) return ['#0A84FF', '#0052B3'];
-  if (normalized === palette.indigo.toLowerCase()) return ['#5E5CE6', '#3C3B99'];
-  if (normalized === palette.green.toLowerCase() || normalized === '#30d158' || normalized === '#30d158') return ['#34C759', '#1E7835'];
-  if (normalized === palette.red.toLowerCase()) return ['#FF453A', '#B8221B'];
+  if (normalized === palette.forest.toLowerCase() || normalized === palette.deepForest.toLowerCase()) return ['#1B4332', '#0F2E22'];
+  if (normalized === palette.blue.toLowerCase()) return ['#2F9E5B', '#14532D'];
+  if (normalized === palette.indigo.toLowerCase()) return ['#2F9E5B', '#1B4332'];
+  if (normalized === palette.green.toLowerCase() || normalized === palette.mint.toLowerCase()) return ['#34C759', '#1E7835'];
+  if (normalized === palette.red.toLowerCase()) return ['#D9485F', '#8F1D32'];
   return [baseColor, baseColor];
 };
 
-export function PageHeroCard({ icon, title, subtitle, value, caption, color }: PageHeroCardProps) {
+export function PageHeroCard({ icon, title, subtitle, value, caption, color, mascot }: PageHeroCardProps) {
   const gradientColors = getGradientColors(color);
 
   return (
@@ -45,7 +48,10 @@ export function PageHeroCard({ icon, title, subtitle, value, caption, color }: P
           <View style={styles.iconWrap}>
             <MaterialCommunityIcons name={icon} color="#FFFFFF" size={26} />
           </View>
-          {caption ? <Text style={styles.caption}>{caption}</Text> : null}
+          <View style={styles.topRight}>
+            {caption ? <Text style={styles.caption}>{caption}</Text> : null}
+            {mascot ? <TarsiMascot size={58} /> : null}
+          </View>
         </View>
         <View style={styles.copy}>
           <Text variant="headlineSmall" style={styles.title}>{title}</Text>
@@ -78,7 +84,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   card: { 
-    borderRadius: 20, 
+    borderRadius: 24, 
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -100,6 +106,6 @@ const styles = StyleSheet.create({
   subtitle: { color: 'rgba(255,255,255,0.82)', fontSize: 13, lineHeight: 18 },
   title: { color: '#FFFFFF', fontWeight: '900', letterSpacing: 0.5 },
   top: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
+  topRight: { alignItems: 'center', flexDirection: 'row', gap: 10 },
   value: { color: '#FFFFFF', fontWeight: '900', letterSpacing: -0.5, marginTop: 4 },
 });
-

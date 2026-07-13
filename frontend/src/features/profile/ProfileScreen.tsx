@@ -113,13 +113,14 @@ export function ProfileScreen() {
         title={activeUser?.fullName ?? 'PesoPilot User'}
         subtitle={activeUser?.email ?? 'No email loaded'}
         caption="My Wallet"
-        color={palette.indigo}
+        color={palette.forest}
+        mascot
       />
 
       {/* ── Update Profile ────────────────────────────── */}
       <Card style={cardStyle}>
         <Card.Content style={styles.content}>
-          <SectionHeader icon="account-edit-outline" title="Update Profile" subtitle="Keep your account details current." color={palette.indigo} />
+          <SectionHeader icon="account-edit-outline" title="Update Profile" subtitle="Keep your account details current." color={palette.forest} />
           <TextInput
             left={<TextInput.Icon icon="account-outline" color="rgba(120,120,120,0.5)" />}
             mode="outlined"
@@ -153,7 +154,7 @@ export function ProfileScreen() {
       {/* ── Change Password ───────────────────────────── */}
       <Card style={cardStyle}>
         <Card.Content style={styles.content}>
-          <SectionHeader icon="shield-lock-outline" title="Change Password" subtitle="Use at least 8 characters for the new password." color={palette.orange} />
+          <SectionHeader icon="shield-lock-outline" title="Change Password" subtitle="Use at least 8 characters for the new password." color={palette.forest} />
           <TextInput
             left={<TextInput.Icon icon="lock-outline" color="rgba(120,120,120,0.5)" />}
             mode="outlined"
@@ -189,25 +190,25 @@ export function ProfileScreen() {
       {/* ── App Settings ──────────────────────────────── */}
       <Card style={cardStyle}>
         <Card.Content style={styles.content}>
-          <SectionHeader icon="cog-outline" title="App Settings" subtitle="Personalise theme, currency and alerts." color={palette.blue} />
+          <SectionHeader icon="cog-outline" title="App Settings" subtitle="Personalise theme, currency and alerts." color={palette.forest} />
           <View style={styles.settingsGroup}>
             <SettingRow
               icon="theme-light-dark"
-              iconBg="#5E5CE6"
+              iconBg={palette.forest}
               label="Dark Mode"
               value={isDarkMode ? 'On' : 'Off'}
-              right={<Switch value={isDarkMode} onValueChange={setDarkMode} trackColor={{ true: '#5E5CE6' }} />}
+              right={<Switch value={isDarkMode} onValueChange={setDarkMode} trackColor={{ true: palette.forest }} />}
             />
             <View style={[styles.separator, { backgroundColor: theme.colors.outlineVariant }]} />
             <SettingRow
               icon="currency-php"
-              iconBg="#FF9F0A"
+              iconBg={palette.orange}
               label="Currency"
               value={currency}
               onPress={() => setCurrency(currency === 'PHP' ? 'USD' : 'PHP')}
               right={
                 <View style={styles.chevronWrap}>
-                  <Text style={[styles.currencyBadge, { color: '#FF9F0A' }]}>{currency}</Text>
+                  <Text style={[styles.currencyBadge, { color: palette.orange }]}>{currency}</Text>
                   <MaterialCommunityIcons name="chevron-right" size={16} color={theme.colors.onSurfaceVariant} style={{ opacity: 0.5 }} />
                 </View>
               }
@@ -215,10 +216,10 @@ export function ProfileScreen() {
             <View style={[styles.separator, { backgroundColor: theme.colors.outlineVariant }]} />
             <SettingRow
               icon="bell-outline"
-              iconBg="#34C759"
+              iconBg={palette.leaf}
               label="Notifications"
               value={notificationsEnabled ? 'Enabled' : 'Disabled'}
-              right={<Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} trackColor={{ true: '#34C759' }} />}
+              right={<Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} trackColor={{ true: palette.leaf }} />}
             />
           </View>
         </Card.Content>
@@ -239,9 +240,8 @@ export function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  // Cards
   card: {
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -250,12 +250,11 @@ const styles = StyleSheet.create({
   },
   content: { gap: 14, paddingVertical: 18 },
 
-  // Buttons
   buttonContent: { height: 48 },
   saveButton: {
-    backgroundColor: '#5E5CE6',
-    borderRadius: 12,
-    shadowColor: '#5E5CE6',
+    backgroundColor: palette.forest,
+    borderRadius: 16,
+    shadowColor: palette.forest,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.22,
     shadowRadius: 8,
@@ -263,9 +262,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   passwordButton: {
-    backgroundColor: '#FF9F0A',
-    borderRadius: 12,
-    shadowColor: '#FF9F0A',
+    backgroundColor: palette.forest,
+    borderRadius: 16,
+    shadowColor: palette.forest,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.22,
     shadowRadius: 8,
@@ -273,8 +272,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  // Settings group
-  settingsGroup: { borderRadius: 14, overflow: 'hidden' },
+  settingsGroup: { borderRadius: 18, overflow: 'hidden' },
   settingRow: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -296,7 +294,6 @@ const styles = StyleSheet.create({
   chevronWrap: { alignItems: 'center', flexDirection: 'row', gap: 4 },
   currencyBadge: { fontSize: 14, fontWeight: '800' },
 
-  // Logout
   logoutCard: {
     alignItems: 'center',
     borderRadius: 16,

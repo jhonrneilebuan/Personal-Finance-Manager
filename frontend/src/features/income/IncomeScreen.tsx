@@ -57,14 +57,15 @@ export function IncomeScreen() {
       <PageHeroCard
         icon="cash-plus"
         title="Income"
-        subtitle="Record every source of money and watch cashflow improve."
+        subtitle="Track every money-in moment so Tarsi can read your cashflow better."
         value={formatCurrency(totalIncome)}
         caption={`${data?.length ?? 0} records`}
-        color={palette.green}
+        color={palette.forest}
+        mascot
       />
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="cash-plus" title="New Income" subtitle="Add salary, freelance, business, or other money in." color={palette.green} />
+          <SectionHeader icon="cash-plus" title="New Income" subtitle="Add salary, freelance, business, baon, or other money in." color={palette.forest} />
           {(['source', 'amount', 'description'] as const).map((name) => (
             <Controller key={name} control={control} name={name} render={({ field: { value, onChange } }) => (
               <TextInput 
@@ -93,7 +94,7 @@ export function IncomeScreen() {
       </Card>
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="history" title="Income History" subtitle="Latest money-in records" color={palette.green} />
+          <SectionHeader icon="history" title="Income History" subtitle="Latest money-in records" color={palette.forest} />
           {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load income" message={error} /> : data?.length ? (
             <View style={styles.list}>
               {data.map((item) => <TransactionRow key={item.id} title={item.source} subtitle={item.description ?? 'Income'} amount={Number(item.amount)} type="income" />)}
@@ -109,9 +110,9 @@ export function IncomeScreen() {
 const styles = StyleSheet.create({
   buttonContent: { height: 48 },
   saveButton: {
-    backgroundColor: '#34C759',
-    borderRadius: 12,
-    shadowColor: '#34C759',
+    backgroundColor: palette.forest,
+    borderRadius: 16,
+    shadowColor: palette.forest,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   card: { 
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -130,4 +131,3 @@ const styles = StyleSheet.create({
   listContent: { gap: 12, paddingVertical: 18 },
   list: { gap: 4 },
 });
-

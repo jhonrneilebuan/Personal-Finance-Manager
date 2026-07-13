@@ -20,7 +20,7 @@ export function CashflowGraphCard({ income, expenses, savings }: CashflowGraphCa
   const data: GraphItem[] = [
     { label: 'Income', value: income, color: theme.colors.secondary },
     { label: 'Expenses', value: expenses, color: theme.colors.error },
-    { label: savings >= 0 ? 'Savings' : 'Deficit', value: savings, color: savings >= 0 ? theme.colors.tertiary : theme.colors.error },
+    { label: savings >= 0 ? 'Savings' : 'Deficit', value: savings, color: savings >= 0 ? theme.colors.primary : theme.colors.error },
   ];
   const max = Math.max(...data.map((item) => Math.abs(item.value)), 1);
 
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     width: 44 
   },
   card: { 
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -90,13 +90,12 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   column: { alignItems: 'center', flex: 1, gap: 8 },
-  content: { gap: 16, paddingVertical: 18 },
+  content: { gap: 16, paddingVertical: 20 },
   graph: { alignItems: 'flex-end', flexDirection: 'row', gap: 12, minHeight: 200, marginTop: 4 },
   header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
-  headerIcon: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  headerIcon: { alignItems: 'center', borderRadius: 14, height: 42, justifyContent: 'center', width: 42 },
   label: { fontSize: 13, fontWeight: '600', opacity: 0.6 },
   subtitle: { fontSize: 12, opacity: 0.6, fontWeight: '500' },
   title: { fontSize: 16, fontWeight: '800', letterSpacing: -0.2 },
   value: { fontSize: 13, fontWeight: '700', textAlign: 'center', letterSpacing: -0.2 },
 });
-

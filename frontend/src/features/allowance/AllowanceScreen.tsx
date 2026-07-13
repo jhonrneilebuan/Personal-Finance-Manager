@@ -93,20 +93,21 @@ export function AllowanceScreen() {
       <PageHeroCard
         icon="school-outline"
         title="Baon Planner"
-        subtitle="Plan weekday allowance and see how much you can save this month."
+        subtitle="Plan weekday allowance and let Tarsi estimate your monthly ipon."
         value={formatCurrency(summary.data?.projectedSavings ?? 0)}
         caption={`${summary.data?.allowanceDays ?? 0} baon days in ${formatMonth(selectedMonth)}`}
-        color={palette.green}
+        color={palette.forest}
+        mascot
       />
 
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="calendar-month-outline" title="Monthly Baon Setup" subtitle="Set daily baon, spending cap, and active weekdays." color={palette.green} />
+          <SectionHeader icon="calendar-month-outline" title="Monthly Baon Setup" subtitle="Set daily baon, spending cap, and active weekdays." color={palette.forest} />
           <MonthSelector
             title="Baon Month"
             monthLabel={formatMonth(selectedMonth)}
             caption={`${summary.data?.plans.length ?? 0} active plan${summary.data?.plans.length === 1 ? '' : 's'}`}
-            color={palette.green}
+            color={palette.forest}
             onPrevious={() => setSelectedMonth((value) => shiftMonth(value, -1))}
             onNext={() => setSelectedMonth((value) => shiftMonth(value, 1))}
             onCurrent={() => setSelectedMonth(monthStart())}
@@ -142,7 +143,7 @@ export function AllowanceScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="chart-line" title="Baon Projection" subtitle="Compares planned savings against current month progress." color={palette.green} />
+          <SectionHeader icon="chart-line" title="Baon Projection" subtitle="Compares planned savings against current month progress." color={palette.forest} />
           {summary.isLoading ? <StateView loading /> : summary.error ? <StateView title="Unable to load baon planner" message={summary.error} /> : summary.data ? (
             <>
               <View style={styles.metricGrid}>
@@ -154,9 +155,9 @@ export function AllowanceScreen() {
               <View style={styles.progressBlock}>
                 <View style={styles.progressHeader}>
                   <Text style={[styles.progressTitle, { color: theme.colors.onSurface }]}>Savings pace</Text>
-                  <Text style={[styles.progressTitle, { color: palette.green }]}>{Math.round(savingsProgress * 100)}%</Text>
+                  <Text style={[styles.progressTitle, { color: palette.forest }]}>{Math.round(savingsProgress * 100)}%</Text>
                 </View>
-                <ProgressBar progress={savingsProgress} color={palette.green} style={styles.progress} />
+                <ProgressBar progress={savingsProgress} color={palette.leaf} style={styles.progress} />
                 <Text style={[styles.helperText, { color: theme.colors.onSurfaceVariant }]}>
                   Planned saved to date: {formatCurrency(summary.data.plannedSavedToDate)}. Expenses recorded this month are subtracted from actual left.
                 </Text>
@@ -168,7 +169,7 @@ export function AllowanceScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="clipboard-list-outline" title="Active Baon Plans" subtitle="Saved schedules for the selected month." color={palette.green} />
+          <SectionHeader icon="clipboard-list-outline" title="Active Baon Plans" subtitle="Saved schedules for the selected month." color={palette.forest} />
           {summary.isLoading ? <StateView loading /> : summary.data?.plans.length ? (
             <View style={styles.planList}>
               {summary.data.plans.map((plan) => {
@@ -180,7 +181,7 @@ export function AllowanceScreen() {
                         <Text style={[styles.planTitle, { color: theme.colors.onSurface }]}>{plan.name}</Text>
                         <Text style={[styles.helperText, { color: theme.colors.onSurfaceVariant }]}>{formatWeekdays(plan.weekdays)}</Text>
                       </View>
-                      <Text style={[styles.planAmount, { color: palette.green }]}>{formatCurrency(Number(plan.dailyAmount))}</Text>
+                      <Text style={[styles.planAmount, { color: palette.forest }]}>{formatCurrency(Number(plan.dailyAmount))}</Text>
                     </View>
                     <View style={styles.planMetrics}>
                       <Chip icon="wallet-outline">Cap {formatCurrency(Number(plan.spendingLimit))}</Chip>
@@ -196,7 +197,7 @@ export function AllowanceScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="calendar" title="Baon Calendar" subtitle="Green days have planned allowance." color={palette.green} />
+          <SectionHeader icon="calendar" title="Baon Calendar" subtitle="Green days have planned allowance." color={palette.forest} />
           <View style={styles.weekHeader}>
             {weekdayLabels.map((label) => <Text key={label} style={[styles.weekLabel, { color: theme.colors.onSurfaceVariant }]}>{label}</Text>)}
           </View>
@@ -210,13 +211,13 @@ export function AllowanceScreen() {
                   style={[
                     styles.dayCell,
                     {
-                      backgroundColor: day.hasAllowance ? '#34C75922' : theme.colors.surfaceVariant,
-                      borderColor: day.isToday ? palette.green : 'transparent',
+                      backgroundColor: day.hasAllowance ? `${palette.leaf}24` : theme.colors.surfaceVariant,
+                      borderColor: day.isToday ? palette.forest : 'transparent',
                     },
                   ]}
                 >
                   <Text style={[styles.dayNumber, { color: theme.colors.onSurface }]}>{date.getDate()}</Text>
-                  {day.hasAllowance ? <Text style={[styles.dayAmount, { color: palette.green }]}>{formatCurrency(day.plannedSavings)}</Text> : null}
+                  {day.hasAllowance ? <Text style={[styles.dayAmount, { color: palette.forest }]}>{formatCurrency(day.plannedSavings)}</Text> : null}
                 </View>
               );
             })}
@@ -242,20 +243,20 @@ function Metric({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   buttonContent: { height: 48 },
   calendarGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
-  card: { borderRadius: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 8 },
+  card: { borderRadius: 22, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 8 },
   dayAmount: { fontSize: 9, fontWeight: '800' },
-  dayCell: { alignItems: 'center', aspectRatio: 0.88, borderRadius: 10, borderWidth: 1.5, justifyContent: 'center', width: '13.45%' },
+  dayCell: { alignItems: 'center', aspectRatio: 0.88, borderRadius: 12, borderWidth: 1.5, justifyContent: 'center', width: '13.45%' },
   dayNumber: { fontSize: 12, fontWeight: '900' },
   formContent: { gap: 14, paddingVertical: 18 },
   helperText: { fontSize: 12, lineHeight: 17, opacity: 0.75 },
   listContent: { gap: 12, paddingVertical: 18 },
-  metric: { borderRadius: 14, flexBasis: '47%', flexGrow: 1, gap: 4, padding: 14 },
+  metric: { borderRadius: 18, flexBasis: '47%', flexGrow: 1, gap: 4, padding: 14 },
   metricGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   metricLabel: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase' },
   metricValue: { fontSize: 16, fontWeight: '900' },
   planAmount: { fontSize: 16, fontWeight: '900' },
   planHeader: { alignItems: 'center', flexDirection: 'row', gap: 12, justifyContent: 'space-between' },
-  planItem: { borderRadius: 14, gap: 12, padding: 14 },
+  planItem: { borderRadius: 18, gap: 12, padding: 14 },
   planList: { gap: 10 },
   planMetrics: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   planTitle: { fontSize: 16, fontWeight: '900' },
@@ -264,7 +265,7 @@ const styles = StyleSheet.create({
   progressBlock: { gap: 8 },
   progressHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
   progressTitle: { fontSize: 14, fontWeight: '900' },
-  saveButton: { backgroundColor: '#34C759', borderRadius: 12, marginTop: 6 },
+  saveButton: { backgroundColor: palette.forest, borderRadius: 16, marginTop: 6 },
   weekHeader: { flexDirection: 'row', justifyContent: 'space-between' },
   weekLabel: { fontSize: 11, fontWeight: '900', textAlign: 'center', width: '13.45%' },
   weekdayChip: { flexGrow: 1 },

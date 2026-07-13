@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card, Snackbar, Text, useTheme } from 'react-native-paper';
@@ -10,16 +10,43 @@ import { CashflowGraphCard } from '@/components/CashflowGraphCard';
 import { Screen } from '@/components/Screen';
 import { StateView } from '@/components/StateView';
 import { StatCard } from '@/components/StatCard';
+import { TarsiMascot } from '@/components/TarsiMascot';
 import { TransactionRow } from '@/components/TransactionRow';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { aiApi } from '@/services/ai.service';
 import { financeApi } from '@/services/finance.service';
+import { useAuthStore } from '@/store/auth.store';
 import { useFinanceStore } from '@/store/finance.store';
+import { palette } from '@/theme/theme';
 import type { AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
 
+const formatToday = () => new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date());
+
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 18) return 'Good afternoon';
+  return 'Good evening';
+};
+
+const getNextPayday = () => {
+  const now = new Date();
+  const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const lastDayThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const thisMonthFirstPayday = new Date(now.getFullYear(), now.getMonth(), Math.min(15, lastDayThisMonth));
+  const thisMonthSecondPayday = new Date(now.getFullYear(), now.getMonth(), Math.min(30, lastDayThisMonth));
+  const nextMonthFirstPayday = new Date(now.getFullYear(), now.getMonth() + 1, 15);
+  const target = startToday <= thisMonthFirstPayday ? thisMonthFirstPayday : startToday <= thisMonthSecondPayday ? thisMonthSecondPayday : nextMonthFirstPayday;
+  const daysLeft = Math.max(0, Math.ceil((target.getTime() - startToday.getTime()) / 86400000));
+  return {
+    daysLeft,
+    label: new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(target),
+  };
+};
 
 export function DashboardScreen() {
+  const user = useAuthStore((state) => state.user);
   const revision = useFinanceStore((state) => state.revision);
   const { width } = useWindowDimensions();
   const theme = useTheme();
@@ -29,6 +56,8 @@ export function DashboardScreen() {
   const [aiInsight, setAiInsight] = useState<AiFinanceInsight | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [notice, setNotice] = useState('');
+  const firstName = useMemo(() => user?.fullName?.trim().split(/\s+/)[0] ?? 'Pilot', [user?.fullName]);
+  const payday = useMemo(() => getNextPayday(), []);
 
   const generateDashboardInsight = useCallback(async () => {
     try {
@@ -51,8 +80,9 @@ export function DashboardScreen() {
           <Svg height="100%" width="100%">
             <Defs>
               <LinearGradient id="dashHeroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <Stop offset="0%" stopColor="#0A84FF" />
-                <Stop offset="100%" stopColor="#0052B3" />
+                <Stop offset="0%" stopColor="#1B4332" />
+                <Stop offset="58%" stopColor="#2D6A4F" />
+                <Stop offset="100%" stopColor="#081C15" />
               </LinearGradient>
             </Defs>
             <Rect width="100%" height="100%" fill="url(#dashHeroGrad)" />
@@ -62,28 +92,36 @@ export function DashboardScreen() {
           <View style={styles.heroTop}>
             <View style={styles.heroTopRight}>
               <View style={styles.heroIcon}>
-                <MaterialCommunityIcons name="wallet-bifold-outline" size={24} color="#FFFFFF" />
+                <MaterialCommunityIcons name="wallet-bifold-outline" size={22} color="#FFFFFF" />
               </View>
               <View>
-                <Text style={styles.heroTitle}>PesoPilot Wallet</Text>
-                <Text style={styles.heroSubcopy}>Live financial snapshot</Text>
+                <Text style={styles.heroTitle}>{getGreeting()}, {firstName}</Text>
+                <Text style={styles.heroSubcopy}>Tarsi is watching your wallet today</Text>
               </View>
             </View>
-            <Text style={styles.heroPill}>Live</Text>
+            <View style={styles.heroMascot}>
+              <TarsiMascot size={54} />
+            </View>
           </View>
           <View>
             <Text style={styles.heroLabel}>Available Balance</Text>
             <Text style={styles.heroValue}>{formatCurrency(data.currentBalance)}</Text>
           </View>
-          <Text style={styles.heroMeta}>Income {formatCurrency(data.totalIncome)} / Expenses {formatCurrency(data.totalExpenses)}</Text>
+          <View style={styles.heroFooter}>
+            <View style={styles.paydayPill}>
+              <MaterialCommunityIcons name="calendar-heart" color="#FFFFFF" size={16} />
+              <Text style={styles.paydayText}>{payday.daysLeft} days until {payday.label}</Text>
+            </View>
+            <Text style={styles.heroMeta}>{formatToday()}</Text>
+          </View>
         </Card.Content>
       </Card>
       
       <AiInsightCard
-        title="AI Dashboard Coach"
-        subtitle="Generate a quick read on balance, spending, and next actions."
-        buttonLabel="Generate Insight"
-        color={theme.colors.primary}
+        title="Ask Tarsi"
+        subtitle="Get a quick read on balance, spending, and what to do next."
+        buttonLabel="Generate Advice"
+        color={palette.forest}
         insight={aiInsight}
         loading={isAiLoading}
         onGenerate={generateDashboardInsight}
@@ -142,7 +180,7 @@ export function DashboardScreen() {
 
 const styles = StyleSheet.create({
   card: { 
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -152,7 +190,7 @@ const styles = StyleSheet.create({
   cardContent: { gap: 12, paddingVertical: 16 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   hero: { 
-    borderRadius: 20, 
+    borderRadius: 28, 
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 6 },
@@ -160,16 +198,19 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 3,
   },
-  heroContent: { gap: 16, padding: 20, zIndex: 1 },
-  heroIcon: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 10, height: 44, justifyContent: 'center', width: 44 },
+  heroContent: { gap: 18, padding: 20, zIndex: 1 },
+  heroFooter: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between' },
+  heroIcon: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.18)', borderRadius: 16, height: 44, justifyContent: 'center', width: 44 },
   heroLabel: { color: 'rgba(255,255,255,0.80)', fontSize: 13, fontWeight: '600' },
-  heroMeta: { color: 'rgba(255,255,255,0.85)', fontWeight: '700', fontSize: 13 },
-  heroPill: { backgroundColor: 'rgba(255,255,255,0.16)', borderRadius: 10, color: '#FFFFFF', fontWeight: '800', overflow: 'hidden', paddingHorizontal: 12, paddingVertical: 6, fontSize: 12 },
+  heroMascot: { alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.90)', borderRadius: 22, height: 66, justifyContent: 'center', width: 66 },
+  heroMeta: { color: 'rgba(255,255,255,0.85)', fontWeight: '800', fontSize: 12 },
   heroSubcopy: { color: 'rgba(255,255,255,0.72)', fontSize: 12 },
-  heroTitle: { color: '#FFFFFF', fontWeight: '900', fontSize: 16, letterSpacing: -0.2 },
+  heroTitle: { color: '#FFFFFF', fontWeight: '900', fontSize: 17 },
   heroTop: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
-  heroTopRight: { alignItems: 'center', flexDirection: 'row', gap: 10 },
-  heroValue: { color: '#FFFFFF', fontWeight: '900', letterSpacing: -0.6, fontSize: 28, marginTop: 4 },
+  heroTopRight: { alignItems: 'center', flexDirection: 'row', flex: 1, gap: 10 },
+  heroValue: { color: '#FFFFFF', fontWeight: '900', fontSize: 31, marginTop: 4 },
+  paydayPill: { alignItems: 'center', backgroundColor: 'rgba(183,228,199,0.22)', borderColor: 'rgba(255,255,255,0.20)', borderRadius: 999, borderWidth: 1, flexDirection: 'row', gap: 6, paddingHorizontal: 12, paddingVertical: 8 },
+  paydayText: { color: '#FFFFFF', fontSize: 12, fontWeight: '900' },
   sectionHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   sectionTitleRow: { alignItems: 'center', flexDirection: 'row', gap: 12 },
   sectionTitle: { fontSize: 16, fontWeight: '800', letterSpacing: -0.2 },

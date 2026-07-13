@@ -4,6 +4,7 @@ import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
 import { AppDrawer } from '@/components/AppDrawer';
 import { useUiStore } from '@/store/ui.store';
+import { palette } from '@/theme/theme';
 
 // ─── Tab definitions ────────────────────────────────────────────────────────
 const TABS = [
@@ -17,12 +18,12 @@ const TABS = [
 
 // Accent colors per tab for the active state
 const TAB_ACCENTS: Record<string, string> = {
-  dashboard: '#007AFF',
-  expenses:  '#FF453A',
-  income:    '#34C759',
-  budgets:   '#5E5CE6',
-  reports:   '#0A84FF',
-  profile:   '#FF9F0A',
+  dashboard: palette.forest,
+  expenses:  palette.red,
+  income:    palette.green,
+  budgets:   palette.leaf,
+  reports:   palette.forest,
+  profile:   palette.orange,
 };
 
 // ─── Custom Tab Bar ──────────────────────────────────────────────────────────
@@ -33,8 +34,8 @@ function CustomTabBar() {
   return (
     <View style={[styles.tabBarWrapper, { paddingBottom: Platform.OS === 'ios' ? 24 : 10 }]}>
       <View style={[styles.tabBar, {
-        backgroundColor: theme.dark ? 'rgba(28,28,30,0.96)' : 'rgba(255,255,255,0.97)',
-        borderColor: theme.dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+        backgroundColor: theme.dark ? 'rgba(22,30,25,0.96)' : 'rgba(255,255,255,0.98)',
+        borderColor: theme.dark ? 'rgba(255,255,255,0.06)' : 'rgba(27,67,50,0.10)',
         shadowColor: theme.dark ? '#000' : '#000',
       }]}>
         {TABS.map((tab) => {
@@ -218,7 +219,7 @@ const styles = StyleSheet.create({
   },
   tabBar: {
     alignItems: 'center',
-    borderRadius: 22,
+    borderRadius: 24,
     borderWidth: 1,
     flexDirection: 'row',
     height: 64,

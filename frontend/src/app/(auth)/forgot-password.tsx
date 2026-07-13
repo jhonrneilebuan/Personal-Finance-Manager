@@ -8,6 +8,7 @@ import { Button, Card, Text, TextInput, HelperText } from 'react-native-paper';
 import { Svg, Rect, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { z } from 'zod';
 import { authApi } from '@/services/auth.service';
+import { palette } from '@/theme/theme';
 
 const schema = z.object({ email: z.string().email() });
 
@@ -42,9 +43,9 @@ export default function ForgotPassword() {
       <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
         <Defs>
           <LinearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%" stopColor="#080B11" />
-            <Stop offset="50%" stopColor="#111625" />
-            <Stop offset="100%" stopColor="#05080E" />
+            <Stop offset="0%" stopColor="#081C15" />
+            <Stop offset="50%" stopColor="#123524" />
+            <Stop offset="100%" stopColor="#050B08" />
           </LinearGradient>
         </Defs>
         <Rect width="100%" height="100%" fill="url(#bgGrad)" />
@@ -62,7 +63,7 @@ export default function ForgotPassword() {
           {/* Icon badge */}
           <View style={styles.iconWrap}>
             <View style={styles.iconBadge}>
-              <MaterialCommunityIcons name="lock-reset" size={26} color="#0A84FF" />
+              <MaterialCommunityIcons name="lock-reset" size={26} color={palette.leaf} />
             </View>
             <Text style={styles.iconTitle}>Forgot Password</Text>
             <Text style={styles.iconSub}>We'll send a reset link to your email.</Text>
@@ -72,7 +73,7 @@ export default function ForgotPassword() {
             <Card.Content style={styles.form}>
               <View style={styles.formHeader}>
                 <View style={styles.formBadge}>
-                  <MaterialCommunityIcons name="lock-reset" size={13} color="#0A84FF" />
+                  <MaterialCommunityIcons name="lock-reset" size={13} color={palette.leaf} />
                   <Text style={styles.formBadgeText}>Reset Password</Text>
                 </View>
                 <Text style={styles.title}>Reset password</Text>
@@ -94,7 +95,7 @@ export default function ForgotPassword() {
                       onChangeText={onChange}
                       error={!!errors.email}
                       textColor="#FFFFFF"
-                      activeOutlineColor="#0A84FF"
+                      activeOutlineColor={palette.leaf}
                       outlineColor="rgba(255,255,255,0.12)"
                       style={styles.textInput}
                       theme={{ roundness: 12, colors: { background: 'transparent' } }}
@@ -118,7 +119,7 @@ export default function ForgotPassword() {
               </Button>
 
               <View style={styles.centerLink}>
-                <Link href="/(auth)/login" style={styles.linkTextHighlight}>← Back to login</Link>
+                <Link href="/(auth)/login" style={styles.linkTextHighlight}>Back to login</Link>
               </View>
             </Card.Content>
           </Card>
@@ -131,7 +132,7 @@ export default function ForgotPassword() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#080B11',
+    backgroundColor: '#081C15',
   },
   kav: {
     flex: 1,
@@ -146,7 +147,7 @@ const styles = StyleSheet.create({
     width: 280,
     height: 280,
     borderRadius: 140,
-    backgroundColor: '#0A84FF',
+    backgroundColor: palette.leaf,
     opacity: 0.12,
   },
   glowIndigo: {
@@ -156,7 +157,7 @@ const styles = StyleSheet.create({
     width: 320,
     height: 320,
     borderRadius: 160,
-    backgroundColor: '#5E5CE6',
+    backgroundColor: palette.forest,
     opacity: 0.11,
   },
   shell: { gap: 20, maxWidth: 440, alignSelf: 'center', width: '100%' },
@@ -165,8 +166,8 @@ const styles = StyleSheet.create({
   iconWrap: { alignItems: 'center', gap: 6 },
   iconBadge: {
     alignItems: 'center',
-    backgroundColor: 'rgba(10,132,255,0.15)',
-    borderColor: 'rgba(10,132,255,0.25)',
+    backgroundColor: 'rgba(82,183,136,0.15)',
+    borderColor: 'rgba(82,183,136,0.24)',
     borderRadius: 20,
     borderWidth: 1,
     height: 64,
@@ -196,8 +197,8 @@ const styles = StyleSheet.create({
   formBadge: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(10,132,255,0.15)',
-    borderColor: 'rgba(10,132,255,0.22)',
+    backgroundColor: 'rgba(82,183,136,0.15)',
+    borderColor: 'rgba(82,183,136,0.24)',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
   },
-  formBadgeText: { color: '#0A84FF', fontSize: 10, fontWeight: '800', textTransform: 'uppercase' },
+  formBadgeText: { color: palette.leaf, fontSize: 10, fontWeight: '800', textTransform: 'uppercase' },
   title: { color: '#FFFFFF', fontSize: 22, fontWeight: '900' },
   caption: { color: 'rgba(255,255,255,0.48)', fontSize: 13 },
 
@@ -214,10 +215,10 @@ const styles = StyleSheet.create({
   errorText: { color: '#FF453A', fontSize: 12, marginLeft: 2, marginTop: -2 },
 
   submitButton: {
-    backgroundColor: '#0A84FF',
-    borderRadius: 12,
+    backgroundColor: palette.forest,
+    borderRadius: 16,
     marginTop: 4,
-    shadowColor: '#0A84FF',
+    shadowColor: palette.forest,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 10,
@@ -225,5 +226,5 @@ const styles = StyleSheet.create({
   },
   buttonContent: { height: 48 },
   centerLink: { alignItems: 'center', marginTop: 4 },
-  linkTextHighlight: { color: '#0A84FF', fontSize: 13, fontWeight: '700' },
+  linkTextHighlight: { color: palette.leaf, fontSize: 13, fontWeight: '700' },
 });

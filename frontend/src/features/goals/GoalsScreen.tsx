@@ -92,18 +92,19 @@ export function GoalsScreen() {
       <PageHeroCard
         icon="bullseye-arrow"
         title="Savings Goals"
-        subtitle="Track emergency funds, school needs, gadgets, and future plans."
+        subtitle="Let Tarsi help you turn small savings into clear targets."
         value={formatCurrency(totals.saved)}
         caption={`${formatCurrency(totals.target)} total target`}
-        color={palette.blue}
+        color={palette.forest}
+        mascot
       />
 
       <Card style={cardStyle}>
         <Card.Content style={styles.snapshotContent}>
-          <SectionHeader icon="chart-box-outline" title="Savings Snapshot" subtitle="Fast view of your total progress." color={palette.blue} />
+          <SectionHeader icon="chart-box-outline" title="Savings Snapshot" subtitle="Fast view of your total progress." color={palette.forest} />
           <View style={styles.statGrid}>
-            <FeatureStatCard icon="piggy-bank-outline" label="Saved" value={formatCurrency(totals.saved)} helper={`${Math.round(totals.progress * 100)}% complete`} color={palette.blue} />
-            <FeatureStatCard icon="flag-checkered" label="Remaining" value={formatCurrency(totals.remaining)} helper="left to target" color={palette.indigo} />
+            <FeatureStatCard icon="piggy-bank-outline" label="Saved" value={formatCurrency(totals.saved)} helper={`${Math.round(totals.progress * 100)}% complete`} color={palette.forest} />
+            <FeatureStatCard icon="flag-checkered" label="Remaining" value={formatCurrency(totals.remaining)} helper="left to target" color={palette.leaf} />
             <FeatureStatCard icon="bullseye-arrow" label="Goals" value={String(data?.length ?? 0)} helper="active targets" color={palette.green} />
             <FeatureStatCard icon="calendar-star" label="Target" value={formatCurrency(totals.target)} helper="all goals" color={palette.orange} />
           </View>
@@ -112,7 +113,7 @@ export function GoalsScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="plus-circle-outline" title="New Goal" subtitle="Set a target and update progress whenever you save." color={palette.blue} />
+          <SectionHeader icon="plus-circle-outline" title="New Goal" subtitle="Set a target and update progress whenever you save." color={palette.forest} />
           {(['name', 'targetAmount', 'currentAmount', 'targetDate', 'note'] as const).map((name) => (
             <Controller key={name} control={control} name={name} render={({ field: { value, onChange } }) => (
               <TextInput
@@ -135,7 +136,7 @@ export function GoalsScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="chart-donut" title="Goal Progress" subtitle="Quickly add common contributions." color={palette.blue} />
+          <SectionHeader icon="chart-donut" title="Goal Progress" subtitle="Quickly add common contributions." color={palette.forest} />
           {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load goals" message={error} /> : data?.length ? (
             <View style={styles.list}>
               {data.map((goal) => {
@@ -151,9 +152,9 @@ export function GoalsScreen() {
                           {goal.targetDate ? `Target: ${new Date(goal.targetDate).toLocaleDateString()}` : 'No target date'} - Remaining {formatCurrency(Math.max(target - saved, 0))}
                         </Text>
                       </View>
-                      <Text style={[styles.itemAmount, { color: palette.blue }]}>{Math.round(progress * 100)}%</Text>
+                      <Text style={[styles.itemAmount, { color: palette.forest }]}>{Math.round(progress * 100)}%</Text>
                     </View>
-                    <ProgressBar progress={progress} color={palette.blue} style={styles.progress} />
+                    <ProgressBar progress={progress} color={palette.leaf} style={styles.progress} />
                     <View style={styles.contributionRow}>
                       {[50, 100, 500].map((amount) => (
                         <Button key={amount} mode="contained-tonal" compact onPress={() => contribute(goal.id, amount)}>
@@ -176,10 +177,10 @@ export function GoalsScreen() {
 
 const styles = StyleSheet.create({
   buttonContent: { height: 48 },
-  card: { borderRadius: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 8 },
+  card: { borderRadius: 22, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 8 },
   contributionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   formContent: { gap: 14, paddingVertical: 18 },
-  item: { borderRadius: 14, gap: 12, padding: 14 },
+  item: { borderRadius: 18, gap: 12, padding: 14 },
   itemAmount: { fontSize: 16, fontWeight: '900' },
   itemHeader: { alignItems: 'center', flexDirection: 'row', gap: 12, justifyContent: 'space-between' },
   itemSubtitle: { fontSize: 12, fontWeight: '500', opacity: 0.7 },
@@ -188,7 +189,7 @@ const styles = StyleSheet.create({
   list: { gap: 10 },
   listContent: { gap: 12, paddingVertical: 18 },
   progress: { borderRadius: 4, height: 8 },
-  saveButton: { backgroundColor: '#0A84FF', borderRadius: 12, marginTop: 6 },
+  saveButton: { backgroundColor: palette.forest, borderRadius: 16, marginTop: 6 },
   snapshotContent: { gap: 12, paddingVertical: 18 },
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
 });

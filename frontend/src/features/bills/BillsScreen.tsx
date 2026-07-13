@@ -33,6 +33,22 @@ type RecurringFormValues = {
 
 const todayIso = () => new Date().toISOString().slice(0, 10);
 
+const getBillStatus = (dueDate: string, isPaid: boolean) => {
+  if (isPaid) {
+    return { label: 'PAID', backgroundColor: '#D8F3DC', color: palette.forest };
+  }
+
+  const due = new Date(dueDate);
+  const today = new Date();
+  const startToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const startDue = new Date(due.getFullYear(), due.getMonth(), due.getDate());
+  const days = Math.ceil((startDue.getTime() - startToday.getTime()) / 86400000);
+
+  if (days < 0) return { label: 'OVERDUE', backgroundColor: '#FFE2E0', color: palette.red };
+  if (days === 0) return { label: 'DUE TODAY', backgroundColor: '#FFF3D8', color: palette.orange };
+  return { label: `${days} DAYS LEFT`, backgroundColor: '#E6F4EA', color: palette.forest };
+};
+
 export function BillsScreen() {
   const theme = useTheme();
   const revision = useFinanceStore((state) => state.revision);
@@ -151,19 +167,20 @@ export function BillsScreen() {
       <PageHeroCard
         icon="calendar-clock"
         title="Bills & Recurring"
-        subtitle="Plan due dates and repeating money events before they surprise you."
+        subtitle="Tarsi keeps due dates, subscriptions, and repeated money moves visible."
         value={formatCurrency(totals.unpaid)}
         caption={`${totals.activeRecurring} active recurring`}
-        color={palette.orange}
+        color={palette.forest}
+        mascot
       />
 
       <Card style={cardStyle}>
         <Card.Content style={styles.snapshotContent}>
-          <SectionHeader icon="calendar-alert" title="Schedule Snapshot" subtitle="Bills and recurring money at a glance." color={palette.orange} />
+          <SectionHeader icon="calendar-alert" title="Schedule Snapshot" subtitle="Bills and recurring money at a glance." color={palette.forest} />
           <View style={styles.statGrid}>
             <FeatureStatCard icon="receipt-clock-outline" label="Unpaid" value={formatCurrency(totals.unpaid)} helper="open bills" color={palette.orange} />
             <FeatureStatCard icon="alert-circle-outline" label="Overdue" value={String(totals.overdue)} helper="needs attention" color={palette.red} />
-            <FeatureStatCard icon="repeat-variant" label="Recurring" value={String(totals.activeRecurring)} helper="active schedules" color={palette.indigo} />
+            <FeatureStatCard icon="repeat-variant" label="Recurring" value={String(totals.activeRecurring)} helper="active schedules" color={palette.forest} />
             <FeatureStatCard
               icon="calendar-arrow-right"
               label="Next Due"
@@ -177,7 +194,7 @@ export function BillsScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="bell-plus-outline" title="New Bill Reminder" subtitle="Track due dates and mark bills paid." color={palette.orange} />
+          <SectionHeader icon="bell-plus-outline" title="New Bill Reminder" subtitle="Track due dates and mark bills paid." color={palette.forest} />
           {(['name', 'amount', 'category', 'dueDate', 'note'] as const).map((name) => (
             <Controller key={name} control={billForm.control} name={name} render={({ field: { value, onChange } }) => (
               <TextInput
@@ -199,7 +216,7 @@ export function BillsScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="repeat-variant" title="Recurring Money" subtitle="Create repeating income or expense schedules." color={palette.indigo} />
+          <SectionHeader icon="repeat-variant" title="Recurring Money" subtitle="Create repeating income or expense schedules." color={palette.forest} />
           <SegmentedButtons
             value={recurringType}
             onValueChange={(value) => recurringForm.setValue('type', value as RecurringFormValues['type'])}
@@ -231,14 +248,19 @@ export function BillsScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="calendar-check-outline" title="Upcoming Bills" subtitle="Tap to mark paid or reopen." color={palette.orange} />
+          <SectionHeader icon="calendar-check-outline" title="Upcoming Bills" subtitle="Tap to mark paid or reopen." color={palette.forest} />
           {bills.isLoading ? <StateView loading /> : bills.error ? <StateView title="Unable to load bills" message={bills.error} /> : bills.data?.length ? (
             <View style={styles.list}>
-              {bills.data.map((bill) => (
+              {bills.data.map((bill) => {
+                const status = getBillStatus(bill.dueDate, bill.isPaid);
+                return (
                 <View key={bill.id} style={[styles.item, { backgroundColor: theme.colors.surfaceVariant }]}>
                   <View style={styles.itemHeader}>
                     <View style={styles.itemTitleGroup}>
-                      <Text style={[styles.itemTitle, { color: theme.colors.onSurface }]}>{bill.name}</Text>
+                      <View style={styles.itemTitleRow}>
+                        <Text style={[styles.itemTitle, { color: theme.colors.onSurface }]}>{bill.name}</Text>
+                        <Text style={[styles.statusBadge, { backgroundColor: status.backgroundColor, color: status.color }]}>{status.label}</Text>
+                      </View>
                       <Text style={[styles.itemSubtitle, { color: theme.colors.onSurfaceVariant }]}>{bill.category} - Due {new Date(bill.dueDate).toLocaleDateString()}</Text>
                     </View>
                     <Text style={[styles.itemAmount, { color: bill.isPaid ? palette.green : palette.orange }]}>{formatCurrency(Number(bill.amount))}</Text>
@@ -247,7 +269,8 @@ export function BillsScreen() {
                     {bill.isPaid ? 'Paid' : 'Mark paid'}
                   </Chip>
                 </View>
-              ))}
+                );
+              })}
             </View>
           ) : <StateView title="No bill reminders" message="Bills you add will appear here." />}
         </Card.Content>
@@ -255,7 +278,7 @@ export function BillsScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="repeat" title="Recurring List" subtitle="Pause or reactivate scheduled money." color={palette.indigo} />
+          <SectionHeader icon="repeat" title="Recurring List" subtitle="Pause or reactivate scheduled money." color={palette.forest} />
           {recurring.isLoading ? <StateView loading /> : recurring.error ? <StateView title="Unable to load recurring items" message={recurring.error} /> : recurring.data?.length ? (
             <View style={styles.list}>
               {recurring.data.map((item) => (
@@ -285,19 +308,21 @@ export function BillsScreen() {
 }
 
 const styles = StyleSheet.create({
-  billButton: { backgroundColor: '#FF9F0A', borderRadius: 12, marginTop: 6 },
+  billButton: { backgroundColor: palette.forest, borderRadius: 16, marginTop: 6 },
   buttonContent: { height: 48 },
-  card: { borderRadius: 16, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 8 },
+  card: { borderRadius: 22, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 8 },
   formContent: { gap: 14, paddingVertical: 18 },
-  item: { borderRadius: 14, gap: 10, padding: 14 },
+  item: { borderRadius: 18, gap: 10, padding: 14 },
   itemAmount: { fontSize: 15, fontWeight: '900' },
   itemHeader: { alignItems: 'center', flexDirection: 'row', gap: 12, justifyContent: 'space-between' },
   itemSubtitle: { fontSize: 12, fontWeight: '500', opacity: 0.72 },
   itemTitle: { fontSize: 16, fontWeight: '900' },
+  itemTitleRow: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   itemTitleGroup: { flex: 1, gap: 2 },
   list: { gap: 10 },
   listContent: { gap: 12, paddingVertical: 18 },
-  recurringButton: { backgroundColor: '#5E5CE6', borderRadius: 12, marginTop: 6 },
+  recurringButton: { backgroundColor: palette.forest, borderRadius: 16, marginTop: 6 },
   snapshotContent: { gap: 12, paddingVertical: 18 },
   statGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  statusBadge: { borderRadius: 999, fontSize: 10, fontWeight: '900', overflow: 'hidden', paddingHorizontal: 8, paddingVertical: 4 },
 });

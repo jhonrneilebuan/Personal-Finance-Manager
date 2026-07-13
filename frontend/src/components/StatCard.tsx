@@ -20,7 +20,7 @@ const toneIcon = {
 
 export function StatCard({ label, value, tone = 'primary', icon, style }: StatCardProps) {
   const theme = useTheme();
-  const color = tone === 'expense' ? theme.colors.error : tone === 'income' ? theme.colors.secondary : tone === 'savings' ? theme.colors.tertiary : theme.colors.primary;
+  const color = tone === 'expense' ? theme.colors.error : tone === 'income' ? theme.colors.secondary : tone === 'savings' ? theme.colors.primary : theme.colors.primary;
 
   return (
     <Card 
@@ -56,7 +56,7 @@ export function StatCard({ label, value, tone = 'primary', icon, style }: StatCa
 
 const styles = StyleSheet.create({
   card: { 
-    borderRadius: 16, 
+    borderRadius: 22, 
     flexGrow: 1, 
     minWidth: 140,
     shadowColor: '#000',
@@ -65,12 +65,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  content: { gap: 12, padding: 14, paddingVertical: 16 },
+  content: { gap: 14, padding: 16, paddingVertical: 18 },
   copy: { gap: 2 },
   dot: { borderRadius: 4, height: 6, width: 6 },
-  iconWrap: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  iconWrap: { alignItems: 'center', borderRadius: 14, height: 42, justifyContent: 'center', width: 42 },
   label: { fontSize: 13, fontWeight: '600', opacity: 0.6 },
   topRow: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
-  value: { fontWeight: '900', fontSize: 19, letterSpacing: -0.3 },
+  value: { fontWeight: '900', fontSize: 21, letterSpacing: -0.3 },
 });
-

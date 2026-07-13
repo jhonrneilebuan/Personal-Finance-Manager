@@ -78,10 +78,11 @@ export function ReportsScreen() {
       <PageHeroCard
         icon="chart-areaspline"
         title="Reports"
-        subtitle="Understand income, expenses, savings, and category trends."
+        subtitle="Tarsi turns your month into clear cashflow, category, and savings patterns."
         value={formatCurrency(monthly.data?.savings ?? 0)}
         caption={formatMonth(selectedMonth)}
-        color={palette.blue}
+        color={palette.forest}
+        mascot
       />
       <Card style={cardStyle}>
         <Card.Content style={styles.monthContent}>
@@ -89,7 +90,7 @@ export function ReportsScreen() {
             title="Report Month"
             monthLabel={formatMonth(selectedMonth)}
             caption="Review cashflow, charts, exports, and AI summary"
-            color={palette.blue}
+            color={palette.forest}
             onPrevious={() => setSelectedMonth((value) => shiftMonth(value, -1))}
             onNext={() => setSelectedMonth((value) => shiftMonth(value, 1))}
             onCurrent={() => setSelectedMonth(monthStart())}
@@ -98,17 +99,17 @@ export function ReportsScreen() {
       </Card>
       <AiInsightCard
         title="AI Monthly Summary"
-        subtitle="Summarize this month and get practical next steps."
+        subtitle="Let Tarsi explain what changed and what to adjust next."
         buttonLabel="Generate Summary"
         icon="chart-timeline-variant"
-        color={palette.blue}
+        color={palette.forest}
         insight={summary}
         loading={isAiLoading}
         onGenerate={generateMonthlySummary}
       />
       <Card style={cardStyle}>
         <Card.Content style={styles.exportContent}>
-          <SectionHeader icon="file-export-outline" title="Export Report" subtitle="Generate CSV or PDF from the current month." color={palette.blue} />
+          <SectionHeader icon="file-export-outline" title="Export Report" subtitle="Generate CSV or PDF from the current month." color={palette.forest} />
           <View style={styles.exportButtons}>
             <Button icon="file-delimited-outline" mode="contained-tonal" loading={isExporting} disabled={isExporting} onPress={() => exportReport('csv')}>CSV</Button>
             <Button icon="file-pdf-box" mode="contained-tonal" loading={isExporting} disabled={isExporting} onPress={() => exportReport('pdf')}>PDF</Button>
@@ -158,7 +159,7 @@ export function ReportsScreen() {
 
 const styles = StyleSheet.create({
   card: { 
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
   exportContent: { gap: 12, paddingVertical: 18 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   monthContent: { paddingVertical: 18 },
-  previewBox: { borderRadius: 12, padding: 12 },
+  previewBox: { borderRadius: 18, padding: 12 },
   previewText: { fontFamily: 'monospace', fontSize: 11, lineHeight: 16 },
   stat: { flexBasis: '47%' },
 });

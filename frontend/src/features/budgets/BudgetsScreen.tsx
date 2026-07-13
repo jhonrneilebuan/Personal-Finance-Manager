@@ -112,24 +112,25 @@ export function BudgetsScreen() {
       <PageHeroCard
         icon="target-variant"
         title="Budgets"
-        subtitle="Set monthly guardrails and compare limits against spending."
+        subtitle="Set monthly guardrails and let Tarsi recommend smarter limits."
         value={formatCurrency(totalBudget)}
         caption={formatMonth(selectedMonth)}
-        color={palette.indigo}
+        color={palette.forest}
+        mascot
       />
       <AiInsightCard
-        title="AI Budget Coach"
+        title="Tarsi Budget Coach"
         subtitle="Get advice on limits, overspending, and what to adjust next."
         buttonLabel="Analyze Budgets"
         icon="target-variant"
-        color={palette.indigo}
+        color={palette.forest}
         insight={aiAdvice}
         loading={isAiLoading}
         onGenerate={generateBudgetAdvice}
       />
       <Card style={cardStyle}>
         <Card.Content style={styles.recommendationContent}>
-          <SectionHeader icon="robot-excited-outline" title="AI Budget Recommendation" subtitle="Suggest limits and a savings target for the next month." color={palette.indigo} />
+          <SectionHeader icon="robot-excited-outline" title="AI Budget Recommendation" subtitle="Suggest limits and a savings target for the next month." color={palette.forest} />
           <Button
             icon="sparkles"
             mode="contained-tonal"
@@ -143,14 +144,14 @@ export function BudgetsScreen() {
             <View style={styles.recommendationList}>
               <View style={[styles.savingsTarget, { backgroundColor: theme.colors.surfaceVariant }]}>
                 <Text style={[styles.savingsTargetLabel, { color: theme.colors.onSurfaceVariant }]}>Savings target</Text>
-                <Text style={[styles.savingsTargetValue, { color: palette.indigo }]}>{formatCurrency(recommendation.savingsTarget)}</Text>
+                <Text style={[styles.savingsTargetValue, { color: palette.forest }]}>{formatCurrency(recommendation.savingsTarget)}</Text>
               </View>
               <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>{recommendation.summary}</Text>
               {recommendation.recommendations.map((item) => (
                 <View key={`${item.category}-${item.priority}`} style={[styles.recommendationItem, { backgroundColor: theme.colors.surfaceVariant }]}>
                   <View style={styles.budgetMeta}>
                     <Text style={[styles.budgetTitle, { color: theme.colors.onSurface }]}>{item.category}</Text>
-                    <Text style={[styles.budgetLimitText, { color: palette.indigo }]}>{formatCurrency(item.suggestedLimit)}</Text>
+                    <Text style={[styles.budgetLimitText, { color: palette.forest }]}>{formatCurrency(item.suggestedLimit)}</Text>
                   </View>
                   <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>{item.priority.toUpperCase()} - {item.reason}</Text>
                 </View>
@@ -161,12 +162,12 @@ export function BudgetsScreen() {
       </Card>
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="target-variant" title="New Budget" subtitle="Choose month, category, and spending limit." color={palette.indigo} />
+          <SectionHeader icon="target-variant" title="New Budget" subtitle="Choose month, category, and spending limit." color={palette.forest} />
           <MonthSelector
             title="Budget Month"
             monthLabel={formatMonth(selectedMonth)}
             caption={`${selectedBudgets.length} categories planned`}
-            color={palette.indigo}
+            color={palette.forest}
             onPrevious={() => setValue('month', shiftMonth(selectedMonth, -1))}
             onNext={() => setValue('month', shiftMonth(selectedMonth, 1))}
             onCurrent={() => setValue('month', currentMonthIso())}
@@ -201,7 +202,7 @@ export function BudgetsScreen() {
       
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="chart-donut" title="Budget Progress" subtitle="Current month usage by category" color={palette.indigo} />
+          <SectionHeader icon="chart-donut" title="Budget Progress" subtitle="Current month usage by category" color={palette.forest} />
           {isLoading || categorySpending.isLoading ? <StateView loading /> : error ? <StateView title="Unable to load budgets" message={error} /> : selectedBudgets.length ? (
             <View style={styles.budgetList}>
               {selectedBudgets.map((item) => {
@@ -216,7 +217,7 @@ export function BudgetsScreen() {
                       </View>
                       <Text style={[styles.budgetLimitText, { color: theme.colors.onSurface }]}>{formatCurrency(Number(item.limitAmount))}</Text>
                     </View>
-                    <ProgressBar progress={progress} color={progress >= 1 ? theme.colors.error : '#5E5CE6'} style={styles.progress} />
+                    <ProgressBar progress={progress} color={progress >= 1 ? theme.colors.error : palette.leaf} style={styles.progress} />
                   </View>
                 );
               })}
@@ -241,9 +242,9 @@ const styles = StyleSheet.create({
   budgetLimitText: { fontSize: 15, fontWeight: '800', letterSpacing: -0.2 },
   buttonContent: { height: 48 },
   saveButton: {
-    backgroundColor: '#5E5CE6',
-    borderRadius: 12,
-    shadowColor: '#5E5CE6',
+    backgroundColor: palette.forest,
+    borderRadius: 16,
+    shadowColor: palette.forest,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
@@ -251,7 +252,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   card: { 
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -262,9 +263,9 @@ const styles = StyleSheet.create({
   listContent: { gap: 12, paddingVertical: 18 },
   budgetList: { gap: 8 },
   recommendationContent: { gap: 12, paddingVertical: 18 },
-  recommendationItem: { borderRadius: 12, gap: 6, padding: 12 },
+  recommendationItem: { borderRadius: 18, gap: 6, padding: 12 },
   recommendationList: { gap: 10 },
-  savingsTarget: { borderRadius: 14, gap: 3, padding: 14 },
+  savingsTarget: { borderRadius: 20, gap: 3, padding: 14 },
   savingsTargetLabel: { fontSize: 11, fontWeight: '800', textTransform: 'uppercase' },
   savingsTargetValue: { fontSize: 22, fontWeight: '900' },
   progress: { borderRadius: 4, height: 8 },

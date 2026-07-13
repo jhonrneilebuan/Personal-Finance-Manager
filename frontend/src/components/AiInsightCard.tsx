@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button, Card, Text, useTheme } from 'react-native-paper';
 import type { AiFinanceInsight } from '@/types/ai';
+import { TarsiMascot } from './TarsiMascot';
 
 type AiInsightCardProps = {
   title: string;
@@ -40,8 +41,9 @@ export function AiInsightCard({
     >
       <Card.Content style={styles.content}>
         <View style={styles.header}>
+          <TarsiMascot size={58} mood={insight ? 'happy' : 'thinking'} />
           <View style={[styles.iconBox, { backgroundColor: `${accent}12` }]}>
-            <MaterialCommunityIcons name={icon} size={20} color={accent} />
+            <MaterialCommunityIcons name={icon} size={19} color={accent} />
           </View>
           <View style={styles.copy}>
             <View style={styles.titleRow}>
@@ -102,7 +104,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   card: { 
-    borderRadius: 16,
+    borderRadius: 22,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -112,10 +114,10 @@ const styles = StyleSheet.create({
   column: { flex: 1, gap: 6, minWidth: 170 },
   columnTitle: { fontWeight: '800', fontSize: 13, letterSpacing: -0.1 },
   columns: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 },
-  content: { gap: 14, paddingVertical: 18 },
+  content: { gap: 14, paddingVertical: 20 },
   copy: { flex: 1, gap: 2 },
   header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
-  iconBox: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
+  iconBox: { alignItems: 'center', borderRadius: 14, height: 40, justifyContent: 'center', width: 40 },
   insightTitle: { fontWeight: '800', fontSize: 15, letterSpacing: -0.2, marginTop: 4 },
   item: { lineHeight: 18, opacity: 0.85, fontSize: 13, paddingLeft: 4 },
   result: { gap: 10, paddingVertical: 4 },
@@ -126,4 +128,3 @@ const styles = StyleSheet.create({
   actionButton: { borderRadius: 10, marginTop: 4 },
   buttonContent: { height: 42 },
 });
-
