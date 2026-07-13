@@ -103,9 +103,9 @@ export function AuthScreen({ mode }: AuthScreenProps) {
       <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
         <Defs>
           <LinearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%" stopColor="#081C15" />
-            <Stop offset="50%" stopColor="#123524" />
-            <Stop offset="100%" stopColor="#050B08" />
+            <Stop offset="0%" stopColor="#031B3A" />
+            <Stop offset="50%" stopColor="#062B5F" />
+            <Stop offset="100%" stopColor="#020812" />
           </LinearGradient>
         </Defs>
         <Rect width="100%" height="100%" fill="url(#bgGrad)" />
@@ -310,7 +310,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#081C15',
+    backgroundColor: '#031B3A',
   },
   kav: {
     flex: 1,
@@ -391,8 +391,8 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
   chip: {
     alignItems: 'center',
-    backgroundColor: 'rgba(82,183,136,0.13)',
-    borderColor: 'rgba(82,183,136,0.24)',
+    backgroundColor: 'rgba(77,163,255,0.13)',
+    borderColor: 'rgba(77,163,255,0.24)',
     borderRadius: 10,
     borderWidth: 1,
     flexDirection: 'row',
@@ -444,8 +444,8 @@ const styles = StyleSheet.create({
   formBadge: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(82,183,136,0.15)',
-    borderColor: 'rgba(82,183,136,0.24)',
+    backgroundColor: 'rgba(77,163,255,0.15)',
+    borderColor: 'rgba(77,163,255,0.24)',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',

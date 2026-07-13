@@ -8,11 +8,12 @@ import { StateView } from './StateView';
 type BarChartCardProps = {
   title: string;
   data: Array<{ label: string; value: number }>;
+  emptyMessage?: string;
 };
 
 const chartColors = [palette.forest, palette.leaf, palette.green, palette.teal, palette.orange, palette.pink];
 
-export function BarChartCard({ title, data }: BarChartCardProps) {
+export function BarChartCard({ title, data, emptyMessage = 'Add transactions to see this chart.' }: BarChartCardProps) {
   const theme = useTheme();
   const max = Math.max(...data.map((item) => item.value), 1);
 
@@ -35,7 +36,7 @@ export function BarChartCard({ title, data }: BarChartCardProps) {
           <Text style={[styles.title, { color: theme.colors.onSurface }]}>{title}</Text>
         </View>
         {data.length === 0 ? (
-          <StateView title="No data yet" message="Add transactions to see this chart." />
+          <StateView title="No data yet" message={emptyMessage} />
         ) : (
           <View style={styles.rows}>
             {data.map((item, index) => {

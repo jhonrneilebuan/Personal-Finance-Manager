@@ -80,9 +80,9 @@ export function DashboardScreen() {
           <Svg height="100%" width="100%">
             <Defs>
               <LinearGradient id="dashHeroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <Stop offset="0%" stopColor="#1B4332" />
-                <Stop offset="58%" stopColor="#2D6A4F" />
-                <Stop offset="100%" stopColor="#081C15" />
+                <Stop offset="0%" stopColor="#0A84FF" />
+                <Stop offset="58%" stopColor="#0066D6" />
+                <Stop offset="100%" stopColor="#003566" />
               </LinearGradient>
             </Defs>
             <Rect width="100%" height="100%" fill="url(#dashHeroGrad)" />
@@ -135,7 +135,11 @@ export function DashboardScreen() {
       </View>
       <CashflowGraphCard income={data.totalIncome} expenses={data.totalExpenses} savings={data.savings} />
       <BarChartCard title="Expense by Category" data={data.expenseByCategory.map((item) => ({ label: item.category, value: item.amount }))} />
-      <BarChartCard title="Budget Usage" data={data.budgetUsage.map((item) => ({ label: item.category, value: item.spentAmount }))} />
+      <BarChartCard
+        title="Budget Usage"
+        data={data.budgetUsage.map((item) => ({ label: item.category, value: item.spentAmount }))}
+        emptyMessage="Create a budget, then add expenses with the same category to see usage."
+      />
       
       <Card 
         style={[

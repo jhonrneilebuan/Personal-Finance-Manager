@@ -132,7 +132,7 @@ export function BudgetsScreen() {
         <Card.Content style={styles.recommendationContent}>
           <SectionHeader icon="robot-excited-outline" title="AI Budget Recommendation" subtitle="Suggest limits and a savings target for the next month." color={palette.forest} />
           <Button
-            icon="sparkles"
+            icon="auto-fix"
             mode="contained-tonal"
             loading={isRecommendationLoading}
             disabled={isRecommendationLoading}

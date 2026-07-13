@@ -80,6 +80,7 @@ export function AiInsightCard({
         <Button 
           icon="auto-fix" 
           mode="contained-tonal" 
+          textColor={accent}
           style={styles.actionButton}
           contentStyle={styles.buttonContent}
           loading={loading} 

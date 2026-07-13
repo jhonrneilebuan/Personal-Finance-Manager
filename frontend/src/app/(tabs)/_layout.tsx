@@ -49,14 +49,8 @@ function CustomTabBar() {
               onPress={() => {
                 router.push(`/(tabs)/${tab.name}`);
               }}
-              activeOpacity={0.7}
+              activeOpacity={0.72}
             >
-              {/* Active background pill */}
-              {active && (
-                <View style={[styles.activePill, { backgroundColor: accent + '18' }]} />
-              )}
-
-              {/* Icon badge */}
               <View style={[
                 styles.iconWrap,
                 active && { backgroundColor: accent + '15' }
@@ -66,10 +60,6 @@ function CustomTabBar() {
                   size={22}
                   color={active ? accent : (theme.dark ? 'rgba(255,255,255,0.38)' : 'rgba(0,0,0,0.35)')}
                 />
-                {/* Active dot indicator */}
-                {active && (
-                  <View style={[styles.activeDot, { backgroundColor: accent }]} />
-                )}
               </View>
 
               <Text style={[
@@ -240,14 +230,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     position: 'relative',
   },
-  activePill: {
-    borderRadius: 16,
-    bottom: 0,
-    left: 4,
-    position: 'absolute',
-    right: 4,
-    top: 0,
-  },
   iconWrap: {
     alignItems: 'center',
     borderRadius: 10,
@@ -255,13 +237,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
     width: 32,
-  },
-  activeDot: {
-    borderRadius: 3,
-    bottom: -5,
-    height: 3,
-    position: 'absolute',
-    width: 14,
   },
   tabLabel: {
     fontSize: 10,

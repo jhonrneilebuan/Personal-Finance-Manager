@@ -124,6 +124,7 @@ export function AiSpendingPlannerCard({ defaultAvailableMoney }: AiSpendingPlann
         <Button 
           icon="auto-fix" 
           mode="contained" 
+          buttonColor={palette.forest}
           style={styles.planButton}
           contentStyle={styles.buttonContent}
           loading={isLoading} 

@@ -197,7 +197,7 @@ export function AllowanceScreen() {
 
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="calendar" title="Baon Calendar" subtitle="Green days have planned allowance." color={palette.forest} />
+          <SectionHeader icon="calendar" title="Baon Calendar" subtitle="Blue days have planned allowance." color={palette.forest} />
           <View style={styles.weekHeader}>
             {weekdayLabels.map((label) => <Text key={label} style={[styles.weekLabel, { color: theme.colors.onSurfaceVariant }]}>{label}</Text>)}
           </View>

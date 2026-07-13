@@ -1,5 +1,6 @@
 import { ActivityIndicator, Button, Text } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
+import { palette } from '@/theme/theme';
 import { TarsiMascot } from './TarsiMascot';
 
 type StateViewProps = {
@@ -17,12 +18,17 @@ export function StateView({ title, message, loading, actionLabel, onAction }: St
       {!loading ? <TarsiMascot size={86} mood="thinking" /> : null}
       {title ? <Text variant="titleMedium">{title}</Text> : null}
       {message ? <Text style={styles.message}>{message}</Text> : null}
-      {actionLabel && onAction ? <Button mode="contained" onPress={onAction}>{actionLabel}</Button> : null}
+      {actionLabel && onAction ? (
+        <Button mode="contained" buttonColor={palette.forest} style={styles.actionButton} onPress={onAction}>
+          {actionLabel}
+        </Button>
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { alignItems: 'center', gap: 10, justifyContent: 'center', minHeight: 190, padding: 24 },
+  actionButton: { borderRadius: 16 },
   message: { opacity: 0.7, textAlign: 'center' },
 });

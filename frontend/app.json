@@ -5,6 +5,7 @@
     "scheme": "pesopilot",
     "version": "1.0.0",
     "orientation": "portrait",
+    "icon": "./src/assets/brand/peso-pilot-logo.png",
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
       "**/*"
@@ -18,7 +19,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0B5D4B"
+        "foregroundImage": "./src/assets/brand/peso-pilot-logo.png",
+        "backgroundColor": "#0A84FF"
       },
       "package": "com.jhonrneilebuan.pesopilot"
     },
