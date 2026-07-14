@@ -17,17 +17,15 @@ import { useFinanceStore } from '@/store/finance.store';
 import { palette } from '@/theme/theme';
 import type { AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
+import { formatLocalMonthKey, shiftLocalMonth, startOfLocalMonth } from '@/utils/date';
 
-const monthStart = (date = new Date()) => new Date(date.getFullYear(), date.getMonth(), 1);
-const shiftMonth = (date: Date, delta: number) => new Date(date.getFullYear(), date.getMonth() + delta, 1);
-const monthKey = (date: Date) => date.toISOString().slice(0, 7);
 const formatMonth = (date: Date) => new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
 
 export function ReportsScreen() {
   const theme = useTheme();
   const revision = useFinanceStore((state) => state.revision);
-  const [selectedMonth, setSelectedMonth] = useState(() => monthStart());
-  const selectedMonthKey = monthKey(selectedMonth);
+  const [selectedMonth, setSelectedMonth] = useState(() => startOfLocalMonth());
+  const selectedMonthKey = formatLocalMonthKey(selectedMonth);
   const monthly = useAsyncData(useCallback(() => financeApi.monthlyReport(selectedMonthKey), [revision, selectedMonthKey]));
   const category = useAsyncData(useCallback(() => financeApi.categoryReport(selectedMonthKey), [revision, selectedMonthKey]));
   const [summary, setSummary] = useState<AiFinanceInsight | null>(null);
@@ -91,9 +89,9 @@ export function ReportsScreen() {
             monthLabel={formatMonth(selectedMonth)}
             caption="Review cashflow, charts, exports, and AI summary"
             color={palette.forest}
-            onPrevious={() => setSelectedMonth((value) => shiftMonth(value, -1))}
-            onNext={() => setSelectedMonth((value) => shiftMonth(value, 1))}
-            onCurrent={() => setSelectedMonth(monthStart())}
+            onPrevious={() => setSelectedMonth((value) => shiftLocalMonth(value, -1))}
+            onNext={() => setSelectedMonth((value) => shiftLocalMonth(value, 1))}
+            onCurrent={() => setSelectedMonth(startOfLocalMonth())}
           />
         </Card.Content>
       </Card>

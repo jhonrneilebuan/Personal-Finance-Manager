@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
-import { endOfMonth, parseMonth } from '../utils/date';
+import { endOfMonth, formatMonthKey, parseMonth } from '../utils/date';
 
 const money = (value: Prisma.Decimal | number | null | undefined) => Number(value ?? 0);
 
@@ -65,7 +65,7 @@ export const reportService = {
     const totalIncome = money(income._sum.amount);
     const totalExpenses = money(expenses._sum.amount);
     return {
-      month: start.toISOString().slice(0, 7),
+      month: formatMonthKey(start),
       totalIncome,
       totalExpenses,
       savings: totalIncome - totalExpenses,

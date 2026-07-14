@@ -11,6 +11,7 @@ import { useAsyncData } from '@/hooks/useAsyncData';
 import { financeApi } from '@/services/finance.service';
 import { useFinanceStore } from '@/store/finance.store';
 import { palette } from '@/theme/theme';
+import { formatLocalMonthKey, parseLocalDate, shiftLocalMonth, startOfLocalMonth } from '@/utils/date';
 import { formatCurrency } from '@/utils/currency';
 
 type AllowanceFormValues = {
@@ -23,9 +24,6 @@ type AllowanceFormValues = {
 const defaultWeekdays = [1, 2, 3, 4, 5];
 const weekdayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-const monthStart = (date = new Date()) => new Date(date.getFullYear(), date.getMonth(), 1);
-const shiftMonth = (date: Date, delta: number) => new Date(date.getFullYear(), date.getMonth() + delta, 1);
-const monthKey = (date: Date) => date.toISOString().slice(0, 7);
 const formatMonth = (date: Date) => new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
 const formatWeekdays = (weekdays: number[]) => weekdays.map((day) => weekdayLabels[day]).join(', ');
 
@@ -33,15 +31,26 @@ export function AllowanceScreen() {
   const theme = useTheme();
   const revision = useFinanceStore((state) => state.revision);
   const markChanged = useFinanceStore((state) => state.markChanged);
-  const [selectedMonth, setSelectedMonth] = useState(() => monthStart());
+  const [selectedMonth, setSelectedMonth] = useState(() => startOfLocalMonth());
   const [weekdays, setWeekdays] = useState(defaultWeekdays);
   const [notice, setNotice] = useState('');
-  const summary = useAsyncData(useCallback(() => financeApi.allowanceSummary(monthKey(selectedMonth)), [revision, selectedMonth]));
+  const selectedMonthKey = formatLocalMonthKey(selectedMonth);
+  const summary = useAsyncData(useCallback(() => financeApi.allowanceSummary(selectedMonthKey), [revision, selectedMonthKey]));
   const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm<AllowanceFormValues>({
     defaultValues: { name: 'School baon', dailyAmount: '', spendingLimit: '', note: '' },
   });
 
-  const firstWeekday = useMemo(() => summary.data?.calendar[0] ? new Date(summary.data.calendar[0].date).getDay() : 0, [summary.data]);
+  const calendarCells = useMemo(() => {
+    const days = summary.data?.calendar ?? [];
+    const startBlanks = days[0] ? parseLocalDate(days[0].date).getDay() : 0;
+    const endBlanks = (7 - ((startBlanks + days.length) % 7)) % 7;
+    return [
+      ...Array.from({ length: startBlanks }, (_, index) => ({ kind: 'blank' as const, key: `blank-start-${index}` })),
+      ...days.map((day) => ({ kind: 'day' as const, key: `day-${day.date}`, day })),
+      ...Array.from({ length: endBlanks }, (_, index) => ({ kind: 'blank' as const, key: `blank-end-${index}` })),
+    ];
+  }, [summary.data?.calendar]);
+
   const savingsProgress = useMemo(() => {
     const target = summary.data?.projectedSavings ?? 0;
     return target > 0 ? Math.max(0, Math.min((summary.data?.actualSavingsToDate ?? 0) / target, 1)) : 0;
@@ -63,7 +72,7 @@ export function AllowanceScreen() {
     try {
       await financeApi.createAllowancePlan({
         name: values.name.trim(),
-        month: selectedMonth.toISOString(),
+        month: `${selectedMonthKey}-01`,
         dailyAmount,
         spendingLimit,
         weekdays,
@@ -108,9 +117,9 @@ export function AllowanceScreen() {
             monthLabel={formatMonth(selectedMonth)}
             caption={`${summary.data?.plans.length ?? 0} active plan${summary.data?.plans.length === 1 ? '' : 's'}`}
             color={palette.forest}
-            onPrevious={() => setSelectedMonth((value) => shiftMonth(value, -1))}
-            onNext={() => setSelectedMonth((value) => shiftMonth(value, 1))}
-            onCurrent={() => setSelectedMonth(monthStart())}
+            onPrevious={() => setSelectedMonth((value) => shiftLocalMonth(value, -1))}
+            onNext={() => setSelectedMonth((value) => shiftLocalMonth(value, 1))}
+            onCurrent={() => setSelectedMonth(startOfLocalMonth())}
           />
 
           {(['name', 'dailyAmount', 'spendingLimit', 'note'] as const).map((name) => (
@@ -198,29 +207,34 @@ export function AllowanceScreen() {
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
           <SectionHeader icon="calendar" title="Baon Calendar" subtitle="Blue days have planned allowance." color={palette.forest} />
-          <View style={styles.weekHeader}>
-            {weekdayLabels.map((label) => <Text key={label} style={[styles.weekLabel, { color: theme.colors.onSurfaceVariant }]}>{label}</Text>)}
-          </View>
-          <View style={styles.calendarGrid}>
-            {Array.from({ length: firstWeekday }).map((_, index) => <View key={`blank-${index}`} style={styles.dayCell} />)}
-            {summary.data?.calendar.map((day) => {
-              const date = new Date(day.date);
-              return (
+          <View style={[styles.calendarShell, { backgroundColor: theme.colors.surfaceVariant, borderColor: theme.colors.outlineVariant }]}>
+            <View style={styles.weekHeader}>
+              {weekdayLabels.map((label) => <Text key={label} style={[styles.weekLabel, { color: theme.colors.onSurfaceVariant }]}>{label}</Text>)}
+            </View>
+            <View style={styles.calendarGrid}>
+              {calendarCells.map((cell) => {
+                if (cell.kind === 'blank') {
+                  return <View key={cell.key} style={[styles.dayCell, styles.emptyDayCell, { borderColor: theme.colors.outlineVariant }]} />;
+                }
+
+                const date = parseLocalDate(cell.day.date);
+                return (
                 <View
-                  key={day.date}
+                  key={cell.key}
                   style={[
                     styles.dayCell,
                     {
-                      backgroundColor: day.hasAllowance ? `${palette.leaf}24` : theme.colors.surfaceVariant,
-                      borderColor: day.isToday ? palette.forest : 'transparent',
+                      backgroundColor: cell.day.hasAllowance ? `${palette.leaf}24` : theme.colors.surface,
+                      borderColor: cell.day.isToday ? palette.forest : theme.colors.outlineVariant,
                     },
                   ]}
                 >
                   <Text style={[styles.dayNumber, { color: theme.colors.onSurface }]}>{date.getDate()}</Text>
-                  {day.hasAllowance ? <Text style={[styles.dayAmount, { color: palette.forest }]}>{formatCurrency(day.plannedSavings)}</Text> : null}
+                  {cell.day.hasAllowance ? <Text style={[styles.dayAmount, { color: palette.forest }]}>{formatCurrency(cell.day.plannedSavings)}</Text> : null}
                 </View>
-              );
-            })}
+                );
+              })}
+            </View>
           </View>
         </Card.Content>
       </Card>
@@ -242,11 +256,13 @@ function Metric({ label, value }: { label: string; value: string }) {
 
 const styles = StyleSheet.create({
   buttonContent: { height: 48 },
-  calendarGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
+  calendarGrid: { flexDirection: 'row', flexWrap: 'wrap' },
+  calendarShell: { borderRadius: 18, borderWidth: 1, overflow: 'hidden' },
   card: { borderRadius: 22, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 8 },
   dayAmount: { fontSize: 9, fontWeight: '800' },
-  dayCell: { alignItems: 'center', aspectRatio: 0.88, borderRadius: 12, borderWidth: 1.5, justifyContent: 'center', width: '13.45%' },
+  dayCell: { alignItems: 'center', aspectRatio: 0.92, borderBottomWidth: 1, borderRightWidth: 1, gap: 2, justifyContent: 'center', paddingHorizontal: 2, width: '14.2857%' },
   dayNumber: { fontSize: 12, fontWeight: '900' },
+  emptyDayCell: { opacity: 0.35 },
   formContent: { gap: 14, paddingVertical: 18 },
   helperText: { fontSize: 12, lineHeight: 17, opacity: 0.75 },
   listContent: { gap: 12, paddingVertical: 18 },
@@ -266,8 +282,8 @@ const styles = StyleSheet.create({
   progressHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
   progressTitle: { fontSize: 14, fontWeight: '900' },
   saveButton: { backgroundColor: palette.forest, borderRadius: 16, marginTop: 6 },
-  weekHeader: { flexDirection: 'row', justifyContent: 'space-between' },
-  weekLabel: { fontSize: 11, fontWeight: '900', textAlign: 'center', width: '13.45%' },
+  weekHeader: { flexDirection: 'row', paddingVertical: 9 },
+  weekLabel: { flex: 1, fontSize: 11, fontWeight: '900', textAlign: 'center' },
   weekdayChip: { flexGrow: 1 },
   weekdayWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
 });

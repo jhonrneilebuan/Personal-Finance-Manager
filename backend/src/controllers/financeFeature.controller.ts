@@ -6,6 +6,7 @@ import {
   savingGoalService,
 } from '../services/financeFeature.service';
 import { asyncHandler } from '../utils/asyncHandler';
+import { parseMonth } from '../utils/date';
 
 const optionalDate = (value: unknown) => value ? new Date(String(value)) : null;
 const optionalNumber = (value: unknown) => value == null || value === '' ? null : Number(value);
@@ -55,7 +56,7 @@ const mapDebt = (body: Record<string, unknown>) => ({
 
 const mapAllowancePlan = (body: Record<string, unknown>) => ({
   name: String(body.name),
-  month: new Date(String(body.month)),
+  month: parseMonth(String(body.month)),
   dailyAmount: Number(body.dailyAmount),
   spendingLimit: body.spendingLimit == null || body.spendingLimit === '' ? undefined : Number(body.spendingLimit),
   weekdays: Array.isArray(body.weekdays) ? body.weekdays.map(Number) : [1, 2, 3, 4, 5],

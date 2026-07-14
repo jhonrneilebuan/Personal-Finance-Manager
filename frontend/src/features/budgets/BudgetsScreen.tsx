@@ -15,19 +15,14 @@ import { useFinanceStore } from '@/store/finance.store';
 import { palette } from '@/theme/theme';
 import type { AiBudgetRecommendation, AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
+import { formatLocalDateKey, monthKeyToDate, shiftMonthKey, startOfLocalMonth } from '@/utils/date';
 
-const currentMonthIso = () => {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-};
+const currentMonthKey = () => formatLocalDateKey(startOfLocalMonth());
 
-const shiftMonth = (isoDate: string, delta: number) => {
-  const date = new Date(isoDate);
-  return new Date(date.getFullYear(), date.getMonth() + delta, 1).toISOString();
-};
+const shiftMonth = (dateKey: string, delta: number) => shiftMonthKey(dateKey, delta);
 
-const formatMonth = (isoDate: string) =>
-  new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(new Date(isoDate));
+const formatMonth = (dateKey: string) =>
+  new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(monthKeyToDate(dateKey));
 
 const inputIcon = { category: 'shape-outline', limitAmount: 'wallet-outline' } as const;
 
@@ -43,7 +38,7 @@ export function BudgetsScreen() {
   const { data, isLoading, error, refresh } = useAsyncData(useCallback(() => financeApi.budgets(), [revision]));
   const dashboard = useAsyncData(useCallback(() => financeApi.dashboard(), [revision]));
   const { control, handleSubmit, reset, setValue, formState: { isSubmitting } } = useForm({
-    defaultValues: { category: 'Food', limitAmount: '', month: currentMonthIso() },
+    defaultValues: { category: 'Food', limitAmount: '', month: currentMonthKey() },
   });
   const selectedMonth = useWatch({ control, name: 'month' });
   const categorySpending = useAsyncData(useCallback(() => financeApi.categoryReport(selectedMonth?.slice(0, 7)), [revision, selectedMonth]));
@@ -89,7 +84,7 @@ export function BudgetsScreen() {
 
     try {
       await financeApi.createBudget({ category: values.category, limitAmount, month: values.month });
-      reset({ category: 'Food', limitAmount: '', month: currentMonthIso() });
+      reset({ category: 'Food', limitAmount: '', month: currentMonthKey() });
       await Promise.all([refresh(), dashboard.refresh(), categorySpending.refresh()]);
       markChanged();
       setNotice('Budget saved');
@@ -170,7 +165,7 @@ export function BudgetsScreen() {
             color={palette.forest}
             onPrevious={() => setValue('month', shiftMonth(selectedMonth, -1))}
             onNext={() => setValue('month', shiftMonth(selectedMonth, 1))}
-            onCurrent={() => setValue('month', currentMonthIso())}
+            onCurrent={() => setValue('month', currentMonthKey())}
           />
 
           {(['category', 'limitAmount'] as const).map((name) => (

@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
-import { endOfMonth, parseMonth } from '../utils/date';
+import { endOfMonth, formatDateKey, formatMonthKey, parseMonth } from '../utils/date';
 import { HttpError } from '../utils/httpError';
 
 const ensureOwned = async <T>(value: Promise<T | null>, message: string) => {
@@ -300,7 +300,7 @@ export const allowancePlanService = {
       }
 
       calendar.push({
-        date: day.toISOString(),
+        date: formatDateKey(day),
         weekday,
         hasAllowance,
         allowanceAmount,
@@ -313,7 +313,7 @@ export const allowancePlanService = {
     const actualSpentToDate = Number(expenses._sum.amount ?? 0);
 
     return {
-      month: start.toISOString().slice(0, 7),
+      month: formatMonthKey(start),
       plans,
       totalAllowance,
       plannedSpending,
