@@ -110,7 +110,7 @@ export function ProfileScreen() {
     <Screen refreshing={profile.isLoading} onRefresh={profile.refresh}>
       <PageHeroCard
         icon="account-circle-outline"
-        title={activeUser?.fullName ?? 'PesoPilot User'}
+        title={activeUser?.fullName ?? 'PisoPilot User'}
         subtitle={activeUser?.email ?? 'No email loaded'}
         caption="My Wallet"
         color={palette.forest}

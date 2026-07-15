@@ -34,8 +34,8 @@ function CustomTabBar() {
   return (
     <View style={[styles.tabBarWrapper, { paddingBottom: Platform.OS === 'ios' ? 24 : 10 }]}>
       <View style={[styles.tabBar, {
-        backgroundColor: theme.dark ? 'rgba(22,30,25,0.96)' : 'rgba(255,255,255,0.98)',
-        borderColor: theme.dark ? 'rgba(255,255,255,0.06)' : 'rgba(27,67,50,0.10)',
+        backgroundColor: theme.dark ? 'rgba(12,20,35,0.96)' : 'rgba(255,255,255,0.98)',
+        borderColor: theme.dark ? 'rgba(255,255,255,0.06)' : 'rgba(10,132,255,0.14)',
         shadowColor: theme.dark ? '#000' : '#000',
       }]}>
         {TABS.map((tab) => {
@@ -87,7 +87,6 @@ const HEADER_ICONS: Record<string, keyof typeof MaterialCommunityIcons.glyphMap>
   Profile:   'account-circle-outline',
   Goals:     'bullseye-arrow',
   Bills:     'calendar-clock',
-  Debts:     'credit-card-clock-outline',
   Baon:      'school-outline',
 };
 
@@ -156,7 +155,6 @@ export default function TabsLayout() {
         <Tabs.Screen name="profile"   options={{ title: 'Profile',   headerTitle: () => <HeaderTitle title="Profile" /> }} />
         <Tabs.Screen name="goals"     options={{ title: 'Goals',     headerTitle: () => <HeaderTitle title="Goals" /> }} />
         <Tabs.Screen name="bills"     options={{ title: 'Bills',     headerTitle: () => <HeaderTitle title="Bills" /> }} />
-        <Tabs.Screen name="debts"     options={{ title: 'Debts',     headerTitle: () => <HeaderTitle title="Debts" /> }} />
         <Tabs.Screen name="allowance" options={{ title: 'Baon',      headerTitle: () => <HeaderTitle title="Baon" /> }} />
       </Tabs>
       <AppDrawer />

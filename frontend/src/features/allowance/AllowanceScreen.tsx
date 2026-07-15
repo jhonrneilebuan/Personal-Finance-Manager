@@ -102,7 +102,7 @@ export function AllowanceScreen() {
       <PageHeroCard
         icon="school-outline"
         title="Baon Planner"
-        subtitle="Plan weekday allowance and let Tarsi estimate your monthly ipon."
+        subtitle="Plan weekday allowance and let PisoPilot AI estimate your monthly ipon."
         value={formatCurrency(summary.data?.projectedSavings ?? 0)}
         caption={`${summary.data?.allowanceDays ?? 0} baon days in ${formatMonth(selectedMonth)}`}
         color={palette.forest}

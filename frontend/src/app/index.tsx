@@ -6,9 +6,8 @@ export default function Index() {
   const { accessToken, isHydrated } = useAuthStore();
 
   if (!isHydrated) {
-    return <StateView loading message="Preparing PesoPilot" />;
+    return <StateView loading message="Preparing PisoPilot" />;
   }
 
   return <Redirect href={accessToken ? '/(tabs)/dashboard' : '/(auth)/login'} />;
 }
-

@@ -6,7 +6,7 @@ import { aiApi } from '@/services/ai.service';
 import { palette } from '@/theme/theme';
 import type { AiSpendingPlan, PurchasePlanItem } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
-import { TarsiMascot } from './TarsiMascot';
+import { PisoPilotMascot } from './PisoPilotMascot';
 
 type AiSpendingPlannerCardProps = {
   defaultAvailableMoney: number;
@@ -89,7 +89,7 @@ export function AiSpendingPlannerCard({ defaultAvailableMoney }: AiSpendingPlann
     >
       <Card.Content style={styles.content}>
         <View style={styles.header}>
-          <TarsiMascot size={58} mood={plan ? 'happy' : 'thinking'} />
+          <PisoPilotMascot size={58} mood={plan ? 'happy' : 'thinking'} />
           <View style={[styles.iconBox, { backgroundColor: `${theme.colors.primary}12` }]}>
             <MaterialCommunityIcons name="cart-check" size={20} color={theme.colors.primary} />
           </View>

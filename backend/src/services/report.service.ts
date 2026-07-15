@@ -126,7 +126,7 @@ export const reportService = {
     ].sort((a, b) => b.date.localeCompare(a.date));
 
     const lines = [
-      'PesoPilot Monthly Report',
+      'PisoPilot Monthly Report',
       `Month: ${monthly.month}`,
       `Total Income: PHP ${monthly.totalIncome.toFixed(2)}`,
       `Total Expenses: PHP ${monthly.totalExpenses.toFixed(2)}`,

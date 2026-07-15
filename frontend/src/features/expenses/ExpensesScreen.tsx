@@ -74,7 +74,7 @@ export function ExpensesScreen() {
       const confidence = Math.round(suggestion.confidence * 100);
       setValue('category', suggestion.category, { shouldDirty: true, shouldValidate: true });
       setAiReason(`${suggestion.category} (${confidence}%): ${suggestion.reason}`);
-      setNotice(`${suggestion.source === 'ai' ? 'AI' : 'PesoPilot'} suggested ${suggestion.category}`);
+      setNotice(`${suggestion.source === 'ai' ? 'AI' : 'PisoPilot'} suggested ${suggestion.category}`);
     } catch {
       setNotice('Unable to suggest a category');
     } finally {
@@ -111,7 +111,7 @@ export function ExpensesScreen() {
       setValue('category', receipt.category || 'Other', { shouldDirty: true });
       if (receipt.amount > 0) setValue('amount', String(receipt.amount), { shouldDirty: true });
       setValue('description', receipt.notes || `Receipt scan confidence: ${Math.round(receipt.confidence * 100)}%`, { shouldDirty: true });
-      setAiReason(`${receipt.source === 'ai' ? 'AI' : 'PesoPilot'} scanned ${receipt.category} (${Math.round(receipt.confidence * 100)}%)`);
+      setAiReason(`${receipt.source === 'ai' ? 'AI' : 'PisoPilot'} scanned ${receipt.category} (${Math.round(receipt.confidence * 100)}%)`);
       setNotice('Receipt scanned');
     } catch {
       setNotice('Unable to scan receipt');
@@ -159,7 +159,7 @@ export function ExpensesScreen() {
       <PageHeroCard
         icon="credit-card-minus-outline"
         title="Expenses"
-        subtitle="Log spending fast, then let Tarsi suggest the right category."
+        subtitle="Log spending fast, then let PisoPilot AI suggest the right category."
         value={formatCurrency(totalExpenses)}
         caption={`${data?.length ?? 0} records`}
         color={palette.forest}
@@ -223,7 +223,7 @@ export function ExpensesScreen() {
             {quickCategories.map((category) => (
               <Chip
                 key={category}
-                icon="leaf"
+                icon="auto-fix"
                 selected={categoryValue === category}
                 onPress={() => setValue('category', category, { shouldDirty: true, shouldValidate: true })}
                 style={styles.quickChip}

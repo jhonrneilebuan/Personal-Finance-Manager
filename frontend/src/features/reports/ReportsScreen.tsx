@@ -89,7 +89,7 @@ export function ReportsScreen() {
       <PageHeroCard
         icon="chart-areaspline"
         title="Reports"
-        subtitle="Tarsi turns your month into clear cashflow, category, and savings patterns."
+        subtitle="PisoPilot AI turns your month into clear cashflow, category, and savings patterns."
         value={formatCurrency(monthly.data?.savings ?? 0)}
         caption={formatMonth(selectedMonth)}
         color={palette.forest}
@@ -110,7 +110,7 @@ export function ReportsScreen() {
       </Card>
       <AiInsightCard
         title="AI Monthly Summary"
-        subtitle="Let Tarsi explain what changed and what to adjust next."
+        subtitle="Let PisoPilot AI explain what changed and what to adjust next."
         buttonLabel="Generate Summary"
         icon="chart-timeline-variant"
         color={palette.forest}

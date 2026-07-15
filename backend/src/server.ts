@@ -3,7 +3,7 @@ import { env } from './config/env';
 import { prisma } from './config/prisma';
 
 const server = app.listen(env.port, () => {
-  console.log(`PesoPilot API running on port ${env.port}`);
+  console.log(`PisoPilot API running on port ${env.port}`);
 });
 
 const shutdown = async () => {
@@ -13,4 +13,3 @@ const shutdown = async () => {
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
-

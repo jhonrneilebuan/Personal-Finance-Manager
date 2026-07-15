@@ -11,7 +11,7 @@ import { CashflowGraphCard } from '@/components/CashflowGraphCard';
 import { Screen } from '@/components/Screen';
 import { StateView } from '@/components/StateView';
 import { StatCard } from '@/components/StatCard';
-import { TarsiMascot } from '@/components/TarsiMascot';
+import { PisoPilotMascot } from '@/components/PisoPilotMascot';
 import { TransactionRow } from '@/components/TransactionRow';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { aiApi } from '@/services/ai.service';
@@ -96,9 +96,9 @@ export function DashboardScreen() {
           <Svg height="100%" width="100%">
             <Defs>
               <LinearGradient id="dashHeroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <Stop offset="0%" stopColor="#2F9E5B" />
-                <Stop offset="58%" stopColor="#1B4332" />
-                <Stop offset="100%" stopColor="#14532D" />
+                <Stop offset="0%" stopColor="#0A84FF" />
+                <Stop offset="58%" stopColor="#0066D6" />
+                <Stop offset="100%" stopColor="#003566" />
               </LinearGradient>
             </Defs>
             <Rect width="100%" height="100%" fill="url(#dashHeroGrad)" />
@@ -112,11 +112,11 @@ export function DashboardScreen() {
               </View>
               <View>
                 <Text style={styles.heroTitle}>{getGreeting()}, {firstName}</Text>
-                <Text style={styles.heroSubcopy}>Tarsi is watching your wallet today</Text>
+                <Text style={styles.heroSubcopy}>PisoPilot AI is watching your wallet today</Text>
               </View>
             </View>
             <View style={styles.heroMascot}>
-              <TarsiMascot size={54} />
+              <PisoPilotMascot size={54} />
             </View>
           </View>
           <View>
@@ -134,7 +134,7 @@ export function DashboardScreen() {
       </Card>
       
       <AiInsightCard
-        title="Ask Tarsi"
+        title="Ask PisoPilot AI"
         subtitle="Get a quick read on balance, spending, and what to do next."
         buttonLabel="Generate Advice"
         color={palette.forest}

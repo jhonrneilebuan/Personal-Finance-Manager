@@ -297,7 +297,7 @@ const requestInsight = async (task: string, snapshot: unknown): Promise<AiFinanc
         {
           role: 'system',
           content: [
-            'You are PesoPilot, a concise personal finance coach for a Philippine peso budgeting app.',
+            'You are PisoPilot AI, a concise personal finance coach for a Philippine peso budgeting app.',
             'Give practical, safe budgeting guidance based only on the provided numbers.',
             'Keep the tone direct, helpful, and mobile-friendly.',
           ].join(' '),
@@ -342,7 +342,7 @@ const requestSpendingPlan = async (input: SpendingPlanInput): Promise<AiSpending
         {
           role: 'system',
           content: [
-            'You are PesoPilot, a practical spending planner for a Philippine peso personal finance app.',
+            'You are PisoPilot AI, a practical spending planner for a Philippine peso personal finance app.',
             'Help the user decide what to buy first, what to delay, what to skip, and how to split money.',
             'Prioritize essentials, bills, health, school, transportation, and emergency savings before wants.',
             'Never encourage debt or spending all available money.',
@@ -388,7 +388,7 @@ const requestBudgetRecommendation = async (dashboard: DashboardSnapshot): Promis
         {
           role: 'system',
           content: [
-            'You are PesoPilot, a strict but practical budget planner for a Philippine peso personal finance app.',
+            'You are PisoPilot AI, a strict but practical budget planner for a Philippine peso personal finance app.',
             'Recommend monthly budget limits using the existing spending categories, current budgets, and savings.',
             'Prioritize food, transportation, school, health, bills, and emergency savings before wants.',
           ].join(' '),
@@ -436,7 +436,7 @@ const requestReceiptScan = async (filePath: string, mimeType: string): Promise<A
         {
           role: 'system',
           content: [
-            'You extract expense details from receipts for PesoPilot.',
+            'You extract expense details from receipts for PisoPilot.',
             'Return only data that is visible or strongly inferable from the receipt image.',
             'Use Philippine peso context and choose a practical category such as Food, Transport, Bills, School, Health, Shopping, Groceries, or Other.',
           ].join(' '),
@@ -588,7 +588,7 @@ const fallbackSpendingPlan = (input: SpendingPlanInput): AiSpendingPlan => {
 
   return {
     title: 'Priority spending plan',
-    summary: 'PesoPilot protected savings first, then ranked essentials before wants.',
+    summary: 'PisoPilot AI protected savings first, then ranked essentials before wants.',
     recommendedBudget: { essentials, flexible, savings },
     decisions,
     actionItems: [
@@ -629,7 +629,7 @@ const fallbackBudgetRecommendation = (dashboard: DashboardSnapshot): AiBudgetRec
 
   return {
     title: 'Suggested next-month budget',
-    summary: 'PesoPilot used your largest categories and current limits to suggest practical monthly caps.',
+    summary: 'PisoPilot AI used your largest categories and current limits to suggest practical monthly caps.',
     recommendations,
     savingsTarget,
     source: 'fallback',

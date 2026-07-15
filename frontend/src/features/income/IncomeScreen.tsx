@@ -57,7 +57,7 @@ export function IncomeScreen() {
       <PageHeroCard
         icon="cash-plus"
         title="Income"
-        subtitle="Track every money-in moment so Tarsi can read your cashflow better."
+        subtitle="Track every money-in moment so PisoPilot AI can read your cashflow better."
         value={formatCurrency(totalIncome)}
         caption={`${data?.length ?? 0} records`}
         color={palette.forest}

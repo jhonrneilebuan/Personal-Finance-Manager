@@ -1,7 +1,7 @@
 import { ActivityIndicator, Button, Text } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
 import { palette } from '@/theme/theme';
-import { TarsiMascot } from './TarsiMascot';
+import { PisoPilotMascot } from './PisoPilotMascot';
 
 type StateViewProps = {
   title?: string;
@@ -15,7 +15,7 @@ export function StateView({ title, message, loading, actionLabel, onAction }: St
   return (
     <View style={styles.container}>
       {loading ? <ActivityIndicator /> : null}
-      {!loading ? <TarsiMascot size={86} mood="thinking" /> : null}
+      {!loading ? <PisoPilotMascot size={86} mood="thinking" /> : null}
       {title ? <Text variant="titleMedium">{title}</Text> : null}
       {message ? <Text style={styles.message}>{message}</Text> : null}
       {actionLabel && onAction ? (

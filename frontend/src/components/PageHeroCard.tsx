@@ -3,7 +3,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card, Text } from 'react-native-paper';
 import { Svg, Rect, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { palette } from '@/theme/theme';
-import { TarsiMascot } from './TarsiMascot';
+import { PisoPilotMascot } from './PisoPilotMascot';
 
 type PageHeroCardProps = {
   icon: keyof typeof MaterialCommunityIcons.glyphMap;
@@ -17,7 +17,7 @@ type PageHeroCardProps = {
 
 const getGradientColors = (baseColor: string): [string, string] => {
   const normalized = baseColor.toLowerCase();
-  if (normalized === palette.forest.toLowerCase() || normalized === palette.deepForest.toLowerCase()) return ['#2F9E5B', '#14532D'];
+  if (normalized === palette.forest.toLowerCase() || normalized === palette.deepForest.toLowerCase()) return ['#0A84FF', '#0052B3'];
   if (normalized === palette.blue.toLowerCase()) return ['#0A84FF', '#0052B3'];
   if (normalized === palette.indigo.toLowerCase()) return ['#5E5CE6', '#3030A8'];
   if (normalized === palette.green.toLowerCase() || normalized === palette.mint.toLowerCase()) return ['#34C759', '#1E7835'];
@@ -50,7 +50,7 @@ export function PageHeroCard({ icon, title, subtitle, value, caption, color, mas
           </View>
           <View style={styles.topRight}>
             {caption ? <Text style={styles.caption}>{caption}</Text> : null}
-            {mascot ? <TarsiMascot size={58} /> : null}
+            {mascot ? <PisoPilotMascot size={58} /> : null}
           </View>
         </View>
         <View style={styles.copy}>

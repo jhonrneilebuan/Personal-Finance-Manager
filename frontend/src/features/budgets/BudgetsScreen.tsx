@@ -107,14 +107,14 @@ export function BudgetsScreen() {
       <PageHeroCard
         icon="target-variant"
         title="Budgets"
-        subtitle="Set monthly guardrails and let Tarsi recommend smarter limits."
+        subtitle="Set monthly guardrails and let PisoPilot AI recommend smarter limits."
         value={formatCurrency(totalBudget)}
         caption={formatMonth(selectedMonth)}
         color={palette.forest}
         mascot
       />
       <AiInsightCard
-        title="Tarsi Budget Coach"
+        title="PisoPilot AI Budget Coach"
         subtitle="Get advice on limits, overspending, and what to adjust next."
         buttonLabel="Analyze Budgets"
         icon="target-variant"

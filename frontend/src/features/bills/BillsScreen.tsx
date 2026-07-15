@@ -35,7 +35,7 @@ const todayIso = () => new Date().toISOString().slice(0, 10);
 
 const getBillStatus = (dueDate: string, isPaid: boolean) => {
   if (isPaid) {
-    return { label: 'PAID', backgroundColor: '#DDEFE3', color: palette.forest };
+    return { label: 'PAID', backgroundColor: '#DCEBFF', color: palette.forest };
   }
 
   const due = new Date(dueDate);
@@ -46,7 +46,7 @@ const getBillStatus = (dueDate: string, isPaid: boolean) => {
 
   if (days < 0) return { label: 'OVERDUE', backgroundColor: '#FFE2E0', color: palette.red };
   if (days === 0) return { label: 'DUE TODAY', backgroundColor: '#FFF3D8', color: palette.orange };
-  return { label: `${days} DAYS LEFT`, backgroundColor: '#ECF7EF', color: palette.forest };
+  return { label: `${days} DAYS LEFT`, backgroundColor: '#EAF3FF', color: palette.forest };
 };
 
 export function BillsScreen() {
@@ -167,7 +167,7 @@ export function BillsScreen() {
       <PageHeroCard
         icon="calendar-clock"
         title="Bills & Recurring"
-        subtitle="Tarsi keeps due dates, subscriptions, and repeated money moves visible."
+        subtitle="PisoPilot AI keeps due dates, subscriptions, and repeated money moves visible."
         value={formatCurrency(totals.unpaid)}
         caption={`${totals.activeRecurring} active recurring`}
         color={palette.forest}

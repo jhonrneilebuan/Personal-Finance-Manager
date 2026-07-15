@@ -5,7 +5,6 @@ import type {
   BillReminder,
   Budget,
   Dashboard,
-  Debt,
   ExportedReport,
   Expense,
   Income,
@@ -43,12 +42,6 @@ export const financeApi = {
   updateRecurring: (id: string, payload: Omit<RecurringTransaction, 'id'>) => unwrap<RecurringTransaction>(api.put(`/recurring/${id}`, payload)),
   toggleRecurring: (id: string, isActive: boolean) => unwrap<RecurringTransaction>(api.patch(`/recurring/${id}/active`, { isActive })),
   deleteRecurring: (id: string) => api.delete(`/recurring/${id}`).then(() => undefined),
-
-  debts: () => unwrap<Debt[]>(api.get('/debts')),
-  createDebt: (payload: Omit<Debt, 'id'>) => unwrap<Debt>(api.post('/debts', payload)),
-  updateDebt: (id: string, payload: Omit<Debt, 'id'>) => unwrap<Debt>(api.put(`/debts/${id}`, payload)),
-  payDebt: (id: string, amount: number) => unwrap<Debt>(api.post(`/debts/${id}/pay`, { amount })),
-  deleteDebt: (id: string) => api.delete(`/debts/${id}`).then(() => undefined),
 
   allowancePlans: () => unwrap<AllowancePlan[]>(api.get('/allowance')),
   allowanceSummary: (month?: string) => unwrap<AllowanceSummary>(api.get('/allowance/summary', { params: { month } })),

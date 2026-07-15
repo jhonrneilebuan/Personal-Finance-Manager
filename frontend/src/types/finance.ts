@@ -61,17 +61,6 @@ export type RecurringTransaction = {
   note?: string | null;
 };
 
-export type Debt = {
-  id: string;
-  lender: string;
-  totalAmount: number;
-  paidAmount: number;
-  interestRate?: number | null;
-  dueDate?: string | null;
-  minimumPayment?: number | null;
-  note?: string | null;
-};
-
 export type AllowancePlan = {
   id: string;
   name: string;

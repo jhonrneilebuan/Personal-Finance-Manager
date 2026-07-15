@@ -5,7 +5,6 @@ import { aiRoutes } from './ai.routes';
 import { allowanceRoutes } from './allowance.routes';
 import { billRoutes } from './bill.routes';
 import { budgetRoutes } from './budget.routes';
-import { debtRoutes } from './debt.routes';
 import { expenseRoutes } from './expense.routes';
 import { goalRoutes } from './goal.routes';
 import { incomeRoutes } from './income.routes';
@@ -16,7 +15,7 @@ import { reportController } from '../controllers/report.controller';
 
 export const routes = Router();
 
-routes.get('/', (_req, res) => res.json({ success: true, data: { name: 'PesoPilot API', status: 'ok' } }));
+routes.get('/', (_req, res) => res.json({ success: true, data: { name: 'PisoPilot API', status: 'ok' } }));
 routes.get('/health', (_req, res) => res.json({ success: true, data: { status: 'ok' } }));
 routes.use('/auth', authRoutes);
 routes.use('/ai', authenticate, aiRoutes);
@@ -27,7 +26,6 @@ routes.use('/budgets', authenticate, budgetRoutes);
 routes.use('/goals', authenticate, goalRoutes);
 routes.use('/bills', authenticate, billRoutes);
 routes.use('/recurring', authenticate, recurringRoutes);
-routes.use('/debts', authenticate, debtRoutes);
 routes.use('/allowance', authenticate, allowanceRoutes);
 routes.use('/reports', authenticate, reportRoutes);
 routes.get('/dashboard', authenticate, reportController.dashboard);

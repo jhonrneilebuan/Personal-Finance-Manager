@@ -118,7 +118,7 @@ export const aiCategorizationService = {
       return ruleSuggestion ?? {
         category: 'Other',
         confidence: 0.3,
-        reason: 'OpenAI API key is not configured, so PesoPilot used the default category.',
+        reason: 'OpenAI API key is not configured, so PisoPilot used the default category.',
         source: 'fallback',
       };
     }
@@ -178,13 +178,13 @@ export const aiCategorizationService = {
       return ruleSuggestion ?? {
         category: 'Other',
         confidence: 0.35,
-        reason: 'AI was unavailable, so PesoPilot used a safe default category.',
+        reason: 'AI was unavailable, so PisoPilot used a safe default category.',
         source: 'fallback',
       };
     }
   },
 
   async explainSuggestion(input: SuggestCategoryInput, category: string) {
-    return `PesoPilot suggested ${category} based on: ${buildTransactionText(input)}`;
+    return `PisoPilot suggested ${category} based on: ${buildTransactionText(input)}`;
   },
 };

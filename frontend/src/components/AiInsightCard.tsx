@@ -2,7 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button, Card, Text, useTheme } from 'react-native-paper';
 import type { AiFinanceInsight } from '@/types/ai';
-import { TarsiMascot } from './TarsiMascot';
+import { PisoPilotMascot } from './PisoPilotMascot';
 
 type AiInsightCardProps = {
   title: string;
@@ -41,7 +41,7 @@ export function AiInsightCard({
     >
       <Card.Content style={styles.content}>
         <View style={styles.header}>
-          <TarsiMascot size={58} mood={insight ? 'happy' : 'thinking'} />
+          <PisoPilotMascot size={58} mood={insight ? 'happy' : 'thinking'} />
           <View style={[styles.iconBox, { backgroundColor: `${accent}12` }]}>
             <MaterialCommunityIcons name={icon} size={19} color={accent} />
           </View>

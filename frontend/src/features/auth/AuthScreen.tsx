@@ -103,9 +103,9 @@ export function AuthScreen({ mode }: AuthScreenProps) {
       <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
         <Defs>
           <LinearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%" stopColor="#14532D" />
-            <Stop offset="52%" stopColor="#0F3324" />
-            <Stop offset="100%" stopColor="#06130E" />
+            <Stop offset="0%" stopColor="#031B3A" />
+            <Stop offset="52%" stopColor="#062B5F" />
+            <Stop offset="100%" stopColor="#020812" />
           </LinearGradient>
         </Defs>
         <Rect width="100%" height="100%" fill="url(#bgGrad)" />
@@ -131,7 +131,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
               <Animated.View style={[styles.logoFrameLarge, { transform: [{ translateY: floatAnim }] }]}>
                 <Image source={pesoPilotLogo} resizeMode="contain" style={styles.logoImageLarge} />
               </Animated.View>
-              <Text style={styles.brandKicker}>Peso Pilot</Text>
+              <Text style={styles.brandKicker}>PisoPilot</Text>
               <Text style={styles.brandText}>Track money, plan budgets, and let AI help decide what to buy first.</Text>
               <View style={styles.chips}>
                 {[
@@ -157,7 +157,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
                   <Animated.View style={[styles.logoFrameSmall, { transform: [{ translateY: floatAnim }] }]}>
                     <Image source={pesoPilotLogo} resizeMode="contain" style={styles.logoImageSmall} />
                   </Animated.View>
-                  <Text style={styles.mobileBrandName}>PesoPilot</Text>
+                  <Text style={styles.mobileBrandName}>PisoPilot</Text>
                   <Text style={styles.mobileBrandSub}>Personal Finance AI</Text>
                 </View>
               )}
@@ -310,7 +310,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#14532D',
+    backgroundColor: '#031B3A',
   },
   kav: {
     flex: 1,
@@ -391,8 +391,8 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, justifyContent: 'center' },
   chip: {
     alignItems: 'center',
-    backgroundColor: 'rgba(47,158,91,0.16)',
-    borderColor: 'rgba(47,158,91,0.28)',
+    backgroundColor: 'rgba(77,163,255,0.16)',
+    borderColor: 'rgba(77,163,255,0.28)',
     borderRadius: 10,
     borderWidth: 1,
     flexDirection: 'row',
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
 
   // Form card
   card: {
-    backgroundColor: 'rgba(8,28,20,0.74)',
+    backgroundColor: 'rgba(8,18,34,0.78)',
     borderRadius: 22,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
@@ -444,8 +444,8 @@ const styles = StyleSheet.create({
   formBadge: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(47,158,91,0.16)',
-    borderColor: 'rgba(47,158,91,0.28)',
+    backgroundColor: 'rgba(77,163,255,0.16)',
+    borderColor: 'rgba(77,163,255,0.28)',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',

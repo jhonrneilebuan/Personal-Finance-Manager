@@ -3,7 +3,7 @@ import { router, usePathname } from 'expo-router';
 import { Defs, LinearGradient, Rect, Stop, Svg } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Modal, Portal, Text, useTheme } from 'react-native-paper';
-import { TarsiMascot } from '@/components/TarsiMascot';
+import { PisoPilotMascot } from '@/components/PisoPilotMascot';
 import { useAuthStore } from '@/store/auth.store';
 import { useUiStore } from '@/store/ui.store';
 import { palette } from '@/theme/theme';
@@ -17,7 +17,6 @@ type TabHref =
   | '/(tabs)/profile'
   | '/(tabs)/goals'
   | '/(tabs)/bills'
-  | '/(tabs)/debts'
   | '/(tabs)/allowance';
 
 const navItems: Array<{ title: string; icon: keyof typeof MaterialCommunityIcons.glyphMap; href: TabHref; match: string; accent: string }> = [
@@ -28,7 +27,6 @@ const navItems: Array<{ title: string; icon: keyof typeof MaterialCommunityIcons
   { title: 'Baon Plan',  icon: 'school-outline',            href: '/(tabs)/allowance', match: '/allowance', accent: palette.leaf },
   { title: 'Goals',      icon: 'bullseye-arrow',            href: '/(tabs)/goals',     match: '/goals',     accent: palette.forest },
   { title: 'Bills',      icon: 'calendar-clock',            href: '/(tabs)/bills',     match: '/bills',     accent: palette.orange },
-  { title: 'Debts',      icon: 'credit-card-clock-outline', href: '/(tabs)/debts',     match: '/debts',     accent: '#FF453A' },
   { title: 'Reports',    icon: 'chart-areaspline',          href: '/(tabs)/reports',   match: '/reports',   accent: palette.forest },
   { title: 'Profile',    icon: 'account-circle-outline',    href: '/(tabs)/profile',   match: '/profile',   accent: palette.orange },
 ];
@@ -73,8 +71,8 @@ export function AppDrawer() {
           <Svg style={StyleSheet.absoluteFill}>
             <Defs>
               <LinearGradient id="dg" x1="0" y1="0" x2="1" y2="1">
-                <Stop offset="0%" stopColor="#2F9E5B" />
-                <Stop offset="100%" stopColor="#14532D" />
+                <Stop offset="0%" stopColor="#0A84FF" />
+                <Stop offset="100%" stopColor="#003566" />
               </LinearGradient>
             </Defs>
             <Rect width="100%" height="100%" fill="url(#dg)" />
@@ -92,17 +90,17 @@ export function AppDrawer() {
               </View>
             </View>
             <View style={styles.drawerMascot}>
-              <TarsiMascot size={46} />
+              <PisoPilotMascot size={46} />
             </View>
           </View>
 
-          <Text style={styles.userName} numberOfLines={1}>{user?.fullName ?? 'PesoPilot User'}</Text>
+          <Text style={styles.userName} numberOfLines={1}>{user?.fullName ?? 'PisoPilot User'}</Text>
           <Text style={styles.userEmail} numberOfLines={1}>{user?.email ?? ''}</Text>
 
           {/* App badge */}
           <View style={styles.appBadge}>
-            <MaterialCommunityIcons name="leaf" size={11} color="rgba(255,255,255,0.7)" />
-            <Text style={styles.appBadgeText}>Tarsi Wallet</Text>
+            <MaterialCommunityIcons name="robot-outline" size={11} color="rgba(255,255,255,0.7)" />
+            <Text style={styles.appBadgeText}>PisoPilot AI</Text>
           </View>
         </View>
 
