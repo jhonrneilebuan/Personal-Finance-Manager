@@ -13,6 +13,18 @@ export const reportController = {
     const format = req.query.format === 'pdf' ? 'pdf' : 'csv';
     const report = await reportService.exportMonthly(req.user!.userId, req.query.month as string | undefined, format);
 
+    if (req.query.base64 === 'true') {
+      res.json({
+        success: true,
+        data: {
+          filename: report.filename,
+          contentType: report.contentType,
+          base64: report.body.toString('base64'),
+        },
+      });
+      return;
+    }
+
     res.setHeader('Content-Type', report.contentType);
     res.setHeader('Content-Disposition', `attachment; filename="${report.filename}"`);
     res.send(report.body);

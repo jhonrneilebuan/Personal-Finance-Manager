@@ -202,7 +202,9 @@ export function BudgetsScreen() {
             <View style={styles.budgetList}>
               {selectedBudgets.map((item) => {
                 const spentAmount = spentByCategory.get(item.category) ?? 0;
-                const progress = Math.min(spentAmount / Number(item.limitAmount), 1);
+                const rawProgress = spentAmount / Number(item.limitAmount);
+                const progress = Math.min(rawProgress, 1);
+                const progressColor = rawProgress >= 1 ? theme.colors.error : rawProgress >= 0.85 ? palette.orange : palette.leaf;
                 return (
                   <View key={item.id} style={[styles.budgetItem, { backgroundColor: theme.colors.surfaceVariant }]}>
                     <View style={styles.budgetMeta}>
@@ -212,7 +214,7 @@ export function BudgetsScreen() {
                       </View>
                       <Text style={[styles.budgetLimitText, { color: theme.colors.onSurface }]}>{formatCurrency(Number(item.limitAmount))}</Text>
                     </View>
-                    <ProgressBar progress={progress} color={progress >= 1 ? theme.colors.error : palette.leaf} style={styles.progress} />
+                    <ProgressBar progress={progress} color={progressColor} style={styles.progress} />
                   </View>
                 );
               })}

@@ -73,8 +73,8 @@ export function AppDrawer() {
           <Svg style={StyleSheet.absoluteFill}>
             <Defs>
               <LinearGradient id="dg" x1="0" y1="0" x2="1" y2="1">
-                <Stop offset="0%" stopColor="#0A84FF" />
-                <Stop offset="100%" stopColor="#003566" />
+                <Stop offset="0%" stopColor="#2F9E5B" />
+                <Stop offset="100%" stopColor="#14532D" />
               </LinearGradient>
             </Defs>
             <Rect width="100%" height="100%" fill="url(#dg)" />

@@ -6,6 +6,7 @@ import type {
   Budget,
   Dashboard,
   Debt,
+  ExportedReport,
   Expense,
   Income,
   RecurringTransaction,
@@ -20,10 +21,10 @@ export const financeApi = {
   createIncome: (payload: Omit<Income, 'id'>) => unwrap<Income>(api.post('/income', payload)),
   budgets: () => unwrap<Budget[]>(api.get('/budgets')),
   createBudget: (payload: Omit<Budget, 'id'>) => unwrap<Budget>(api.post('/budgets', payload)),
-  monthlyReport: (month?: string) => unwrap<{ totalIncome: number; totalExpenses: number; savings: number }>(api.get('/reports/monthly', { params: { month } })),
+  monthlyReport: (month?: string) => unwrap<{ totalIncome: number; totalExpenses: number; savings: number; transactionCount: number }>(api.get('/reports/monthly', { params: { month } })),
   categoryReport: (month?: string) => unwrap<Array<{ category: string; amount: number }>>(api.get('/reports/category', { params: { month } })),
   exportReport: (format: 'csv' | 'pdf', month?: string) =>
-    api.get('/reports/export', { params: { format, month }, responseType: format === 'pdf' ? 'arraybuffer' : 'text' }).then((response) => response.data),
+    unwrap<ExportedReport>(api.get('/reports/export', { params: { format, month, base64: true } })),
 
   goals: () => unwrap<SavingGoal[]>(api.get('/goals')),
   createGoal: (payload: Omit<SavingGoal, 'id'>) => unwrap<SavingGoal>(api.post('/goals', payload)),

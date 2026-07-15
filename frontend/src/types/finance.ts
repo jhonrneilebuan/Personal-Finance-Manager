@@ -113,5 +113,44 @@ export type Dashboard = {
   savings: number;
   expenseByCategory: Array<{ category: string; amount: number }>;
   budgetUsage: Array<{ id: string; category: string; limitAmount: number; spentAmount: number }>;
+  budgetSummary: {
+    limitAmount: number;
+    spentAmount: number;
+    remainingAmount: number;
+    progress: number;
+    categories: number;
+  };
+  goalsSummary: {
+    savedAmount: number;
+    targetAmount: number;
+    remainingAmount: number;
+    progress: number;
+    activeCount: number;
+    completedCount: number;
+    totalCount: number;
+  };
+  expenseSummary: {
+    today: number;
+    last7DaysTotal: number;
+    month: number;
+    last7Days: Array<{ date: string; amount: number }>;
+  };
+  upcoming: Array<{
+    id: string;
+    title: string;
+    type: 'income' | 'expense';
+    category: string;
+    amount: number;
+    date: string;
+    daysLeft: number;
+    badge: string;
+    source: 'bill' | 'recurring';
+  }>;
   recentTransactions: Array<Record<string, unknown>>;
+};
+
+export type ExportedReport = {
+  filename: string;
+  contentType: string;
+  base64: string;
 };

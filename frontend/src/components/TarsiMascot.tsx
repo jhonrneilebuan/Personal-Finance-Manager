@@ -11,7 +11,7 @@ export function TarsiMascot({ size = 82, mood = 'happy' }: TarsiMascotProps) {
   return (
     <View style={[styles.shell, { height: size, width: size, borderRadius: size / 2 }]}>
       <Svg width={size} height={size} viewBox="0 0 96 96">
-        <Circle cx="48" cy="48" r="44" fill="#DCEBFF" />
+        <Circle cx="48" cy="48" r="44" fill="#DDEFE3" />
         <Circle cx="48" cy="52" r="31" fill="#8B5E3C" />
         <Ellipse cx="32" cy="43" rx="16" ry="19" fill="#F6E7D8" />
         <Ellipse cx="64" cy="43" rx="16" ry="19" fill="#F6E7D8" />
@@ -20,10 +20,10 @@ export function TarsiMascot({ size = 82, mood = 'happy' }: TarsiMascotProps) {
         <Circle cx="29" cy="39" r="3" fill="#FFFFFF" />
         <Circle cx="61" cy="39" r="3" fill="#FFFFFF" />
         <Ellipse cx="48" cy="56" rx="14" ry="12" fill="#F6E7D8" />
-        <Path d="M44 54 Q48 58 52 54" stroke="#003566" strokeWidth="3" strokeLinecap="round" fill="none" />
+        <Path d="M44 54 Q48 58 52 54" stroke="#1B4332" strokeWidth="3" strokeLinecap="round" fill="none" />
         <Path
           d={mood === 'thinking' ? 'M38 66 Q48 61 58 66' : 'M38 64 Q48 73 58 64'}
-          stroke="#003566"
+          stroke="#1B4332"
           strokeWidth="3"
           strokeLinecap="round"
           fill="none"

@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
-import { StyleSheet, View, useWindowDimensions } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, useWindowDimensions } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Card, Snackbar, Text, useTheme } from 'react-native-paper';
+import { router } from 'expo-router';
+import { Card, ProgressBar, SegmentedButtons, Snackbar, Text, useTheme } from 'react-native-paper';
 import { Svg, Rect, LinearGradient, Stop, Defs } from 'react-native-svg';
 import { AiInsightCard } from '@/components/AiInsightCard';
 import { AiSpendingPlannerCard } from '@/components/AiSpendingPlannerCard';
@@ -20,6 +21,7 @@ import { useFinanceStore } from '@/store/finance.store';
 import { palette } from '@/theme/theme';
 import type { AiFinanceInsight } from '@/types/ai';
 import { formatCurrency } from '@/utils/currency';
+import { parseLocalDate } from '@/utils/date';
 
 const formatToday = () => new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date());
 
@@ -55,9 +57,23 @@ export function DashboardScreen() {
   const { data, isLoading, error, refresh } = useAsyncData(load);
   const [aiInsight, setAiInsight] = useState<AiFinanceInsight | null>(null);
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [expenseWindow, setExpenseWindow] = useState<'today' | 'week' | 'month'>('today');
   const [notice, setNotice] = useState('');
   const firstName = useMemo(() => user?.fullName?.trim().split(/\s+/)[0] ?? 'Pilot', [user?.fullName]);
   const payday = useMemo(() => getNextPayday(), []);
+  const last7Chart = useMemo(
+    () => (data?.expenseSummary.last7Days ?? []).map((item) => ({
+      label: new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(parseLocalDate(item.date)),
+      value: item.amount,
+    })),
+    [data?.expenseSummary.last7Days],
+  );
+  const selectedSpend = useMemo(() => {
+    if (!data) return 0;
+    if (expenseWindow === 'week') return data.expenseSummary.last7DaysTotal;
+    if (expenseWindow === 'month') return data.expenseSummary.month;
+    return data.expenseSummary.today;
+  }, [data, expenseWindow]);
 
   const generateDashboardInsight = useCallback(async () => {
     try {
@@ -80,9 +96,9 @@ export function DashboardScreen() {
           <Svg height="100%" width="100%">
             <Defs>
               <LinearGradient id="dashHeroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <Stop offset="0%" stopColor="#0A84FF" />
-                <Stop offset="58%" stopColor="#0066D6" />
-                <Stop offset="100%" stopColor="#003566" />
+                <Stop offset="0%" stopColor="#2F9E5B" />
+                <Stop offset="58%" stopColor="#1B4332" />
+                <Stop offset="100%" stopColor="#14532D" />
               </LinearGradient>
             </Defs>
             <Rect width="100%" height="100%" fill="url(#dashHeroGrad)" />
@@ -133,13 +149,114 @@ export function DashboardScreen() {
         <StatCard icon="piggy-bank-outline" style={isWide ? styles.statWide : styles.statHalf} label="Monthly Savings" value={data.savings} tone="savings" />
         <StatCard icon="wallet-outline" style={isWide ? styles.statWide : styles.statHalf} label="Net Balance" value={data.currentBalance} />
       </View>
+      <View style={styles.summaryGrid}>
+        <DashboardSummaryCard
+          icon="bullseye-arrow"
+          title="Goals"
+          value={`${formatCurrency(data.goalsSummary.savedAmount)} saved`}
+          caption={`${formatCurrency(data.goalsSummary.targetAmount)} target • ${data.goalsSummary.activeCount} active`}
+          progress={data.goalsSummary.progress}
+          color={palette.forest}
+          onPress={() => router.push('/(tabs)/goals')}
+        />
+        <DashboardSummaryCard
+          icon="target-variant"
+          title="Budgets"
+          value={`${formatCurrency(data.budgetSummary.spentAmount)} spent`}
+          caption={`${formatCurrency(data.budgetSummary.limitAmount)} limit • ${formatCurrency(data.budgetSummary.remainingAmount)} left`}
+          progress={data.budgetSummary.progress}
+          color={data.budgetSummary.progress >= 1 ? palette.red : data.budgetSummary.progress >= 0.8 ? palette.orange : palette.leaf}
+          onPress={() => router.push('/(tabs)/budgets')}
+        />
+        <DashboardSummaryCard
+          icon="credit-card-minus-outline"
+          title="Expenses"
+          value={`${formatCurrency(data.expenseSummary.month)} this month`}
+          caption={`${formatCurrency(data.expenseSummary.today)} today • ${formatCurrency(data.expenseSummary.last7DaysTotal)} last 7 days`}
+          progress={data.totalIncome > 0 ? data.expenseSummary.month / data.totalIncome : 0}
+          color={palette.red}
+          onPress={() => router.push('/(tabs)/expenses')}
+        />
+      </View>
+      <Card
+        style={[
+          styles.card,
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.outlineVariant,
+            borderWidth: theme.dark ? 1 : 0,
+          },
+        ]}
+      >
+        <Card.Content style={styles.cardContent}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleRow}>
+              <View style={[styles.headerIcon, { backgroundColor: `${palette.red}12` }]}>
+                <MaterialCommunityIcons name="calendar-today" color={palette.red} size={18} />
+              </View>
+              <View>
+                <Text style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>Spend Watch</Text>
+                <Text style={[styles.sectionCaption, { color: theme.colors.onSurfaceVariant }]}>Day, week, and month totals from expenses</Text>
+              </View>
+            </View>
+          </View>
+          <Text style={[styles.spendValue, { color: theme.colors.onSurface }]}>{formatCurrency(selectedSpend)}</Text>
+          <SegmentedButtons
+            value={expenseWindow}
+            onValueChange={(value) => setExpenseWindow(value as 'today' | 'week' | 'month')}
+            buttons={[
+              { value: 'today', label: 'Day' },
+              { value: 'week', label: 'Week' },
+              { value: 'month', label: 'Month' },
+            ]}
+          />
+        </Card.Content>
+      </Card>
       <CashflowGraphCard income={data.totalIncome} expenses={data.totalExpenses} savings={data.savings} />
+      <BarChartCard title="Last 7 Days" data={last7Chart} emptyMessage="Add expenses to see your daily spending trend." />
       <BarChartCard title="Expense by Category" data={data.expenseByCategory.map((item) => ({ label: item.category, value: item.amount }))} />
       <BarChartCard
         title="Budget Usage"
         data={data.budgetUsage.map((item) => ({ label: item.category, value: item.spentAmount }))}
         emptyMessage="Create a budget, then add expenses with the same category to see usage."
       />
+      <Card
+        style={[
+          styles.card,
+          {
+            backgroundColor: theme.colors.surface,
+            borderColor: theme.colors.outlineVariant,
+            borderWidth: theme.dark ? 1 : 0,
+          },
+        ]}
+      >
+        <Card.Content style={styles.cardContent}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleRow}>
+              <View style={[styles.headerIcon, { backgroundColor: `${palette.orange}14` }]}>
+                <MaterialCommunityIcons name="calendar-clock" color={palette.orange} size={18} />
+              </View>
+              <Text style={[styles.sectionTitle, { color: theme.colors.onSurface }]}>Upcoming</Text>
+            </View>
+          </View>
+          {data.upcoming.length === 0 ? (
+            <StateView title="No upcoming items" message="Bills and recurring money will appear here." />
+          ) : (
+            <View style={styles.list}>
+              {data.upcoming.map((item) => (
+                <TransactionRow
+                  key={`${item.source}-${item.id}`}
+                  title={item.title}
+                  subtitle={`${item.category} • ${item.date}`}
+                  amount={item.amount}
+                  type={item.type}
+                  badge={item.badge}
+                />
+              ))}
+            </View>
+          )}
+        </Card.Content>
+      </Card>
       
       <Card 
         style={[
@@ -182,6 +299,55 @@ export function DashboardScreen() {
   );
 }
 
+function DashboardSummaryCard({
+  icon,
+  title,
+  value,
+  caption,
+  progress,
+  color,
+  onPress,
+}: {
+  icon: keyof typeof MaterialCommunityIcons.glyphMap;
+  title: string;
+  value: string;
+  caption: string;
+  progress: number;
+  color: string;
+  onPress: () => void;
+}) {
+  const theme = useTheme();
+  const safeProgress = Math.max(0, Math.min(progress, 1));
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.82}
+      onPress={onPress}
+      style={[
+        styles.summaryCard,
+        {
+          backgroundColor: theme.colors.surface,
+          borderColor: theme.colors.outlineVariant,
+          borderWidth: theme.dark ? 1 : 0,
+        },
+      ]}
+    >
+      <View style={styles.summaryTop}>
+        <View style={[styles.summaryIcon, { backgroundColor: `${color}14` }]}>
+          <MaterialCommunityIcons name={icon} color={color} size={19} />
+        </View>
+        <MaterialCommunityIcons name="chevron-right" color={theme.colors.onSurfaceVariant} size={20} />
+      </View>
+      <View style={styles.summaryCopy}>
+        <Text style={[styles.summaryTitle, { color: theme.colors.onSurfaceVariant }]}>{title}</Text>
+        <Text style={[styles.summaryValue, { color: theme.colors.onSurface }]}>{value}</Text>
+        <Text style={[styles.summaryCaption, { color: theme.colors.onSurfaceVariant }]}>{caption}</Text>
+      </View>
+      <ProgressBar progress={safeProgress} color={color} style={[styles.summaryProgress, { backgroundColor: theme.colors.surfaceVariant }]} />
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
   card: { 
     borderRadius: 22,
@@ -217,9 +383,32 @@ const styles = StyleSheet.create({
   paydayText: { color: '#FFFFFF', fontSize: 12, fontWeight: '900' },
   sectionHeader: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 4 },
   sectionTitleRow: { alignItems: 'center', flexDirection: 'row', gap: 12 },
+  sectionCaption: { fontSize: 12, fontWeight: '600', opacity: 0.72 },
   sectionTitle: { fontSize: 16, fontWeight: '800', letterSpacing: -0.2 },
+  spendValue: { fontSize: 30, fontWeight: '900', letterSpacing: -0.5 },
   headerIcon: { alignItems: 'center', borderRadius: 10, height: 38, justifyContent: 'center', width: 38 },
   statHalf: { flexBasis: '47%' },
   statWide: { flexBasis: '23%' },
+  summaryCaption: { fontSize: 12, fontWeight: '600', lineHeight: 17, opacity: 0.72 },
+  summaryCard: {
+    borderRadius: 22,
+    elevation: 2,
+    flexBasis: '100%',
+    flexGrow: 1,
+    gap: 14,
+    minWidth: 220,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+  },
+  summaryCopy: { gap: 3 },
+  summaryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  summaryIcon: { alignItems: 'center', borderRadius: 14, height: 42, justifyContent: 'center', width: 42 },
+  summaryProgress: { borderRadius: 999, height: 8 },
+  summaryTitle: { fontSize: 12, fontWeight: '900', letterSpacing: 0.4, textTransform: 'uppercase' },
+  summaryTop: { alignItems: 'center', flexDirection: 'row', justifyContent: 'space-between' },
+  summaryValue: { fontSize: 19, fontWeight: '900', letterSpacing: -0.3 },
   list: { gap: 4 },
 });

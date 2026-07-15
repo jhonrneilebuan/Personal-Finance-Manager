@@ -17,9 +17,9 @@ type PageHeroCardProps = {
 
 const getGradientColors = (baseColor: string): [string, string] => {
   const normalized = baseColor.toLowerCase();
-  if (normalized === palette.forest.toLowerCase() || normalized === palette.deepForest.toLowerCase()) return ['#0A84FF', '#0052B3'];
+  if (normalized === palette.forest.toLowerCase() || normalized === palette.deepForest.toLowerCase()) return ['#2F9E5B', '#14532D'];
   if (normalized === palette.blue.toLowerCase()) return ['#0A84FF', '#0052B3'];
-  if (normalized === palette.indigo.toLowerCase()) return ['#4DA3FF', '#0052B3'];
+  if (normalized === palette.indigo.toLowerCase()) return ['#5E5CE6', '#3030A8'];
   if (normalized === palette.green.toLowerCase() || normalized === palette.mint.toLowerCase()) return ['#34C759', '#1E7835'];
   if (normalized === palette.red.toLowerCase()) return ['#D9485F', '#8F1D32'];
   return [baseColor, baseColor];

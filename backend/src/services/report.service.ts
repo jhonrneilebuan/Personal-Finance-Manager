@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { prisma } from '../config/prisma';
-import { endOfMonth, formatMonthKey, parseMonth } from '../utils/date';
+import { endOfMonth, formatDateKey, formatMonthKey, parseMonth } from '../utils/date';
 
 const money = (value: Prisma.Decimal | number | null | undefined) => Number(value ?? 0);
 
@@ -51,7 +51,7 @@ export const reportService = {
     const start = parseMonth(month);
     const end = endOfMonth(start);
 
-    const [income, expenses] = await Promise.all([
+    const [income, expenses, incomeCount, expenseCount] = await Promise.all([
       prisma.income.aggregate({
         where: { userId, transactionDate: { gte: start, lte: end } },
         _sum: { amount: true },
@@ -60,6 +60,8 @@ export const reportService = {
         where: { userId, transactionDate: { gte: start, lte: end } },
         _sum: { amount: true },
       }),
+      prisma.income.count({ where: { userId, transactionDate: { gte: start, lte: end } } }),
+      prisma.expense.count({ where: { userId, transactionDate: { gte: start, lte: end } } }),
     ]);
 
     const totalIncome = money(income._sum.amount);
@@ -69,6 +71,7 @@ export const reportService = {
       totalIncome,
       totalExpenses,
       savings: totalIncome - totalExpenses,
+      transactionCount: incomeCount + expenseCount,
     };
   },
 
@@ -87,12 +90,41 @@ export const reportService = {
   },
 
   async exportMonthly(userId: string, month?: string, format: 'csv' | 'pdf' = 'csv') {
-    const [monthly, categories] = await Promise.all([
+    const start = parseMonth(month);
+    const end = endOfMonth(start);
+    const [monthly, categories, incomes, expenses] = await Promise.all([
       reportService.monthly(userId, month),
       reportService.category(userId, month),
+      prisma.income.findMany({
+        where: { userId, transactionDate: { gte: start, lte: end } },
+        orderBy: { transactionDate: 'desc' },
+      }),
+      prisma.expense.findMany({
+        where: { userId, transactionDate: { gte: start, lte: end } },
+        orderBy: { transactionDate: 'desc' },
+      }),
     ]);
 
     const baseName = `pesopilot-report-${monthly.month}`;
+    const transactions = [
+      ...expenses.map((item) => ({
+        date: formatDateKey(item.transactionDate),
+        type: 'Expense',
+        category: item.category,
+        account: 'Cash',
+        note: item.description || item.title,
+        amount: -money(item.amount),
+      })),
+      ...incomes.map((item) => ({
+        date: formatDateKey(item.transactionDate),
+        type: 'Income',
+        category: item.source,
+        account: 'Cash',
+        note: item.description || item.source,
+        amount: money(item.amount),
+      })),
+    ].sort((a, b) => b.date.localeCompare(a.date));
+
     const lines = [
       'PesoPilot Monthly Report',
       `Month: ${monthly.month}`,
@@ -102,6 +134,11 @@ export const reportService = {
       '',
       'Expense Categories',
       ...categories.map((item) => `${item.category}: PHP ${item.amount.toFixed(2)}`),
+      '',
+      'Transactions',
+      ...(transactions.length
+        ? transactions.slice(0, 22).map((item) => `${item.date} | ${item.type} | ${item.category} | ${item.note} | PHP ${item.amount.toFixed(2)}`)
+        : ['No transactions recorded for this month.']),
     ];
 
     if (format === 'pdf') {
@@ -113,11 +150,13 @@ export const reportService = {
     }
 
     const rows = [
-      ['Section', 'Name', 'Amount'],
-      ['Summary', 'Total Income', monthly.totalIncome],
-      ['Summary', 'Total Expenses', monthly.totalExpenses],
-      ['Summary', 'Savings', monthly.savings],
-      ...categories.map((item) => ['Category', item.category, item.amount]),
+      ['Date', 'Type', 'Category', 'Account', 'Note', 'Amount'],
+      ...transactions.map((item) => [item.date, item.type, item.category, item.account, item.note, item.amount]),
+      [],
+      ['Summary', 'Total Income', '', '', '', monthly.totalIncome],
+      ['Summary', 'Total Expenses', '', '', '', monthly.totalExpenses],
+      ['Summary', 'Net Flow', '', '', '', monthly.savings],
+      ...categories.map((item) => ['Category', 'Expense', item.category, '', '', item.amount]),
     ];
 
     return {

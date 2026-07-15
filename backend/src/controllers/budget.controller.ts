@@ -1,10 +1,11 @@
 import { budgetService } from '../services/transaction.service';
 import { asyncHandler } from '../utils/asyncHandler';
+import { parseMonth } from '../utils/date';
 
 const mapBudget = (body: Record<string, unknown>) => ({
   category: String(body.category),
   limitAmount: Number(body.limitAmount),
-  month: new Date(String(body.month)),
+  month: parseMonth(String(body.month)),
 });
 
 export const budgetController = {

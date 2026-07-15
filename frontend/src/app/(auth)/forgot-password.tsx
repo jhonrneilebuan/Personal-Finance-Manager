@@ -43,9 +43,9 @@ export default function ForgotPassword() {
       <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
         <Defs>
           <LinearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <Stop offset="0%" stopColor="#031B3A" />
-            <Stop offset="50%" stopColor="#062B5F" />
-            <Stop offset="100%" stopColor="#020812" />
+            <Stop offset="0%" stopColor="#14532D" />
+            <Stop offset="52%" stopColor="#0F3324" />
+            <Stop offset="100%" stopColor="#06130E" />
           </LinearGradient>
         </Defs>
         <Rect width="100%" height="100%" fill="url(#bgGrad)" />
@@ -132,7 +132,7 @@ export default function ForgotPassword() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#031B3A',
+    backgroundColor: '#14532D',
   },
   kav: {
     flex: 1,
@@ -166,8 +166,8 @@ const styles = StyleSheet.create({
   iconWrap: { alignItems: 'center', gap: 6 },
   iconBadge: {
     alignItems: 'center',
-    backgroundColor: 'rgba(77,163,255,0.15)',
-    borderColor: 'rgba(77,163,255,0.24)',
+    backgroundColor: 'rgba(47,158,91,0.16)',
+    borderColor: 'rgba(47,158,91,0.28)',
     borderRadius: 20,
     borderWidth: 1,
     height: 64,
@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
 
   // Card
   card: {
-    backgroundColor: 'rgba(21,28,45,0.72)',
+    backgroundColor: 'rgba(8,28,20,0.74)',
     borderRadius: 22,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.08)',
@@ -197,8 +197,8 @@ const styles = StyleSheet.create({
   formBadge: {
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(77,163,255,0.15)',
-    borderColor: 'rgba(77,163,255,0.24)',
+    backgroundColor: 'rgba(47,158,91,0.16)',
+    borderColor: 'rgba(47,158,91,0.28)',
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',

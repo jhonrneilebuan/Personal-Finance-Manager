@@ -9,6 +9,7 @@ type StatCardProps = {
   tone?: 'primary' | 'income' | 'expense' | 'savings';
   icon?: keyof typeof MaterialCommunityIcons.glyphMap;
   style?: ViewStyle;
+  format?: 'currency' | 'number';
 };
 
 const toneIcon = {
@@ -18,7 +19,7 @@ const toneIcon = {
   savings: 'piggy-bank-outline',
 } satisfies Record<NonNullable<StatCardProps['tone']>, keyof typeof MaterialCommunityIcons.glyphMap>;
 
-export function StatCard({ label, value, tone = 'primary', icon, style }: StatCardProps) {
+export function StatCard({ label, value, tone = 'primary', icon, style, format = 'currency' }: StatCardProps) {
   const theme = useTheme();
   const color = tone === 'expense' ? theme.colors.error : tone === 'income' ? theme.colors.secondary : tone === 'savings' ? theme.colors.primary : theme.colors.primary;
 
@@ -46,7 +47,7 @@ export function StatCard({ label, value, tone = 'primary', icon, style }: StatCa
             {label}
           </Text>
           <Text style={[styles.value, { color: theme.colors.onSurface }]}>
-            {formatCurrency(value)}
+            {format === 'number' ? new Intl.NumberFormat('en-PH').format(value) : formatCurrency(value)}
           </Text>
         </View>
       </Card.Content>

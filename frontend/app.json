@@ -6,12 +6,12 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./src/assets/brand/peso-pilot-logo.png",
-    "backgroundColor": "#031B3A",
+    "backgroundColor": "#14532D",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./src/assets/brand/peso-pilot-logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#031B3A"
+      "backgroundColor": "#14532D"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -25,29 +25,29 @@
           "image": "./src/assets/brand/peso-pilot-logo.png",
           "imageWidth": 180,
           "resizeMode": "contain",
-          "backgroundColor": "#031B3A",
+          "backgroundColor": "#14532D",
           "dark": {
             "image": "./src/assets/brand/peso-pilot-logo.png",
-            "backgroundColor": "#031B3A"
+            "backgroundColor": "#14532D"
           },
           "android": {
             "image": "./src/assets/brand/peso-pilot-logo.png",
             "imageWidth": 180,
             "resizeMode": "contain",
-            "backgroundColor": "#031B3A",
+            "backgroundColor": "#14532D",
             "dark": {
               "image": "./src/assets/brand/peso-pilot-logo.png",
-              "backgroundColor": "#031B3A"
+              "backgroundColor": "#14532D"
             }
           },
           "ios": {
             "image": "./src/assets/brand/peso-pilot-logo.png",
             "imageWidth": 180,
             "resizeMode": "contain",
-            "backgroundColor": "#031B3A",
+            "backgroundColor": "#14532D",
             "dark": {
               "image": "./src/assets/brand/peso-pilot-logo.png",
-              "backgroundColor": "#031B3A"
+              "backgroundColor": "#14532D"
             }
           }
         }
@@ -59,12 +59,12 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/assets/brand/peso-pilot-logo.png",
-        "backgroundColor": "#031B3A"
+        "backgroundColor": "#14532D"
       },
       "splash": {
         "image": "./src/assets/brand/peso-pilot-logo.png",
         "resizeMode": "contain",
-        "backgroundColor": "#031B3A"
+        "backgroundColor": "#14532D"
       },
       "package": "com.jhonrneilebuan.pesopilot"
     },
