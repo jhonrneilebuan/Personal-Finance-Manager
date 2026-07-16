@@ -1,4 +1,3 @@
-import fs from 'node:fs/promises';
 import axios from 'axios';
 import { env } from '../config/env';
 
@@ -422,11 +421,10 @@ const requestBudgetRecommendation = async (dashboard: DashboardSnapshot): Promis
   return sanitizeBudgetRecommendation(JSON.parse(outputText));
 };
 
-const requestReceiptScan = async (filePath: string, mimeType: string): Promise<AiReceiptScan | null> => {
+const requestReceiptScan = async (buffer: Buffer, mimeType: string): Promise<AiReceiptScan | null> => {
   if (!env.openAiApiKey) return null;
 
-  const bytes = await fs.readFile(filePath);
-  const imageUrl = `data:${mimeType};base64,${bytes.toString('base64')}`;
+  const imageUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
 
   const response = await axios.post(
     'https://api.openai.com/v1/responses',
@@ -694,9 +692,9 @@ export const aiInsightsService = {
     );
   },
 
-  scanReceipt(filePath: string, mimeType: string) {
+  scanReceipt(buffer: Buffer, mimeType: string) {
     return withFallback(
-      () => requestReceiptScan(filePath, mimeType),
+      () => requestReceiptScan(buffer, mimeType),
       fallbackReceiptScan(),
     );
   },

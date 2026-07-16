@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Link, router } from 'expo-router';
-import { useEffect, useRef } from 'react';
+import { Link } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, StyleSheet, View, Animated } from 'react-native';
 import { Button, Card, Text, TextInput, HelperText } from 'react-native-paper';
@@ -13,6 +13,9 @@ import { palette } from '@/theme/theme';
 const schema = z.object({ email: z.string().email() });
 
 export default function ForgotPassword() {
+  const [successMessage, setSuccessMessage] = useState('');
+  const [devResetUrl, setDevResetUrl] = useState('');
+  const [submitError, setSubmitError] = useState('');
   const {
     control,
     handleSubmit,
@@ -33,8 +36,16 @@ export default function ForgotPassword() {
   }, []);
 
   const onSubmit = handleSubmit(async ({ email }) => {
-    await authApi.forgotPassword(email);
-    router.replace('/(auth)/login');
+    setSubmitError('');
+    setSuccessMessage('');
+    setDevResetUrl('');
+    try {
+      const response = await authApi.forgotPassword(email);
+      setSuccessMessage(response.message);
+      if (response.resetUrl) setDevResetUrl(response.resetUrl);
+    } catch {
+      setSubmitError('Unable to request password reset. Check your email and backend connection.');
+    }
   });
 
   return (
@@ -117,6 +128,21 @@ export default function ForgotPassword() {
               >
                 Send reset link
               </Button>
+              {successMessage ? (
+                <HelperText type="info" visible style={styles.successText}>
+                  {successMessage}
+                </HelperText>
+              ) : null}
+              {devResetUrl ? (
+                <HelperText type="info" visible style={styles.devLinkText}>
+                  Development reset link: {devResetUrl}
+                </HelperText>
+              ) : null}
+              {submitError ? (
+                <HelperText type="error" visible style={styles.errorText}>
+                  {submitError}
+                </HelperText>
+              ) : null}
 
               <View style={styles.centerLink}>
                 <Link href="/(auth)/login" style={styles.linkTextHighlight}>Back to login</Link>
@@ -213,6 +239,8 @@ const styles = StyleSheet.create({
 
   textInput: { backgroundColor: 'rgba(255,255,255,0.02)' },
   errorText: { color: '#FF453A', fontSize: 12, marginLeft: 2, marginTop: -2 },
+  successText: { color: palette.leaf, fontSize: 12, lineHeight: 17, marginTop: -2 },
+  devLinkText: { color: 'rgba(255,255,255,0.70)', fontSize: 11, lineHeight: 16 },
 
   submitButton: {
     backgroundColor: palette.forest,

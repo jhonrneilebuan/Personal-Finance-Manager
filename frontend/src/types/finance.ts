@@ -3,6 +3,8 @@ export type User = {
   fullName: string;
   email: string;
   avatar?: string | null;
+  notificationsEnabled?: boolean;
+  notificationPermission?: 'unknown' | 'granted' | 'denied' | 'undetermined';
 };
 
 export type Expense = {

@@ -20,6 +20,7 @@ routes.get('/health', (_req, res) => res.json({ success: true, data: { status: '
 routes.use('/auth', authRoutes);
 routes.use('/ai', authenticate, aiRoutes);
 routes.use('/user', authenticate, userRoutes);
+routes.use('/users', authenticate, userRoutes);
 routes.use('/expenses', authenticate, expenseRoutes);
 routes.use('/income', authenticate, incomeRoutes);
 routes.use('/budgets', authenticate, budgetRoutes);

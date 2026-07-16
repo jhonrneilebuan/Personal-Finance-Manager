@@ -1,4 +1,5 @@
 import { expenseService } from '../services/transaction.service';
+import { imageStorageService } from '../services/imageStorage.service';
 import { asyncHandler } from '../utils/asyncHandler';
 
 const mapExpense = (body: Record<string, unknown>, receiptImage?: string) => ({
@@ -15,12 +16,27 @@ export const expenseController = {
     res.json({ success: true, data: await expenseService.list(req.user!.userId) });
   }),
   create: asyncHandler(async (req, res) => {
-    const receiptImage = req.file?.path;
+    const receiptImage = req.file
+      ? await imageStorageService.uploadImage({
+        buffer: req.file.buffer,
+        mimeType: req.file.mimetype,
+        originalName: req.file.originalname,
+        folder: 'receipts',
+      })
+      : undefined;
     const data = await expenseService.create(req.user!.userId, mapExpense(req.body, receiptImage));
     res.status(201).json({ success: true, data });
   }),
   update: asyncHandler(async (req, res) => {
-    const data = await expenseService.update(String(req.params.id), req.user!.userId, mapExpense(req.body, req.file?.path));
+    const receiptImage = req.file
+      ? await imageStorageService.uploadImage({
+        buffer: req.file.buffer,
+        mimeType: req.file.mimetype,
+        originalName: req.file.originalname,
+        folder: 'receipts',
+      })
+      : undefined;
+    const data = await expenseService.update(String(req.params.id), req.user!.userId, mapExpense(req.body, receiptImage));
     res.json({ success: true, data });
   }),
   delete: asyncHandler(async (req, res) => {

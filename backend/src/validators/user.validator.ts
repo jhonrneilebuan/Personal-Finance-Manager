@@ -10,3 +10,7 @@ export const changePasswordRules = [
   body('newPassword').isLength({ min: 8 }).withMessage('New password must be at least 8 characters'),
 ];
 
+export const updateSettingsRules = [
+  body('notificationsEnabled').isBoolean().withMessage('Notification setting is required'),
+  body('notificationPermission').optional().isIn(['unknown', 'granted', 'denied', 'undetermined']),
+];

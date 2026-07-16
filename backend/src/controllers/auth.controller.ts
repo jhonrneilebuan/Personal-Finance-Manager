@@ -14,5 +14,10 @@ export const authController = {
   logout: asyncHandler(async (_req, res) => {
     res.status(204).send();
   }),
+  forgotPassword: asyncHandler(async (req, res) => {
+    res.json({ success: true, data: await authService.forgotPassword(req.body.email) });
+  }),
+  resetPassword: asyncHandler(async (req, res) => {
+    res.json({ success: true, data: await authService.resetPassword(req.body) });
+  }),
 };
-

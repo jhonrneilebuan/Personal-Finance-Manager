@@ -22,4 +22,10 @@ export const env = {
   uploadDir: process.env.UPLOAD_DIR ?? 'src/uploads',
   openAiApiKey: process.env.OPENAI_API_KEY,
   openAiModel: process.env.OPENAI_MODEL ?? 'gpt-4.1-mini',
+  appUrl: process.env.APP_URL ?? 'http://localhost:8081',
+  resendApiKey: process.env.RESEND_API_KEY,
+  emailFrom: process.env.EMAIL_FROM ?? 'PisoPilot <noreply@pisopilot.local>',
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
 };

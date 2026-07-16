@@ -80,7 +80,7 @@ export const aiController = {
       throw new HttpError(400, 'Receipt image is required');
     }
 
-    const receipt = await aiInsightsService.scanReceipt(req.file.path, req.file.mimetype);
+    const receipt = await aiInsightsService.scanReceipt(req.file.buffer, req.file.mimetype);
     res.json({ success: true, data: receipt });
   }),
 };
