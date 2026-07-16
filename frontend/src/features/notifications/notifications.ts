@@ -1,5 +1,7 @@
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
-import * as Notifications from 'expo-notifications';
+
+type ExpoNotificationsModule = typeof import('expo-notifications');
 
 export type NotificationPreference = {
   budgetAlerts: boolean;
@@ -16,22 +18,41 @@ export const defaultNotificationPreference: NotificationPreference = {
 export type NotificationPermissionState = 'unknown' | 'granted' | 'denied' | 'undetermined';
 
 const CHANNEL_ID = 'pisopilot-reminders';
+let notificationsModule: ExpoNotificationsModule | null = null;
+let handlerConfigured = false;
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+const isExpoGo = () => Constants.appOwnership === 'expo';
 
 const normalizePermission = (status?: string): NotificationPermissionState => {
   if (status === 'granted' || status === 'denied' || status === 'undetermined') return status;
   return 'unknown';
 };
 
-const ensureAndroidChannel = async () => {
+const loadNotifications = async () => {
+  if (isExpoGo()) return null;
+
+  try {
+    notificationsModule ??= await import('expo-notifications');
+
+    if (!handlerConfigured) {
+      notificationsModule.setNotificationHandler({
+        handleNotification: async () => ({
+          shouldShowBanner: true,
+          shouldShowList: true,
+          shouldPlaySound: false,
+          shouldSetBadge: false,
+        }),
+      });
+      handlerConfigured = true;
+    }
+
+    return notificationsModule;
+  } catch {
+    return null;
+  }
+};
+
+const ensureAndroidChannel = async (Notifications: ExpoNotificationsModule) => {
   if (Platform.OS !== 'android') return;
 
   await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
@@ -44,6 +65,9 @@ const ensureAndroidChannel = async () => {
 
 export const getNotificationPermissionStatus = async (): Promise<NotificationPermissionState> => {
   try {
+    const Notifications = await loadNotifications();
+    if (!Notifications) return 'unknown';
+
     const permissions = await Notifications.getPermissionsAsync();
     return normalizePermission(permissions.status);
   } catch {
@@ -53,6 +77,9 @@ export const getNotificationPermissionStatus = async (): Promise<NotificationPer
 
 export const enablePisoPilotNotifications = async (): Promise<NotificationPermissionState> => {
   try {
+    const Notifications = await loadNotifications();
+    if (!Notifications) return 'unknown';
+
     let permissions = await Notifications.getPermissionsAsync();
     if (permissions.status !== 'granted') {
       permissions = await Notifications.requestPermissionsAsync({
@@ -62,7 +89,7 @@ export const enablePisoPilotNotifications = async (): Promise<NotificationPermis
 
     if (permissions.status !== 'granted') return normalizePermission(permissions.status);
 
-    await ensureAndroidChannel();
+    await ensureAndroidChannel(Notifications);
     await Notifications.cancelAllScheduledNotificationsAsync();
 
     await Notifications.scheduleNotificationAsync({
@@ -100,6 +127,9 @@ export const enablePisoPilotNotifications = async (): Promise<NotificationPermis
 
 export const disablePisoPilotNotifications = async (): Promise<NotificationPermissionState> => {
   try {
+    const Notifications = await loadNotifications();
+    if (!Notifications) return 'unknown';
+
     await Notifications.cancelAllScheduledNotificationsAsync();
     return getNotificationPermissionStatus();
   } catch {

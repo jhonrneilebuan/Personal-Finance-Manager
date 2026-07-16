@@ -165,7 +165,15 @@ export function ProfileScreen() {
       setNotificationPermission(permission);
       setNotificationsEnabled(Boolean(updated.notificationsEnabled));
       await setUser(updated);
-      setNotice(shouldEnable ? 'Notifications enabled' : permission === 'denied' ? 'Notifications blocked in phone settings' : 'Notifications disabled');
+      setNotice(
+        shouldEnable
+          ? 'Notifications enabled'
+          : enabled && permission === 'unknown'
+            ? 'Notifications need an installed APK or development build'
+            : permission === 'denied'
+              ? 'Notifications blocked in phone settings'
+              : 'Notifications disabled',
+      );
     } catch {
       setNotificationsEnabled(!enabled);
       setNotice('Unable to update notifications');
