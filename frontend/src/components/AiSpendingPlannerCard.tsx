@@ -136,6 +136,12 @@ export function AiSpendingPlannerCard({ defaultAvailableMoney }: AiSpendingPlann
 
         {plan ? (
           <View style={styles.result}>
+            {plan.source !== 'ai' ? (
+              <View style={[styles.fallbackNotice, { backgroundColor: `${theme.colors.primary}12` }]}>
+                <MaterialCommunityIcons name="information-outline" size={15} color={theme.colors.primary} />
+                <Text style={[styles.fallbackText, { color: theme.colors.primary }]}>Using basic budgeting rules while AI is unavailable.</Text>
+              </View>
+            ) : null}
             <View>
               <Text style={[styles.resultTitle, { color: theme.colors.onSurface }]}>{plan.title}</Text>
               <Text style={[styles.summary, { color: theme.colors.onSurfaceVariant }]}>{plan.summary}</Text>
@@ -213,6 +219,8 @@ const styles = StyleSheet.create({
   decisionItem: { gap: 4 },
   decisionTop: { alignItems: 'center', flexDirection: 'row', gap: 10, justifyContent: 'space-between' },
   decisions: { gap: 10 },
+  fallbackNotice: { alignItems: 'center', borderRadius: 12, flexDirection: 'row', gap: 7, paddingHorizontal: 10, paddingVertical: 8 },
+  fallbackText: { flex: 1, fontSize: 12, fontWeight: '800' },
   header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
   headerCopy: { flex: 1 },
   iconBox: { alignItems: 'center', borderRadius: 14, height: 40, justifyContent: 'center', width: 40 },

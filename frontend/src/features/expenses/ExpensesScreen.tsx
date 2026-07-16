@@ -73,7 +73,7 @@ export function ExpensesScreen() {
       });
       const confidence = Math.round(suggestion.confidence * 100);
       setValue('category', suggestion.category, { shouldDirty: true, shouldValidate: true });
-      setAiReason(`${suggestion.category} (${confidence}%): ${suggestion.reason}`);
+      setAiReason(`${suggestion.source === 'ai' ? 'AI' : 'Basic rules'} suggested ${suggestion.category} (${confidence}%): ${suggestion.reason}`);
       setNotice(`${suggestion.source === 'ai' ? 'AI' : 'PisoPilot'} suggested ${suggestion.category}`);
     } catch {
       setNotice('Unable to suggest a category');
@@ -111,7 +111,7 @@ export function ExpensesScreen() {
       setValue('category', receipt.category || 'Other', { shouldDirty: true });
       if (receipt.amount > 0) setValue('amount', String(receipt.amount), { shouldDirty: true });
       setValue('description', receipt.notes || `Receipt scan confidence: ${Math.round(receipt.confidence * 100)}%`, { shouldDirty: true });
-      setAiReason(`${receipt.source === 'ai' ? 'AI' : 'PisoPilot'} scanned ${receipt.category} (${Math.round(receipt.confidence * 100)}%)`);
+      setAiReason(`${receipt.source === 'ai' ? 'AI' : 'Basic scan'} scanned ${receipt.category} (${Math.round(receipt.confidence * 100)}%)`);
       setNotice('Receipt scanned');
     } catch {
       setNotice('Unable to scan receipt');

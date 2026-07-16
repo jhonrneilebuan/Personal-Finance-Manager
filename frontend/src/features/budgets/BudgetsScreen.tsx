@@ -137,6 +137,11 @@ export function BudgetsScreen() {
           </Button>
           {recommendation ? (
             <View style={styles.recommendationList}>
+              {recommendation.source !== 'ai' ? (
+                <View style={[styles.fallbackNotice, { backgroundColor: `${palette.forest}12` }]}>
+                  <Text style={[styles.fallbackText, { color: palette.forest }]}>Using basic budget estimates while AI is unavailable.</Text>
+                </View>
+              ) : null}
               <View style={[styles.savingsTarget, { backgroundColor: theme.colors.surfaceVariant }]}>
                 <Text style={[styles.savingsTargetLabel, { color: theme.colors.onSurfaceVariant }]}>Savings target</Text>
                 <Text style={[styles.savingsTargetValue, { color: palette.forest }]}>{formatCurrency(recommendation.savingsTarget)}</Text>
@@ -256,6 +261,8 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  fallbackNotice: { borderRadius: 14, paddingHorizontal: 12, paddingVertical: 10 },
+  fallbackText: { fontSize: 12, fontWeight: '800' },
   formContent: { gap: 14, paddingVertical: 18 },
   listContent: { gap: 12, paddingVertical: 18 },
   budgetList: { gap: 8 },

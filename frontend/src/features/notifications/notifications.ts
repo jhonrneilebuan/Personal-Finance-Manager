@@ -1,3 +1,6 @@
+import { Platform } from 'react-native';
+import * as Notifications from 'expo-notifications';
+
 export type NotificationPreference = {
   budgetAlerts: boolean;
   weeklySummary: boolean;
@@ -10,3 +13,96 @@ export const defaultNotificationPreference: NotificationPreference = {
   billReminders: false,
 };
 
+export type NotificationPermissionState = 'unknown' | 'granted' | 'denied' | 'undetermined';
+
+const CHANNEL_ID = 'pisopilot-reminders';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+const normalizePermission = (status?: string): NotificationPermissionState => {
+  if (status === 'granted' || status === 'denied' || status === 'undetermined') return status;
+  return 'unknown';
+};
+
+const ensureAndroidChannel = async () => {
+  if (Platform.OS !== 'android') return;
+
+  await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
+    name: 'PisoPilot reminders',
+    importance: Notifications.AndroidImportance.DEFAULT,
+    vibrationPattern: [0, 180, 120, 180],
+    lightColor: '#0A84FF',
+  });
+};
+
+export const getNotificationPermissionStatus = async (): Promise<NotificationPermissionState> => {
+  try {
+    const permissions = await Notifications.getPermissionsAsync();
+    return normalizePermission(permissions.status);
+  } catch {
+    return 'unknown';
+  }
+};
+
+export const enablePisoPilotNotifications = async (): Promise<NotificationPermissionState> => {
+  try {
+    let permissions = await Notifications.getPermissionsAsync();
+    if (permissions.status !== 'granted') {
+      permissions = await Notifications.requestPermissionsAsync({
+        ios: { allowAlert: true, allowBadge: true, allowSound: false },
+      });
+    }
+
+    if (permissions.status !== 'granted') return normalizePermission(permissions.status);
+
+    await ensureAndroidChannel();
+    await Notifications.cancelAllScheduledNotificationsAsync();
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'PisoPilot budget check',
+        body: 'Review today\'s spending and keep your monthly budget on track.',
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        channelId: CHANNEL_ID,
+        hour: 20,
+        minute: 0,
+      },
+    });
+
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: 'Weekly money review',
+        body: 'Check goals, upcoming bills, and expenses before the week starts.',
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+        channelId: CHANNEL_ID,
+        weekday: 1,
+        hour: 18,
+        minute: 0,
+      },
+    });
+
+    return 'granted';
+  } catch {
+    return 'unknown';
+  }
+};
+
+export const disablePisoPilotNotifications = async (): Promise<NotificationPermissionState> => {
+  try {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    return getNotificationPermissionStatus();
+  } catch {
+    return 'unknown';
+  }
+};

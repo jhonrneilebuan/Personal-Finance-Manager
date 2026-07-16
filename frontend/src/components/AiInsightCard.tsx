@@ -58,6 +58,12 @@ export function AiInsightCard({
 
         {insight ? (
           <View style={styles.result}>
+            {insight.source !== 'ai' ? (
+              <View style={[styles.fallbackNotice, { backgroundColor: `${accent}12` }]}>
+                <MaterialCommunityIcons name="information-outline" size={15} color={accent} />
+                <Text style={[styles.fallbackText, { color: accent }]}>Using basic estimates while AI is unavailable.</Text>
+              </View>
+            ) : null}
             <Text style={[styles.insightTitle, { color: theme.colors.onSurface }]}>{insight.title}</Text>
             <Text style={[styles.summary, { color: theme.colors.onSurfaceVariant }]}>{insight.summary}</Text>
             <View style={styles.columns}>
@@ -117,6 +123,8 @@ const styles = StyleSheet.create({
   columns: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginTop: 4 },
   content: { gap: 14, paddingVertical: 20 },
   copy: { flex: 1, gap: 2 },
+  fallbackNotice: { alignItems: 'center', borderRadius: 12, flexDirection: 'row', gap: 7, paddingHorizontal: 10, paddingVertical: 8 },
+  fallbackText: { flex: 1, fontSize: 12, fontWeight: '800' },
   header: { alignItems: 'center', flexDirection: 'row', gap: 12 },
   iconBox: { alignItems: 'center', borderRadius: 14, height: 40, justifyContent: 'center', width: 40 },
   insightTitle: { fontWeight: '800', fontSize: 15, letterSpacing: -0.2, marginTop: 4 },

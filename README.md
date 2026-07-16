@@ -16,6 +16,7 @@ The app is designed for Philippine peso budgeting and includes PisoPilot AI feat
 - Axios
 - Expo SecureStore
 - Expo Image Picker
+- Expo Notifications
 - Expo Sharing
 
 **Backend**
@@ -29,6 +30,8 @@ The app is designed for Philippine peso budgeting and includes PisoPilot AI feat
 - Bcrypt password hashing
 - Multer uploads
 - OpenAI API integration
+- Optional Resend email integration
+- Optional Cloudinary image storage
 
 **Database / Deployment**
 
@@ -53,7 +56,10 @@ The app is designed for Philippine peso budgeting and includes PisoPilot AI feat
 - Reports with income, expense, savings, and category breakdown
 - PDF and CSV report export
 - Profile update
+- Profile avatar upload
 - Change password
+- Forgot password reset token flow
+- Local phone notification reminders
 - Dark mode setting
 
 Debt Tracker was removed from the app UI/API route because it is not needed for the current project scope.
@@ -77,6 +83,8 @@ Personal Finance Manager/
 - PostgreSQL local database or Neon PostgreSQL
 - Expo Go for local mobile testing, or EAS Build for APK
 - Optional: OpenAI API key for AI features
+- Optional: Resend API key for real password reset emails
+- Optional: Cloudinary account for persistent uploaded images on Render
 
 ## Environment Variables
 
@@ -94,8 +102,14 @@ JWT_ACCESS_EXPIRES_IN="15m"
 JWT_REFRESH_EXPIRES_IN="7d"
 CORS_ORIGIN="http://localhost:8081"
 UPLOAD_DIR="src/uploads"
+APP_URL="http://localhost:8081"
 OPENAI_MODEL="gpt-4.1-mini"
 OPENAI_API_KEY="your-openai-api-key"
+RESEND_API_KEY=""
+EMAIL_FROM="PisoPilot <noreply@yourdomain.com>"
+CLOUDINARY_CLOUD_NAME=""
+CLOUDINARY_API_KEY=""
+CLOUDINARY_API_SECRET=""
 ```
 
 For Render + Neon:
@@ -108,8 +122,14 @@ JWT_REFRESH_SECRET="replace-with-another-long-random-text"
 JWT_ACCESS_EXPIRES_IN="15m"
 JWT_REFRESH_EXPIRES_IN="7d"
 CORS_ORIGIN="*"
+APP_URL="pesopilot://"
 OPENAI_MODEL="gpt-4.1-mini"
 OPENAI_API_KEY="your-openai-api-key"
+RESEND_API_KEY="your-resend-api-key"
+EMAIL_FROM="PisoPilot <noreply@yourdomain.com>"
+CLOUDINARY_CLOUD_NAME="your-cloud-name"
+CLOUDINARY_API_KEY="your-cloudinary-api-key"
+CLOUDINARY_API_SECRET="your-cloudinary-api-secret"
 ```
 
 Never commit real secrets or API keys.
@@ -188,8 +208,14 @@ JWT_REFRESH_SECRET="replace-with-another-long-random-text"
 JWT_ACCESS_EXPIRES_IN="15m"
 JWT_REFRESH_EXPIRES_IN="7d"
 CORS_ORIGIN="*"
+APP_URL="pesopilot://"
 OPENAI_MODEL="gpt-4.1-mini"
 OPENAI_API_KEY="your-openai-api-key"
+RESEND_API_KEY="your-resend-api-key"
+EMAIL_FROM="PisoPilot <noreply@yourdomain.com>"
+CLOUDINARY_CLOUD_NAME="your-cloud-name"
+CLOUDINARY_API_KEY="your-cloudinary-api-key"
+CLOUDINARY_API_SECRET="your-cloudinary-api-secret"
 ```
 
 Current backend URL used by the app:
@@ -229,15 +255,14 @@ After changing app name, splash screen, logo, colors, API URL, or native depende
 8. Use Baon Planner to estimate weekday allowance and monthly savings.
 9. Add bill reminders and recurring transactions.
 10. Open Reports to view monthly summaries and export PDF or CSV files.
-11. Use Profile to update your name, change password, and adjust app settings.
+11. Use Profile to update your name, profile photo, password, notifications, and app settings.
 
-## What Is Not Fully Implemented Yet
+## External Setup Notes
 
-- Forgot Password is still a placeholder. It does not send a real reset email yet.
-- Notifications toggle is only a setting. Real push notifications are not implemented yet.
-- Profile avatar upload is not fully implemented.
-- AI features require a valid OpenAI API key and available quota.
-- Receipt image files on Render may not be permanent unless persistent storage or cloud storage is added.
+- Forgot password creates real reset tokens. Real email delivery requires `RESEND_API_KEY` and `EMAIL_FROM`; use `APP_URL="pesopilot://"` for APK deep links. Without Resend, development mode logs the reset link.
+- Notifications use `expo-notifications` local reminders. Expo Go may show limited-support warnings; final testing should use an EAS APK/development build.
+- Avatar and receipt uploads use Cloudinary when `CLOUDINARY_*` variables are set. Without Cloudinary, files are stored locally, which is not permanent on Render free instances.
+- AI features work best with a valid `OPENAI_API_KEY` and quota. If unavailable, the app shows fallback/basic-rule recommendations.
 - PDF/CSV export should be tested on the final APK share sheet after every rebuild.
 
 ## Validation Commands

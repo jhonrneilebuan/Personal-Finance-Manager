@@ -1,12 +1,19 @@
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Button, Card, Snackbar, Switch, Text, TextInput, useTheme } from 'react-native-paper';
+import { ActivityIndicator, Button, Card, Snackbar, Switch, Text, TextInput, useTheme } from 'react-native-paper';
 import { PageHeroCard } from '@/components/PageHeroCard';
 import { Screen } from '@/components/Screen';
 import { SectionHeader } from '@/components/SectionHeader';
 import { StateView } from '@/components/StateView';
+import {
+  disablePisoPilotNotifications,
+  enablePisoPilotNotifications,
+  type NotificationPermissionState,
+} from '@/features/notifications/notifications';
+import { apiBaseUrl } from '@/services/api';
 import { useAsyncData } from '@/hooks/useAsyncData';
 import { authApi } from '@/services/auth.service';
 import { useAuthStore } from '@/store/auth.store';
@@ -38,6 +45,20 @@ function SettingRow({ icon, iconBg, label, value, right, onPress }: SettingRowPr
   );
 }
 
+const getInitials = (name?: string) =>
+  (name ?? 'PisoPilot User')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('') || 'PP';
+
+const resolveMediaUrl = (value?: string | null) => {
+  if (!value) return null;
+  if (value.startsWith('http')) return value;
+  return `${apiBaseUrl.replace(/\/api$/, '')}${value.startsWith('/') ? value : `/${value}`}`;
+};
+
 export function ProfileScreen() {
   const theme = useTheme();
   const user = useAuthStore((state) => state.user);
@@ -50,16 +71,22 @@ export function ProfileScreen() {
   const [newPassword, setNewPassword] = useState('');
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUpdatingNotifications, setIsUpdatingNotifications] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermissionState>('unknown');
   const [notice, setNotice] = useState('');
 
   useEffect(() => {
     if (profile.data) {
       setFullName(profile.data.fullName);
       setUser(profile.data);
+      setNotificationsEnabled(Boolean(profile.data.notificationsEnabled));
+      setNotificationPermission(profile.data.notificationPermission ?? 'unknown');
     }
-  }, [profile.data, setUser]);
+  }, [profile.data, setNotificationsEnabled, setUser]);
 
   const activeUser = profile.data ?? user;
+  const avatarUri = resolveMediaUrl(activeUser?.avatar);
 
   const handleSaveProfile = async () => {
     setIsSavingProfile(true);
@@ -85,6 +112,65 @@ export function ProfileScreen() {
       setNotice('Unable to change password');
     } finally {
       setIsChangingPassword(false);
+    }
+  };
+
+  const handleUploadAvatar = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        setNotice('Allow photo access to update your avatar');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        mediaTypes: ['images'],
+        quality: 0.82,
+      });
+
+      if (result.canceled || !result.assets[0]) return;
+
+      const asset = result.assets[0];
+      const formData = new FormData();
+      formData.append('avatar', {
+        uri: asset.uri,
+        name: asset.fileName ?? `avatar-${Date.now()}.jpg`,
+        type: asset.mimeType ?? 'image/jpeg',
+      } as unknown as Blob);
+
+      setIsUploadingAvatar(true);
+      const updated = await authApi.uploadAvatar(formData);
+      await setUser(updated);
+      await profile.refresh();
+      setNotice('Profile photo updated');
+    } catch {
+      setNotice('Unable to update profile photo');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleNotificationsToggle = async (enabled: boolean) => {
+    setIsUpdatingNotifications(true);
+    try {
+      const permission = enabled ? await enablePisoPilotNotifications() : await disablePisoPilotNotifications();
+      const shouldEnable = enabled && permission === 'granted';
+      const updated = await authApi.updateSettings({
+        notificationsEnabled: shouldEnable,
+        notificationPermission: permission,
+      });
+
+      setNotificationPermission(permission);
+      setNotificationsEnabled(Boolean(updated.notificationsEnabled));
+      await setUser(updated);
+      setNotice(shouldEnable ? 'Notifications enabled' : permission === 'denied' ? 'Notifications blocked in phone settings' : 'Notifications disabled');
+    } catch {
+      setNotificationsEnabled(!enabled);
+      setNotice('Unable to update notifications');
+    } finally {
+      setIsUpdatingNotifications(false);
     }
   };
 
@@ -116,6 +202,43 @@ export function ProfileScreen() {
         color={palette.forest}
         mascot
       />
+
+      <Card style={cardStyle}>
+        <Card.Content style={styles.avatarContent}>
+          <TouchableOpacity style={styles.avatarWrap} onPress={handleUploadAvatar} activeOpacity={0.85} disabled={isUploadingAvatar}>
+            {avatarUri ? (
+              <Image source={{ uri: avatarUri }} style={styles.avatarImage} />
+            ) : (
+              <View style={styles.avatarFallback}>
+                <Text style={styles.avatarInitials}>{getInitials(activeUser?.fullName)}</Text>
+              </View>
+            )}
+            <View style={styles.avatarEdit}>
+              {isUploadingAvatar ? (
+                <ActivityIndicator size={16} color="#FFFFFF" />
+              ) : (
+                <MaterialCommunityIcons name="camera-outline" size={16} color="#FFFFFF" />
+              )}
+            </View>
+          </TouchableOpacity>
+          <View style={styles.avatarCopy}>
+            <Text style={[styles.avatarTitle, { color: theme.colors.onSurface }]}>{activeUser?.fullName ?? 'PisoPilot User'}</Text>
+            <Text style={[styles.avatarSubtitle, { color: theme.colors.onSurfaceVariant }]}>{activeUser?.email ?? 'No email loaded'}</Text>
+            <Button
+              icon="image-edit-outline"
+              mode="contained-tonal"
+              compact
+              textColor={palette.forest}
+              disabled={isUploadingAvatar}
+              loading={isUploadingAvatar}
+              style={styles.avatarButton}
+              onPress={handleUploadAvatar}
+            >
+              Update Photo
+            </Button>
+          </View>
+        </Card.Content>
+      </Card>
 
       {/* ── Update Profile ────────────────────────────── */}
       <Card style={cardStyle}>
@@ -218,8 +341,15 @@ export function ProfileScreen() {
               icon="bell-outline"
               iconBg={palette.leaf}
               label="Notifications"
-              value={notificationsEnabled ? 'Enabled' : 'Disabled'}
-              right={<Switch value={notificationsEnabled} onValueChange={setNotificationsEnabled} trackColor={{ true: palette.leaf }} />}
+              value={notificationsEnabled ? 'Enabled' : notificationPermission === 'denied' ? 'Blocked by phone settings' : 'Disabled'}
+              right={
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={handleNotificationsToggle}
+                  disabled={isUpdatingNotifications}
+                  trackColor={{ true: palette.leaf }}
+                />
+              }
             />
           </View>
         </Card.Content>
@@ -249,6 +379,40 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   content: { gap: 14, paddingVertical: 18 },
+
+  avatarButton: { alignSelf: 'flex-start', borderRadius: 12, marginTop: 4 },
+  avatarContent: { alignItems: 'center', flexDirection: 'row', gap: 16, paddingVertical: 18 },
+  avatarCopy: { flex: 1, gap: 3 },
+  avatarEdit: {
+    alignItems: 'center',
+    backgroundColor: palette.forest,
+    borderColor: '#FFFFFF',
+    borderRadius: 14,
+    borderWidth: 2,
+    bottom: 0,
+    height: 30,
+    justifyContent: 'center',
+    position: 'absolute',
+    right: 0,
+    width: 30,
+  },
+  avatarFallback: {
+    alignItems: 'center',
+    backgroundColor: '#DCEBFF',
+    borderRadius: 38,
+    height: 76,
+    justifyContent: 'center',
+    width: 76,
+  },
+  avatarImage: {
+    borderRadius: 38,
+    height: 76,
+    width: 76,
+  },
+  avatarInitials: { color: palette.forest, fontSize: 23, fontWeight: '900', letterSpacing: 0.2 },
+  avatarSubtitle: { fontSize: 13, fontWeight: '600', opacity: 0.65 },
+  avatarTitle: { fontSize: 18, fontWeight: '900', letterSpacing: -0.3 },
+  avatarWrap: { borderRadius: 38, height: 76, position: 'relative', width: 76 },
 
   buttonContent: { height: 48 },
   saveButton: {

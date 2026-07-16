@@ -3,10 +3,10 @@ import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import { useAuthStore } from '@/store/auth.store';
 
-const apiUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:4000/api';
+export const apiBaseUrl = Constants.expoConfig?.extra?.apiUrl ?? 'http://localhost:4000/api';
 
 export const api = axios.create({
-  baseURL: apiUrl,
+  baseURL: apiBaseUrl,
   timeout: 15000,
 });
 
