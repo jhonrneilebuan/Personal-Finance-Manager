@@ -14,6 +14,7 @@ import { palette } from '@/theme/theme';
 import { formatCurrency } from '@/utils/currency';
 
 const inputIcon = { source: 'briefcase-outline', amount: 'cash-plus', description: 'note-text-outline' } as const;
+const INCOME_ACCENT = palette.green;
 
 export function IncomeScreen() {
   const theme = useTheme();
@@ -60,12 +61,12 @@ export function IncomeScreen() {
         subtitle="Track every money-in moment so PisoPilot AI can read your cashflow better."
         value={formatCurrency(totalIncome)}
         caption={`${data?.length ?? 0} records`}
-        color={palette.forest}
+        color={INCOME_ACCENT}
         mascot
       />
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="cash-plus" title="New Income" subtitle="Add salary, freelance, business, baon, or other money in." color={palette.forest} />
+          <SectionHeader icon="cash-plus" title="New Income" subtitle="Add salary, freelance, business, baon, or other money in." color={INCOME_ACCENT} />
           {(['source', 'amount', 'description'] as const).map((name) => (
             <Controller key={name} control={control} name={name} render={({ field: { value, onChange } }) => (
               <TextInput 
@@ -94,7 +95,7 @@ export function IncomeScreen() {
       </Card>
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="history" title="Income History" subtitle="Latest money-in records" color={palette.forest} />
+          <SectionHeader icon="history" title="Income History" subtitle="Latest money-in records" color={INCOME_ACCENT} />
           {isLoading ? <StateView loading /> : error ? <StateView title="Unable to load income" message={error} /> : data?.length ? (
             <View style={styles.list}>
               {data.map((item) => <TransactionRow key={item.id} title={item.source} subtitle={item.description ?? 'Income'} amount={Number(item.amount)} type="income" />)}
@@ -110,9 +111,9 @@ export function IncomeScreen() {
 const styles = StyleSheet.create({
   buttonContent: { height: 48 },
   saveButton: {
-    backgroundColor: palette.forest,
+    backgroundColor: INCOME_ACCENT,
     borderRadius: 16,
-    shadowColor: palette.forest,
+    shadowColor: INCOME_ACCENT,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,

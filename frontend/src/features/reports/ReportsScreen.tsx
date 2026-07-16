@@ -23,6 +23,7 @@ import { formatCurrency } from '@/utils/currency';
 import { formatLocalMonthKey, shiftLocalMonth, startOfLocalMonth } from '@/utils/date';
 
 const formatMonth = (date: Date) => new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+const REPORT_ACCENT = palette.red;
 
 export function ReportsScreen() {
   const theme = useTheme();
@@ -92,7 +93,7 @@ export function ReportsScreen() {
         subtitle="PisoPilot AI turns your month into clear cashflow, category, and savings patterns."
         value={formatCurrency(monthly.data?.savings ?? 0)}
         caption={formatMonth(selectedMonth)}
-        color={palette.forest}
+        color={REPORT_ACCENT}
         mascot
       />
       <Card style={cardStyle}>
@@ -101,7 +102,7 @@ export function ReportsScreen() {
             title="Report Month"
             monthLabel={formatMonth(selectedMonth)}
             caption="Review cashflow, charts, exports, and AI summary"
-            color={palette.forest}
+            color={REPORT_ACCENT}
             onPrevious={() => setSelectedMonth((value) => shiftLocalMonth(value, -1))}
             onNext={() => setSelectedMonth((value) => shiftLocalMonth(value, 1))}
             onCurrent={() => setSelectedMonth(startOfLocalMonth())}
@@ -113,17 +114,37 @@ export function ReportsScreen() {
         subtitle="Let PisoPilot AI explain what changed and what to adjust next."
         buttonLabel="Generate Summary"
         icon="chart-timeline-variant"
-        color={palette.forest}
+        color={REPORT_ACCENT}
         insight={summary}
         loading={isAiLoading}
         onGenerate={generateMonthlySummary}
       />
       <Card style={cardStyle}>
         <Card.Content style={styles.exportContent}>
-          <SectionHeader icon="file-export-outline" title="Export Report" subtitle="Generate and share the selected month as PDF or CSV." color={palette.forest} />
+          <SectionHeader icon="file-export-outline" title="Export Report" subtitle="Generate and share the selected month as PDF or CSV." color={REPORT_ACCENT} />
           <View style={styles.exportButtons}>
-            <Button icon="file-pdf-box" mode="contained" loading={isExporting} disabled={isExporting} onPress={() => exportReport('pdf')}>Export PDF</Button>
-            <Button icon="file-delimited-outline" mode="contained-tonal" loading={isExporting} disabled={isExporting} onPress={() => exportReport('csv')}>Export CSV</Button>
+            <Button
+              icon="file-pdf-box"
+              mode="contained"
+              buttonColor={REPORT_ACCENT}
+              style={styles.exportButton}
+              loading={isExporting}
+              disabled={isExporting}
+              onPress={() => exportReport('pdf')}
+            >
+              Export PDF
+            </Button>
+            <Button
+              icon="file-delimited-outline"
+              mode="contained-tonal"
+              textColor={REPORT_ACCENT}
+              style={styles.exportButton}
+              loading={isExporting}
+              disabled={isExporting}
+              onPress={() => exportReport('csv')}
+            >
+              Export CSV
+            </Button>
           </View>
         </Card.Content>
       </Card>
@@ -171,7 +192,7 @@ function ExpenseDistributionCard({ data }: { data: Array<{ category: string; amo
   const theme = useTheme();
   const total = data.reduce((sum, item) => sum + Number(item.amount), 0);
   const circumference = 2 * Math.PI * 44;
-  const colors = [palette.forest, palette.leaf, palette.green, palette.orange, palette.pink, palette.teal];
+  const colors = [REPORT_ACCENT, palette.orange, palette.blue, palette.green, palette.pink, palette.teal];
   let offset = 0;
   const topCategory = data[0];
   const topPercent = total > 0 && topCategory ? Math.round((topCategory.amount / total) * 100) : 0;
@@ -188,7 +209,7 @@ function ExpenseDistributionCard({ data }: { data: Array<{ category: string; amo
       ]}
     >
       <Card.Content style={styles.distributionContent}>
-        <SectionHeader icon="chart-donut" title="Expense Distribution" subtitle="Top categories for the selected month" color={palette.forest} />
+        <SectionHeader icon="chart-donut" title="Expense Distribution" subtitle="Top categories for the selected month" color={REPORT_ACCENT} />
         <View style={styles.distributionBody}>
           <View style={styles.donutWrap}>
             <Svg width={132} height={132} viewBox="0 0 120 120">
@@ -243,6 +264,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  exportButton: { borderRadius: 14 },
   exportButtons: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   exportContent: { gap: 12, paddingVertical: 18 },
   distributionBody: { alignItems: 'center', flexDirection: 'row', flexWrap: 'wrap', gap: 18 },

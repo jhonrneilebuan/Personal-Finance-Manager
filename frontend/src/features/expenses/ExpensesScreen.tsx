@@ -18,6 +18,7 @@ import { formatCurrency } from '@/utils/currency';
 const inputIcon = { title: 'store-outline', amount: 'cash-minus', category: 'shape-outline', description: 'note-text-outline' } as const;
 const expenseFields = ['title', 'amount', 'category', 'description'] as const;
 const quickCategories = ['Food', 'Transport', 'Bills', 'School', 'Shopping', 'Health'];
+const EXPENSE_ACCENT = palette.red;
 
 type ExpenseFormValues = {
   title: string;
@@ -162,24 +163,25 @@ export function ExpensesScreen() {
         subtitle="Log spending fast, then let PisoPilot AI suggest the right category."
         value={formatCurrency(totalExpenses)}
         caption={`${data?.length ?? 0} records`}
-        color={palette.forest}
+        color={EXPENSE_ACCENT}
         mascot
       />
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="robot-outline" title="New Expense" subtitle="Use AI to suggest the best category before saving." color={palette.forest} />
+          <SectionHeader icon="robot-outline" title="New Expense" subtitle="Use AI to suggest the best category before saving." color={EXPENSE_ACCENT} />
           <View style={[styles.entryPreview, { backgroundColor: theme.colors.surfaceVariant }]}>
             <View style={styles.entryPreviewCopy}>
               <Text style={[styles.entryPreviewLabel, { color: theme.colors.onSurfaceVariant }]}>Draft spending</Text>
               <Text style={[styles.entryPreviewAmount, { color: palette.red }]}>{formatCurrency(Number.isFinite(draftAmount) ? draftAmount : 0)}</Text>
             </View>
-            <View style={[styles.entryPreviewBadge, { backgroundColor: `${palette.forest}18` }]}>
-              <Text style={[styles.entryPreviewBadgeText, { color: palette.forest }]}>{categoryValue || 'Pick category'}</Text>
+            <View style={[styles.entryPreviewBadge, { backgroundColor: `${EXPENSE_ACCENT}18` }]}>
+              <Text style={[styles.entryPreviewBadgeText, { color: EXPENSE_ACCENT }]}>{categoryValue || 'Pick category'}</Text>
             </View>
           </View>
           <Button
             icon="receipt-text-outline"
             mode="contained-tonal"
+            textColor={EXPENSE_ACCENT}
             style={styles.aiButton}
             contentStyle={styles.aiButtonContent}
             loading={isScanningReceipt}
@@ -206,6 +208,7 @@ export function ExpensesScreen() {
                   <Button 
                     icon="robot-outline" 
                     mode="contained-tonal" 
+                    textColor={EXPENSE_ACCENT}
                     style={styles.aiButton}
                     contentStyle={styles.aiButtonContent}
                     loading={isSuggesting} 
@@ -247,7 +250,7 @@ export function ExpensesScreen() {
       </Card>
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="history" title="Expense History" subtitle="Latest spending records" color={palette.forest} />
+          <SectionHeader icon="history" title="Expense History" subtitle="Latest spending records" color={EXPENSE_ACCENT} />
           <View style={styles.filterRow}>
             <TextInput
               mode="outlined"
@@ -302,9 +305,9 @@ const styles = StyleSheet.create({
   entryPreviewCopy: { flex: 1, gap: 2 },
   entryPreviewLabel: { fontSize: 12, fontWeight: '800', textTransform: 'uppercase' },
   saveButton: {
-    backgroundColor: palette.forest,
+    backgroundColor: EXPENSE_ACCENT,
     borderRadius: 16,
-    shadowColor: palette.forest,
+    shadowColor: EXPENSE_ACCENT,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,

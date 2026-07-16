@@ -21,8 +21,8 @@ const TAB_ACCENTS: Record<string, string> = {
   dashboard: palette.forest,
   expenses:  palette.red,
   income:    palette.green,
-  budgets:   palette.leaf,
-  reports:   palette.forest,
+  budgets:   palette.blue,
+  reports:   palette.red,
   profile:   palette.orange,
 };
 
@@ -45,19 +45,22 @@ function CustomTabBar() {
           return (
             <TouchableOpacity
               key={tab.name}
-              style={styles.tabItem}
+              style={[
+                styles.tabItem,
+                active && {
+                  backgroundColor: `${accent}12`,
+                  borderColor: `${accent}24`,
+                },
+              ]}
               onPress={() => {
                 router.push(`/(tabs)/${tab.name}`);
               }}
               activeOpacity={0.72}
             >
-              <View style={[
-                styles.iconWrap,
-                active && { backgroundColor: accent + '15' }
-              ]}>
+              <View style={styles.iconWrap}>
                 <MaterialCommunityIcons
                   name={active ? tab.icon : tab.iconOutline}
-                  size={22}
+                  size={21}
                   color={active ? accent : (theme.dark ? 'rgba(255,255,255,0.38)' : 'rgba(0,0,0,0.35)')}
                 />
               </View>
@@ -210,9 +213,10 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     borderWidth: 1,
     flexDirection: 'row',
-    height: 64,
+    height: 72,
     justifyContent: 'space-around',
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.08,
     shadowRadius: 12,
@@ -222,19 +226,25 @@ const styles = StyleSheet.create({
   // ── Individual tab item
   tabItem: {
     alignItems: 'center',
+    borderColor: 'transparent',
+    borderRadius: 20,
+    borderWidth: 1,
     flex: 1,
-    gap: 3,
+    gap: 2,
+    height: 58,
     justifyContent: 'center',
-    paddingVertical: 6,
+    marginHorizontal: 2,
+    maxHeight: 58,
+    paddingVertical: 4,
     position: 'relative',
   },
   iconWrap: {
     alignItems: 'center',
     borderRadius: 10,
-    height: 32,
+    height: 28,
     justifyContent: 'center',
     position: 'relative',
-    width: 32,
+    width: 30,
   },
   tabLabel: {
     fontSize: 10,

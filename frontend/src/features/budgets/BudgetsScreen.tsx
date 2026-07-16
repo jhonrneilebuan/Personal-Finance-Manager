@@ -25,6 +25,7 @@ const formatMonth = (dateKey: string) =>
   new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(monthKeyToDate(dateKey));
 
 const inputIcon = { category: 'shape-outline', limitAmount: 'wallet-outline' } as const;
+const BUDGET_ACCENT = palette.blue;
 
 export function BudgetsScreen() {
   const theme = useTheme();
@@ -110,7 +111,7 @@ export function BudgetsScreen() {
         subtitle="Set monthly guardrails and let PisoPilot AI recommend smarter limits."
         value={formatCurrency(totalBudget)}
         caption={formatMonth(selectedMonth)}
-        color={palette.forest}
+        color={BUDGET_ACCENT}
         mascot
       />
       <AiInsightCard
@@ -118,17 +119,18 @@ export function BudgetsScreen() {
         subtitle="Get advice on limits, overspending, and what to adjust next."
         buttonLabel="Analyze Budgets"
         icon="target-variant"
-        color={palette.forest}
+        color={BUDGET_ACCENT}
         insight={aiAdvice}
         loading={isAiLoading}
         onGenerate={generateBudgetAdvice}
       />
       <Card style={cardStyle}>
         <Card.Content style={styles.recommendationContent}>
-          <SectionHeader icon="robot-excited-outline" title="AI Budget Recommendation" subtitle="Suggest limits and a savings target for the next month." color={palette.forest} />
+          <SectionHeader icon="robot-excited-outline" title="AI Budget Recommendation" subtitle="Suggest limits and a savings target for the next month." color={BUDGET_ACCENT} />
           <Button
             icon="auto-fix"
             mode="contained-tonal"
+            textColor={BUDGET_ACCENT}
             loading={isRecommendationLoading}
             disabled={isRecommendationLoading}
             onPress={generateRecommendation}
@@ -138,20 +140,20 @@ export function BudgetsScreen() {
           {recommendation ? (
             <View style={styles.recommendationList}>
               {recommendation.source !== 'ai' ? (
-                <View style={[styles.fallbackNotice, { backgroundColor: `${palette.forest}12` }]}>
-                  <Text style={[styles.fallbackText, { color: palette.forest }]}>Using basic budget estimates while AI is unavailable.</Text>
+                <View style={[styles.fallbackNotice, { backgroundColor: `${BUDGET_ACCENT}12` }]}>
+                  <Text style={[styles.fallbackText, { color: BUDGET_ACCENT }]}>Using basic budget estimates while AI is unavailable.</Text>
                 </View>
               ) : null}
               <View style={[styles.savingsTarget, { backgroundColor: theme.colors.surfaceVariant }]}>
                 <Text style={[styles.savingsTargetLabel, { color: theme.colors.onSurfaceVariant }]}>Savings target</Text>
-                <Text style={[styles.savingsTargetValue, { color: palette.forest }]}>{formatCurrency(recommendation.savingsTarget)}</Text>
+                <Text style={[styles.savingsTargetValue, { color: BUDGET_ACCENT }]}>{formatCurrency(recommendation.savingsTarget)}</Text>
               </View>
               <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>{recommendation.summary}</Text>
               {recommendation.recommendations.map((item) => (
                 <View key={`${item.category}-${item.priority}`} style={[styles.recommendationItem, { backgroundColor: theme.colors.surfaceVariant }]}>
                   <View style={styles.budgetMeta}>
                     <Text style={[styles.budgetTitle, { color: theme.colors.onSurface }]}>{item.category}</Text>
-                    <Text style={[styles.budgetLimitText, { color: palette.forest }]}>{formatCurrency(item.suggestedLimit)}</Text>
+                    <Text style={[styles.budgetLimitText, { color: BUDGET_ACCENT }]}>{formatCurrency(item.suggestedLimit)}</Text>
                   </View>
                   <Text style={[styles.subtitle, { color: theme.colors.onSurfaceVariant }]}>{item.priority.toUpperCase()} - {item.reason}</Text>
                 </View>
@@ -162,12 +164,12 @@ export function BudgetsScreen() {
       </Card>
       <Card style={cardStyle}>
         <Card.Content style={styles.formContent}>
-          <SectionHeader icon="target-variant" title="New Budget" subtitle="Choose month, category, and spending limit." color={palette.forest} />
+          <SectionHeader icon="target-variant" title="New Budget" subtitle="Choose month, category, and spending limit." color={BUDGET_ACCENT} />
           <MonthSelector
             title="Budget Month"
             monthLabel={formatMonth(selectedMonth)}
             caption={`${selectedBudgets.length} categories planned`}
-            color={palette.forest}
+            color={BUDGET_ACCENT}
             onPrevious={() => setValue('month', shiftMonth(selectedMonth, -1))}
             onNext={() => setValue('month', shiftMonth(selectedMonth, 1))}
             onCurrent={() => setValue('month', currentMonthKey())}
@@ -202,7 +204,7 @@ export function BudgetsScreen() {
       
       <Card style={cardStyle}>
         <Card.Content style={styles.listContent}>
-          <SectionHeader icon="chart-donut" title="Budget Progress" subtitle="Current month usage by category" color={palette.forest} />
+          <SectionHeader icon="chart-donut" title="Budget Progress" subtitle="Current month usage by category" color={BUDGET_ACCENT} />
           {isLoading || categorySpending.isLoading ? <StateView loading /> : error ? <StateView title="Unable to load budgets" message={error} /> : selectedBudgets.length ? (
             <View style={styles.budgetList}>
               {selectedBudgets.map((item) => {
@@ -244,9 +246,9 @@ const styles = StyleSheet.create({
   budgetLimitText: { fontSize: 15, fontWeight: '800', letterSpacing: -0.2 },
   buttonContent: { height: 48 },
   saveButton: {
-    backgroundColor: palette.forest,
+    backgroundColor: BUDGET_ACCENT,
     borderRadius: 16,
-    shadowColor: palette.forest,
+    shadowColor: BUDGET_ACCENT,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
