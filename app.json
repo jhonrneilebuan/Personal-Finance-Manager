@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "e44232a6-7665-4155-9bf9-71270658f2a3"
+      }
+    },
+    "android": {
+      "package": "com.jhonrneilebuan.pesopilot"
+    }
+  }
+}
